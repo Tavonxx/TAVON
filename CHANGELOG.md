@@ -33,3 +33,6 @@
 
 ## Phase 08 (part 2c)
 - Swap work day quick action, category editor, spending-by-category bars; tab renamed to "การงาน".
+
+## Backup UI
+- Back up now (share sheet to iCloud Files), import with confirmation + undo, Home card links to it.

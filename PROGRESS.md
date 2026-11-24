@@ -54,3 +54,6 @@ Still pending in part 2: category/subcategory/workplace editors, swap shift, cat
 
 ## Phase 08 (part 2c) - Swap work day, categories, spending chart: DONE (awaiting approval)
 Quick action "สลับวันทำงาน" (planSwap in stats.js + saveWorkDays batch, undo), Settings > Categories (add/rename only, no delete: entries store the code; `src/data/categories.js`), Finance "spending by category" bars (categoryShare, % always written out). Tab/page renamed "การงาน". Workplaces stay free text (no list needed yet). 84 tests + e2e. Phase 08 feature set complete.
+
+## Backup UI (pulled forward from Phase 12 at Pee's request): DONE (awaiting approval)
+Settings > Data & backup (`src/app/backup-ui.js`): "Back up now" builds one dated JSON file and opens the iPhone share sheet (Save to Files / iCloud), falling back to a download; `bk-last` (ms) is only set after the share/download succeeds. Import: file picker, validation, now-vs-file counts, explicit confirm, automatic snapshot first, undo button after. Accepts TAVON and PP Space 2.0 files. Home backup card now links to this page; reminder after 7 days (Pee's choice). Not yet tested on a real iPhone.

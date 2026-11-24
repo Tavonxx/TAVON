@@ -81,7 +81,7 @@ function backupCard(d, L, now) {
   const age = backupAgeDays(d.lastBackup, now);
   if (age !== null && age < 7) return '';
   const msg = age === null ? t('bk.never', L) : t('bk.days', L).replace('{n}', String(age));
-  return `<div class="card-flat"><div class="between"><div class="row-main"><p class="t-headline">${esc(t('bk.title', L))}</p><p class="t-sub muted">${esc(msg)}</p></div><span class="row-icon accent">${icon('shield')}</span></div></div>`;
+  return `<a class="card-flat" href="#/settings/data" style="display:block;text-decoration:none;color:inherit"><div class="between"><div class="row-main"><p class="t-headline">${esc(t('bk.title', L))}</p><p class="t-sub muted">${esc(msg)}</p></div><span class="row-icon accent">${icon('shield')}</span></div></a>`;
 }
 
 /** The whole Home page body (below the header). @param {{data:any, demo:boolean, lang:string, now?:Date, weekOffset?:number, selectedDay?:string}} o */

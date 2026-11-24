@@ -58,3 +58,7 @@
 - Categories: add + rename only. Deleting would orphan old entries (they store the code). Codes never change.
 - Workplaces are free text per day/schedule; a managed list deferred unless Pee wants quick-pick chips.
 - Swap: from-day -> status swapped, 0 hours; to-day -> planned/worked with the same place/time/hours. Refuses if from is not a work day or to already is.
+
+## D-Backup
+- Reminder fixed at 7 days (Pee chose weekly); no interval setting (not needed).
+- Import REPLACES (no merge, no duplicates), always snapshots first. Phase 12 still owns the careful migration of the old app data, with its own backup and explicit permission.
