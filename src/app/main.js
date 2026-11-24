@@ -11,7 +11,7 @@ import { demoData } from './demo.js';
 import { renderWork, wireWork, renderMoney, wireMoney, openWorkEditor, openMoneyEditor } from './datapages.js';
 import { confirmDays } from './editors.js';
 import { wireShortcuts, renderShortcutManage, wireShortcutManage } from './shortcuts.js';
-import { renderSchedule, wireSchedule, renderRecurring, wireRecurring } from './plans.js';
+import { renderSchedule, wireSchedule, renderRecurring, wireRecurring, openSwap, renderCategories, wireCategories } from './plans.js';
 import { todayKey, dayInfo, pendingPastDays } from '../data/stats.js';
 import { animateNumber } from '../ui/ui.js';
 
@@ -54,7 +54,7 @@ function relabel() {
 
 function openQuick() {
   const d = /** @type {HTMLDialogElement} */ (document.getElementById('qa'));
-  const items = [['qa.tip', 'money', 'tip'], ['qa.expense', 'upload', 'expense'], ['qa.income', 'download', 'income'], ['qa.today', 'calendar', 'today'], ['qa.swap', 'repeat', '']];
+  const items = [['qa.tip', 'money', 'tip'], ['qa.expense', 'upload', 'expense'], ['qa.income', 'download', 'income'], ['qa.today', 'calendar', 'today'], ['qa.swap', 'repeat', 'swap']];
   d.innerHTML = `<div class="stack"><div class="between"><h2 class="t-title3" id="qa-t">${esc(t('qa.title'))}</h2>
     <button class="btn btn-ghost btn-icon" data-close aria-label="${esc(t('close'))}">${icon('close')}</button></div>
     <div class="list">${items.map(([k, ic, a]) => `<button class="row" data-act="${a}"><span class="row-icon accent">${icon(ic)}</span><span class="row-main"><span class="row-title">${esc(t(k))}</span></span>${a ? '' : `<span class="badge badge-neutral">${esc(t('soon'))}</span>`}</button>`).join('')}</div></div>`;
@@ -64,6 +64,7 @@ function openQuick() {
     closeSheet(d);
     setTimeout(() => {
       if (a === 'tip') openWorkEditor({ day: todayKey(), data: getData(), demo, focus: 'tips', onDone: rerender });
+      else if (a === 'swap') openSwap({ data: getData(), demo, onDone: rerender });
       else if (a === 'today') openWorkEditor({ day: todayKey(), data: getData(), demo, onDone: rerender });
       else openMoneyEditor({ type: a, items: getData().items, demo, onDone: rerender });
     }, 220);
@@ -91,6 +92,7 @@ const VIEWS = {
     ${row('sun', t('settings.appearance'), t('settings.appearance.sub'), '#/settings/appearance')}
     ${row('search', t('settings.language'), getLang() === 'th' ? 'ไทย' : 'English', '#/settings/language')}
     ${row('work', t('settings.work'), t('settings.work.sub'), '#/settings/schedule')}
+    ${row('tag', t('cat.title'), t('cat.sub'), '#/settings/categories')}
     ${row('money', t('settings.money'), t('settings.money.sub'), '#/settings/recurring')}
     ${row('shield', t('settings.data'), t('settings.data.sub'))}</div>`,
   'settings/appearance': () => header(t('settings.appearance'), '', 'settings') + `<div class="card stack">
@@ -104,6 +106,7 @@ const VIEWS = {
   'settings/shortcuts': () => header(t('settings.shortcuts'), '', 'settings') + renderShortcutManage({ data: getData(), lang: getLang() }),
   'settings/schedule': () => header(t('pl.sched'), t('pl.sched.sub'), 'settings') + renderSchedule({ data: getData(), lang: getLang() }),
   'settings/recurring': () => header(t('pl.rec'), t('pl.rec.sub'), 'settings') + renderRecurring({ data: getData(), lang: getLang() }),
+  'settings/categories': () => header(t('cat.title'), t('cat.sub'), 'settings') + renderCategories({ lang: getLang() }),
   'settings/language': () => header(t('settings.language'), '', 'settings') + `<div class="card stack">${seg('s-lang', 'settings.language', [['th', 'ไทย'], ['en', 'English']])}</div>`,
   notfound: () => header(t('nf.title'), '', null) + `<div class="card state"><div class="state-icon">${icon("alert", "i-lg")}</div><a class="btn btn-primary" href="#/">${esc(t('nf.btn'))}</a></div>`,
 };
@@ -146,6 +149,7 @@ function wire(name) {
   }
   if (name === 'settings/schedule') wireSchedule({ data: getData(), demo, rerender });
   if (name === 'settings/recurring') wireRecurring({ data: getData(), demo, rerender });
+  if (name === 'settings/categories') wireCategories({ demo, rerender });
   if (name === 'settings/shortcuts') wireShortcutManage({ data: getData(), demo, rerender });
   if (name === 'work') wireWork({ data: getData(), demo, rerender });
   if (name === 'money') wireMoney({ data: getData(), demo, rerender });

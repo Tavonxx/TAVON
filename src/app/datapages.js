@@ -5,7 +5,7 @@ import { segmented } from '../ui/ui.js';
 import { t } from './i18n.js';
 import { esc } from './format.js';
 import { money, hours, shortDate, dayLabel, weekdayShort, monthLabel } from './format.js';
-import { todayKey, weekStartKey, addDays, weekSummary, monthWork, monthSummary, filterItems, nextMonth, itemsByDay, pendingPastDays } from '../data/stats.js';
+import { todayKey, weekStartKey, addDays, weekSummary, monthWork, monthSummary, filterItems, categoryShare, nextMonth, itemsByDay, pendingPastDays } from '../data/stats.js';
 import { readCategories, categoryLabel, addItem } from '../data/store.js';
 import { openWorkEditor, openMoneyEditor, confirmDays } from './editors.js';
 import { shortcutGrid, wireShortcuts } from './shortcuts.js';
@@ -70,7 +70,7 @@ export function renderMoney({ data, lang }) {
   const label = (tp, code) => categoryLabel(cats, tp, code, lang);
   const s = monthSummary(data.items, M.month);
   const tabs = `<div class="seg" id="mn-view" role="group" aria-label="${esc(t('nav.money'))}"><button data-value="list" aria-pressed="${M.view === 'list'}">${esc(t('mn.list'))}</button><button data-value="cal" aria-pressed="${M.view === 'cal'}">${esc(t('mn.cal'))}</button></div>`;
-  const quickHtml = `<div class="stack" style="gap:var(--s-2)"><span class="t-label">${esc(t('sc.title'))}</span>${shortcutGrid(data.shortcuts || [], lang)}</div>`;
+  const quickHtml = !(data.shortcuts || []).length ? `<a class="btn btn-tonal btn-block" href="#/settings/shortcuts">${icon('bolt', 'i-sm')}${esc(t('sc.create'))}</a>` : `<div class="stack" style="gap:var(--s-2)"><span class="t-label">${esc(t('sc.title'))}</span>${shortcutGrid(data.shortcuts || [], lang)}</div>`;
   const top = `${navBar(monthLabel(M.month, lang), 'mn')}
     <div class="card-accent stack"><span class="t-label" style="color:inherit">${esc(t('home.balance'))}</span><span class="t-number">${esc(money(s.balance))}</span>
     <div class="grid-2 t-footnote"><span>${esc(t('home.income'))} <b class="num">${esc(money(s.income))}</b></span><span>${esc(t('home.expense'))} <b class="num">${esc(money(s.expense))}</b></span></div>
@@ -91,11 +91,13 @@ export function renderMoney({ data, lang }) {
     const dayBlock = M.day && M.day.startsWith(M.month) ? `<div class="stack"><div class="between"><span class="t-headline">${esc(dayLabel(M.day, lang))}</span><button class="btn btn-tonal btn-sm" id="mn-day-add">${icon('plus', 'i-sm')}${esc(t('mn.day.add'))}</button></div>${sel ? `<div class="list">${sel.items.map((r) => itemRow(r, label, lang)).join('')}</div>` : `<div class="card"><p class="t-sub muted">${esc(t('mn.day.none'))}</p></div>`}</div>` : '';
     return `<div class="stack-lg">${tabs}${top}<div class="card stack"><div class="cal">${heads}${'<div></div>'.repeat(lead)}${cells}</div><p class="t-footnote muted">${esc(t('mn.legend'))}</p></div>${dayBlock}</div>`;
   }
+  const sh = categoryShare(data.items, M.month, 'expense');
+  const share = sh.rows.length ? `<section class="card stack" aria-label="${esc(t('mn.share', lang))}"><h2 class="t-label">${esc(t('mn.share', lang))}</h2>${sh.rows.map((r) => `<div class="stack" style="gap:var(--s-1)"><div class="between t-sub"><span>${esc(r.category ? label('expense', r.category) : t('mn.share.other', lang))}</span><span class="num">${esc(money(r.amount))} · ${r.pct}%</span></div><div class="meter" role="img" aria-label="${r.pct}%"><span style="width:${Math.max(r.pct, 2)}%"></span></div></div>`).join('')}</section>` : '';
   const rows = filterItems(data.items, M.month, M, label);
   const allCats = [...cats.income.map((r) => ['income', r]), ...cats.expense.map((r) => ['expense', r])];
   const opts = allCats.filter(([tp]) => !M.type || tp === M.type).map(([, r]) => `<option value="${esc(r[0])}"${r[0] === M.category ? ' selected' : ''}>${esc(lang === 'en' ? r[2] : r[1])}</option>`).join('');
   const list = rows.length ? `<div class="list">${rows.map((r) => itemRow(r, label, lang)).join('')}</div>` : `<div class="card state"><div class="state-icon">${icon('search', 'i-lg')}</div><p class="t-sub muted">${esc(t('mn.none'))}</p></div>`;
-  return `<div class="stack-lg">${tabs}${top}
+  return `<div class="stack-lg">${tabs}${top}${share}
     <div class="stack"><input class="input" id="mn-q" type="search" placeholder="${esc(t('mn.search'))}" aria-label="${esc(t('mn.search'))}" value="${esc(M.q)}" autocomplete="off">
     <div class="cluster" id="mn-type" role="group"><button class="chip" data-value="" aria-pressed="${M.type === ''}">${esc(t('mn.all'))}</button><button class="chip" data-value="income" aria-pressed="${M.type === 'income'}">${esc(t('home.income'))}</button><button class="chip" data-value="expense" aria-pressed="${M.type === 'expense'}">${esc(t('home.expense'))}</button></div>
     <div class="select-wrap"><select class="select" id="mn-cat" aria-label="${esc(t('ed.category'))}"><option value="">${esc(t('mn.allcat'))}</option>${opts}</select></div>

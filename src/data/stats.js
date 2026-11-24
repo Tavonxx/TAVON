@@ -3,6 +3,7 @@
 // Rules kept from the old app: money page = real money only; tips are NOT added to money automatically;
 // recurring expenses are shown as "upcoming" and are never generated here (the old app generated them on load).
 import { LEGACY_KEYS, TAVON_KEYS, readKey } from './schema.js';
+import { DataError } from './store.js';
 import { shiftForDate } from './schedule.js';
 import { readShortcuts } from './shortcuts.js';
 
@@ -179,4 +180,29 @@ export function itemsByDay(items, month) {
   /** @type {Record<string, {income:number, expense:number, items:any[]}>} */ const out = {};
   for (const it of validItems(items)) if (it.date.startsWith(month)) { const e = (out[it.date] ||= { income: 0, expense: 0, items: [] }); e[it.type]++; e.items.push(it); }
   return out;
+}
+
+/** Swap a work day to another day. Returns the two day edits for saveWorkDays, or throws DataError('swap*').
+ * from = a day you were due to work; to = a day you are free. The old day becomes "swapped" (0 hours), the new day takes its place/time/hours.
+ * @param {any} work @param {any} rules @param {string} from @param {string} to */
+export function planSwap(work, rules, from, to) {
+  const a = dayInfo(work, rules, from), b = dayInfo(work, rules, to);
+  if (from === to) throw new DataError('Same day', 'swapsame');
+  if (!['planned', 'worked'].includes(a.status)) throw new DataError('Not a work day', 'swapfrom');
+  if (['planned', 'worked'].includes(b.status)) throw new DataError('Already a work day', 'swapto');
+  return [
+    { day: from, patch: { status: 'swapped', hours: 0 } },
+    { day: to, patch: { status: a.status === 'worked' ? 'worked' : 'planned', hours: a.hours, place: a.place, time: a.time } },
+  ];
+}
+
+/** Where the month's money of one type went: per category, biggest first. Beyond `top` categories are grouped as code ''.
+ * @param {any} items @param {string} month @param {'income'|'expense'} [type] @param {number} [top] */
+export function categoryShare(items, month, type = 'expense', top = 5) {
+  const by = new Map(); let total = 0;
+  for (const it of validItems(items)) if (it.type === type && it.date.slice(0, 7) === month) { const c = cents(it.amount); by.set(it.category, (by.get(it.category) || 0) + c); total += c; }
+  if (!total) return { total: 0, rows: [] };
+  let rows = [...by.entries()].sort((a, b) => b[1] - a[1]).map(([category, c]) => ({ category, cents: c }));
+  if (rows.length > top) { const rest = rows.slice(top).reduce((s, r) => s + r.cents, 0); rows = [...rows.slice(0, top), { category: '', cents: rest }]; }
+  return { total: total / 100, rows: rows.map((r) => ({ category: r.category, amount: r.cents / 100, pct: Math.round((r.cents / total) * 100) })) };
 }

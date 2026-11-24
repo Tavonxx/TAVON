@@ -51,3 +51,6 @@ Still pending in part 2: recurring bills, category/workplace/weekly-schedule edi
 ## Phase 08 (part 2b) - Weekly schedule + recurring bills editors: DONE (awaiting approval)
 `src/data/plans.js` (setWeekday/replaceSchedule/restoreSchedule, add/update/remove/restoreRecurring; validated, snapshot-guarded, undo), `src/app/plans.js`, Settings > Work hours (weekly schedule, "suggest from my history") and Settings > Finance (recurring bills). Old-app recurring fields (generatedMonths etc.) preserved on edit. 79 tests + e2e.
 Still pending in part 2: category/subcategory/workplace editors, swap shift, category share chart.
+
+## Phase 08 (part 2c) - Swap work day, categories, spending chart: DONE (awaiting approval)
+Quick action "สลับวันทำงาน" (planSwap in stats.js + saveWorkDays batch, undo), Settings > Categories (add/rename only, no delete: entries store the code; `src/data/categories.js`), Finance "spending by category" bars (categoryShare, % always written out). Tab/page renamed "การงาน". Workplaces stay free text (no list needed yet). 84 tests + e2e. Phase 08 feature set complete.

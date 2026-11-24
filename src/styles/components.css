@@ -189,3 +189,7 @@ details.more>summary .i{transition:transform var(--dur-2) var(--ease)}
 .sc-a{font-size:var(--fs-sub);color:var(--text-2);font-variant-numeric:tabular-nums}
 .sc.inc .sc-l::before{content:"";display:inline-block;width:.5rem;height:.5rem;border-radius:50%;background:var(--success);margin-right:.4rem}
 .sc.exp .sc-l::before{content:"";display:inline-block;width:.5rem;height:.5rem;border-radius:1px;background:var(--danger);margin-right:.4rem}
+
+/* Share bars: the number and % are always written out, the bar is only a visual aid */
+.meter{height:.5rem;border-radius:var(--r-pill);background:var(--surface-2);overflow:hidden}
+.meter>span{display:block;height:100%;background:var(--accent);border-radius:var(--r-pill)}

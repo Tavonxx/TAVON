@@ -26,6 +26,7 @@ const P = {
   info: '<circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8h.01"/>',
   up: '<path d="M6 15l6-6 6 6"/>',
   down: '<path d="M6 9l6 6 6-6"/>',
+  tag: '<path d="M3.5 12.5V4.5a1 1 0 011-1h8l8 8-9 9z"/><circle cx="8" cy="8" r="1.3"/>',
   bolt: '<path d="M13 3L5 13.5h6L10 21l8-10.5h-6z"/>',
   grip: '<path d="M9 6h.01M15 6h.01M9 12h.01M15 12h.01M9 18h.01M15 18h.01"/>',
   more: '<path d="M6 12h.01M12 12h.01M18 12h.01"/>',

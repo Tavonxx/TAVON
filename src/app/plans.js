@@ -4,9 +4,10 @@ import { icon } from '../ui/icons.js';
 import { openSheet, closeSheet, toast, segmented, switchControl } from '../ui/ui.js';
 import { t, getLang } from './i18n.js';
 import { money, esc } from './format.js';
-import { todayKey } from '../data/stats.js';
+import { todayKey, planSwap, addDays, dayInfo } from '../data/stats.js';
 import { suggestWeeklySchedule } from '../data/schedule.js';
-import { readCategories, categoryLabel, DataError } from '../data/store.js';
+import { readCategories, categoryLabel, DataError, saveWorkDays, restoreWorkDays } from '../data/store.js';
+import { addCategory, renameCategory, restoreCategories } from '../data/categories.js';
 import { setWeekday, replaceSchedule, restoreSchedule, addRecurring, updateRecurring, removeRecurring, restoreRecurring } from '../data/plans.js';
 
 const ORDER = [1, 2, 3, 4, 5, 6, 0]; // Monday first, like the rest of the app
@@ -98,4 +99,52 @@ function openRecEditor(r, demo, onDone) {
     try { const { gone, index } = removeRecurring(localStorage, r.id); closeSheet(d); onDone(); undoToast(t('pl.rec.deleted'), () => restoreRecurring(localStorage, gone, index), onDone); } catch (e) { fail(e); }
   });
   openSheet(d); setTimeout(() => /** @type {HTMLElement|null} */ (d.querySelector('#r-note'))?.focus(), 50);
+}
+
+/** Swap one work day for another (quick action). @param {{data:any, demo:boolean, onDone:()=>void}} o */
+export function openSwap({ data, demo, onDone }) {
+  if (demo) { toast(t('ed.demo')); return; }
+  const d = sheet(), today = todayKey();
+  let from = today; for (let i = 0; i < 14; i++) { const k = addDays(today, i); if (dayInfo(data.work, data.rules, k).status === 'planned') { from = k; break; } }
+  let to = addDays(from, 1); for (let i = 1; i < 14; i++) { const k = addDays(from, i); if (!['planned', 'worked'].includes(dayInfo(data.work, data.rules, k).status)) { to = k; break; } }
+  d.innerHTML = `<form class="stack" novalidate>${head(t('sw.title'))}
+    <div class="field"><label for="w-from">${esc(t('sw.from'))}</label><input class="input" id="w-from" type="date" value="${from}"></div>
+    <div class="field"><label for="w-to">${esc(t('sw.to'))}</label><input class="input" id="w-to" type="date" value="${to}"></div>
+    <p class="t-footnote muted">${esc(t('sw.hint'))}</p>
+    <button class="btn btn-primary btn-block" type="submit">${esc(t('sw.save'))}</button></form>`;
+  /** @type {HTMLFormElement} */ (d.querySelector('form')).addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    try {
+      const { prev } = saveWorkDays(localStorage, planSwap(data.work, data.rules, val(d, 'w-from'), val(d, 'w-to')));
+      closeSheet(d); onDone(); undoToast(t('ed.saved'), () => restoreWorkDays(localStorage, prev), onDone);
+    } catch (e) { fail(e); }
+  });
+  openSheet(d);
+}
+
+/** @param {{lang:string}} c */
+export function renderCategories({ lang }) {
+  const cats = readCategories(localStorage);
+  const block = (type) => `<section class="stack" aria-label="${esc(t('home.' + type, lang))}"><h2 class="t-label">${esc(t('home.' + type, lang))}</h2><div class="list">${cats[type].map((r) => `<button class="row row-hit" data-cat="${type}:${esc(r[0])}"><span class="row-main"><span class="row-title">${esc(lang === 'en' ? r[2] : r[1])}</span></span><span class="row-trail">${icon('chevron', 'i-sm')}</span></button>`).join('')}</div><button class="btn btn-secondary btn-block" data-catadd="${type}">${icon('plus', 'i-sm')}${esc(t('cat.add', lang))}</button></section>`;
+  return `<div class="stack-lg">${block('expense')}${block('income')}<p class="t-footnote muted">${esc(t('cat.note', lang))}</p></div>`;
+}
+/** @param {{demo:boolean, rerender:()=>void}} c */
+export function wireCategories({ demo, rerender }) {
+  document.querySelectorAll('[data-cat]').forEach((b) => b.addEventListener('click', () => { const [type, code] = /** @type {string} */ (/** @type {HTMLElement} */ (b).dataset.cat).split(':'); openCatEditor(type, code, demo, rerender); }));
+  document.querySelectorAll('[data-catadd]').forEach((b) => b.addEventListener('click', () => openCatEditor(/** @type {string} */ (/** @type {HTMLElement} */ (b).dataset.catadd), '', demo, rerender)));
+}
+/** @param {string} type @param {string} code @param {boolean} demo @param {()=>void} onDone */
+function openCatEditor(type, code, demo, onDone) {
+  if (demo) { toast(t('ed.demo')); return; }
+  const d = sheet(), row = readCategories(localStorage)[type].find((r) => r[0] === code);
+  d.innerHTML = `<form class="stack" novalidate>${head(row ? t('cat.edit') : t('cat.add'))}
+    <div class="field"><label for="k-th">${esc(t('cat.th'))}</label><input class="input" id="k-th" maxlength="24" value="${esc(row?.[1] || '')}" autocomplete="off"></div>
+    <div class="field"><label for="k-en">${esc(t('cat.en'))}</label><input class="input" id="k-en" maxlength="24" value="${esc(row?.[2] || '')}" autocomplete="off"></div>
+    <button class="btn btn-primary btn-block" type="submit">${esc(t('ed.save'))}</button></form>`;
+  /** @type {HTMLFormElement} */ (d.querySelector('form')).addEventListener('submit', (ev) => {
+    ev.preventDefault();
+    const f = { th: val(d, 'k-th'), en: val(d, 'k-en') };
+    try { const { prev } = row ? renameCategory(localStorage, /** @type {any} */ (type), code, f) : addCategory(localStorage, /** @type {any} */ (type), f); closeSheet(d); onDone(); undoToast(t('ed.saved'), () => restoreCategories(localStorage, prev), onDone); } catch (e) { fail(e); }
+  });
+  openSheet(d); setTimeout(() => /** @type {HTMLElement|null} */ (d.querySelector('#k-th'))?.focus(), 50);
 }

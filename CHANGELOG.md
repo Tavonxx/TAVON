@@ -30,3 +30,6 @@
 
 ## Phase 08 (part 2b)
 - Weekly schedule editor (with suggestion from history) and recurring bills manager in Settings, with undo.
+
+## Phase 08 (part 2c)
+- Swap work day quick action, category editor, spending-by-category bars; tab renamed to "การงาน".

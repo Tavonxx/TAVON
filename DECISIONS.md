@@ -51,3 +51,10 @@
 - Shortcuts replace the auto-picked "frequent entries" chips: Pee controls the buttons; order never reorders itself (muscle memory).
 - Shortcut entries use the legacy item shape unchanged (note = label), so no schema change for money data. Shortcut definitions live in new key tavon-shortcuts.
 - Superseded the "commute bundle on confirm" idea: pressing a shortcut only when it really happened avoids fixing wrong auto-entries.
+
+- Pee later renamed tab/page "ชั่วโมงงาน" -> "การงาน" (EN: Work). Swap feature is always worded "สลับวันทำงาน".
+
+## D-Phase08d
+- Categories: add + rename only. Deleting would orphan old entries (they store the code). Codes never change.
+- Workplaces are free text per day/schedule; a managed list deferred unless Pee wants quick-pick chips.
+- Swap: from-day -> status swapped, 0 hours; to-day -> planned/worked with the same place/time/hours. Refuses if from is not a work day or to already is.

@@ -99,3 +99,14 @@ test('items by day counts income and expense separately', () => {
   const d = itemsByDay([{ type: 'income', date: '2026-11-05', amount: 1 }, { type: 'expense', date: '2026-11-05', amount: 2 }, { type: 'expense', date: '2026-11-05', amount: 3 }, { type: 'expense', date: '2026-10-05', amount: 3 }], '2026-11');
   assert.deepEqual([d['2026-11-05'].income, d['2026-11-05'].expense, Object.keys(d).length], [1, 2, 1]);
 });
+
+import { planSwap } from '../src/data/stats.js';
+test('planSwap: moves a work day, refuses wrong days', () => {
+  const rules = [{ weekday: 2, place: 'Kitchen', time: '10-18', hours: 8 }]; // Tuesdays
+  const e = planSwap({}, rules, '2026-11-24', '2026-11-25');
+  assert.deepEqual(e[0], { day: '2026-11-24', patch: { status: 'swapped', hours: 0 } });
+  assert.deepEqual(e[1].patch, { status: 'planned', hours: 8, place: 'Kitchen', time: '10-18' });
+  assert.throws(() => planSwap({}, rules, '2026-11-25', '2026-11-26'), { code: 'swapfrom' });
+  assert.throws(() => planSwap({}, rules, '2026-11-24', '2026-11-24'), { code: 'swapsame' });
+  assert.throws(() => planSwap({}, [...rules, { weekday: 3, place: 'K', time: '', hours: 4 }], '2026-11-24', '2026-11-25'), { code: 'swapto' });
+});
