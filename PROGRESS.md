@@ -19,4 +19,4 @@
 
 ## ▶ ถัดไป: Phase 04 — TAVON Branding & Logo Design
 - สำรวจทิศทางโลโก้ (สัญลักษณ์จากตัว T + negative space) 3 แบบให้พีเลือก → SVG, wordmark, app icon, สีและฟอนต์แบรนด์
-- Phase 04 เริ่ม: logo concepts A Keystone / B Ascent / C Modules ใน assets/brand/concepts (รอพีเลือก)
+- Phase 04 กำลังทำ: สัญลักษณ์ C ขาวดำ (assets/brand/tavon-symbol.svg) · รอเลือกฟอนต์ wordmark
