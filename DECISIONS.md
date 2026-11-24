@@ -29,3 +29,8 @@
 - Quick Actions items are visible but marked "Soon" and show a toast, instead of being hidden.
 
 - Labels renamed per Pee: tab/page "งาน" -> "ชั่วโมงงาน", "เงิน" -> "การเงิน"; the word "กะ" removed from app text.
+
+## D-Phase07
+- Dashboard is strictly read-only. Recurring bills shown as upcoming, never generated on load (the old app wrote them on load).
+- Tips are shown separately and not added to money, per the old business rule.
+- Preview uses in-memory sample data so Pee can judge the design without real data.

@@ -11,3 +11,6 @@
 
 ## Phase 06
 - Add app shell, tab bar, router, i18n (TH/EN), Quick Actions sheet, Settings > Appearance/Language, index.html with TAVON icons.
+
+## Phase 07
+- Home dashboard (6 widgets), read-only stats module, sample-data preview mode, honest empty state.

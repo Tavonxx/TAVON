@@ -31,3 +31,7 @@ Accent decision made: Terracotta. GitHub Pages live at https://tavonxx.github.io
 
 ## Phase 06 - Layout & Navigation: DONE (awaiting approval)
 App shell in `index.html` + `src/app/` (main, router, i18n): 4 tabs + centre + button (Quick Actions sheet, items marked "Soon"), hash router with 404, large titles, tap current tab = scroll to top, swipe from left edge = back on sub-pages, focus moves to page title on navigation, Thai/English labels, working Settings > Appearance (+ reset with Undo) and Language. Pages Home/Work/Money are placeholders (phases 07-08). Only new keys written: `tavon-appearance`, `tavon-lang`. 37 tests pass, typecheck clean, flows verified in headless Chrome (iPhone viewport).
+
+## Phase 07 - Home dashboard: DONE (awaiting approval)
+`src/data/stats.js` (read-only calculations, 10 tests), `src/app/dashboard.js` (render, escaped), `demo.js` (sample data in memory only). Widgets: today, month balance (carried over + income - expense in cents), this week (hours worked/planned, tips, 7-day strip with shapes), latest 5 money items, upcoming recurring bills (14 days, never generated), backup reminder (never / 7+ days). Verified: rendering writes nothing to storage; hostile text is escaped; empty state is honest. NOT included yet: tip entry button (Phase 08, needs safe writes), widget hide/reorder (Phase 09).
+Known limit: the new site is a different address from the Claude artifact, so it cannot see the old data until Phase 12 import.

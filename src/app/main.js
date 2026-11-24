@@ -3,7 +3,14 @@ import { spriteMarkup, icon } from '../ui/icons.js';
 import { load, save, apply, watchSystem, DEFAULTS } from '../ui/appearance.js';
 import { openSheet, toast, segmented, switchControl } from '../ui/ui.js';
 import { parseRoute } from './router.js';
+import { money } from './format.js';
 import { t, getLang, setLang } from './i18n.js';
+import { renderHome } from './dashboard.js';
+import { readDashboardData } from '../data/stats.js';
+import { demoData } from './demo.js';
+import { animateNumber } from '../ui/ui.js';
+
+let demo = false; // preview with sample data: memory only, never saved
 
 let settings = load();
 const app = /** @type {HTMLElement} */ (document.getElementById('app'));
@@ -58,7 +65,7 @@ const row = (ic, title, sub, href) => {
 const seg = (id, labelKey, opts) => `<div class="field"><span class="label" id="l-${id}">${esc(t(labelKey))}</span><div class="seg" id="${id}" role="group" aria-labelledby="l-${id}">${opts.map(([v, k]) => `<button data-value="${v}" aria-pressed="false">${esc(t(k))}</button>`).join('')}</div></div>`;
 
 const VIEWS = {
-  home: () => header(t('nav.home'), t('home.sub'), null) + stateCard('home', t('home.state'), t('home.state.sub')),
+  home: () => header(t('nav.home'), '', null) + renderHome({ data: demo ? demoData() : readDashboardData(localStorage), demo, lang: getLang() }),
   work: () => header(t('nav.work'), t('work.sub'), null) + stateCard('work', t('work.state'), t('work.state.sub')),
   money: () => header(t('nav.money'), t('money.sub'), null) + stateCard('money', t('money.state'), t('money.state.sub')),
   settings: () => header(t('nav.settings'), t('settings.sub'), null) + `<div class="list">
@@ -95,6 +102,12 @@ function wire(name) {
       settings = { ...DEFAULTS }; save(settings); apply(settings); render();
       toast(t('ap.reset.done'), { action: t('ap.undo'), onAction: () => { settings = before; save(settings); apply(settings); render(); } });
     });
+  }
+  if (name === 'home') {
+    document.getElementById('demo-on')?.addEventListener('click', () => { demo = true; render(false); });
+    document.getElementById('demo-off')?.addEventListener('click', () => { demo = false; render(false); });
+    document.querySelectorAll('[data-soon]').forEach((b) => b.addEventListener('click', () => toast(t('soon.msg'))));
+    document.querySelectorAll('[data-count]').forEach((el) => { const v = Number(/** @type {HTMLElement} */ (el).dataset.count); animateNumber(/** @type {HTMLElement} */ (el), v, (n) => money(n)); });
   }
   if (name === 'settings/language') {
     const el = document.getElementById('s-lang');
