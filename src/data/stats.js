@@ -87,6 +87,12 @@ export function dayInfo(work, rules, day) {
   return { day, status, hours, tips: Number(rec.tips) || 0, place: shift?.place || '', time: shift?.time || '', note: rec.note || '' };
 }
 
+/** The next day after `today` (within 28 days) that is a work day, or null. @param {any} work @param {any} rules @param {string} today */
+export function nextWorkDay(work, rules, today) {
+  for (let n = 1; n <= 28; n++) { const i = dayInfo(work, rules, addDays(today, n)); if (i.status === 'planned' || i.status === 'worked') return i; }
+  return null;
+}
+
 /** Hours and tips for the Monday-start week containing `today`. Tips are summed as recorded (not added to money).
  * @param {any} work @param {any} rules @param {string} today */
 export function weekSummary(work, rules, today) {

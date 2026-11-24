@@ -6,7 +6,7 @@ import { money, hours, dayLabel, weekdayShort, shortDate, periodLabel, esc } fro
 import { shortcutGrid } from './shortcuts.js';
 import { ringDial } from '../ui/dial.js';
 import { readCategories, categoryLabel } from '../data/store.js';
-import { addDays, pendingPastDays, todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData, ringStats } from '../data/stats.js';
+import { addDays, pendingPastDays, todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData, ringStats, nextWorkDay } from '../data/stats.js';
 
 export { esc };
 const BADGE = { worked: 'success', planned: 'info', off: 'neutral', leave: 'warning', swapped: 'info' };
@@ -31,7 +31,11 @@ function todayCard(d, today, L) {
   const dial = ringDial({ rings: [{ done: r.today.done, total: r.today.target }, { done: r.hours.done, total: r.hours.total }, { done: r.days.done, total: r.days.total }], center: esc(center), sub: esc(sub), label: aria });
   const leg = (k, label, a, b, unit) => `<div><span class="v num">${esc(a)} / ${esc(b)}</span><span class="l"><i class="k ${k}"></i>${esc(label)} ${esc(unit)}</span></div>`;
   const legend = `<div class="legend">${leg('k1', t('dial.today', L), h(r.today.done), h(r.today.target), t('home.hours', L))}${leg('k2', plabel, h(r.hours.done), h(r.hours.total), t('home.hours', L))}${leg('k3', t('dial.days', L), String(r.days.done), String(r.days.total), t('dial.unit.d', L))}</div>`;
-  return `<div class="card stack" id="today-card"><div class="between"><span class="t-headline">${esc(dayLabel(today, L))}</span><span class="badge badge-${BADGE[i.status] || 'neutral'}">${esc(t('st.' + i.status, L))}</span></div>${dial}${legend}${dayBody(i, L, false)}
+  const rest = i.status === 'off' || i.status === 'leave' || i.status === 'swapped';
+  const nx = rest ? nextWorkDay(d.work, d.rules, today) : null;
+  const next = !rest ? '' : `<div class="card-flat stack" id="next-work"><span class="t-label">${esc(t('dial.next', L))}</span>${nx ? `<p class="t-headline">${esc(dayLabel(nx.day, L))}</p><p class="t-sub muted">${esc(nx.place)}${nx.time ? ' · ' + esc(nx.time) : ''} · <span class="num">${hours(nx.hours)}</span> ${esc(t('home.hours', L))}</p>` : `<p class="t-sub muted">${esc(t('dial.nonext', L))}</p>`}</div>`;
+  const dialBtn = `<button class="dial-btn" id="dial-open" aria-label="${esc(t('dial.open', L))}">${dial}</button>`;
+  return `<div class="card stack" id="today-card"><div class="between"><span class="t-headline">${esc(dayLabel(today, L))}</span><span class="badge badge-${BADGE[i.status] || 'neutral'}">${esc(t('st.' + i.status, L))}</span></div>${dialBtn}${legend}${next}${dayBody(i, L, false)}
     ${i.status === 'planned' ? `<button class="btn btn-primary btn-block" id="confirm-today">${icon('check', 'i-sm')}${esc(t('cf.one', L))}</button>` : ''}
     <button class="btn btn-tonal btn-block" id="tip-today">${icon('plus', 'i-sm')}${esc(t('home.addtip', L))}</button></div>`;
 }
@@ -98,4 +102,13 @@ export function renderHome({ data, demo, lang, now = new Date(), weekOffset = 0,
   }
   const banner = demo ? `<div class="card-flat between"><span class="t-sub">${esc(t('demo.banner', L))}</span><button class="btn btn-ghost btn-sm" id="demo-off">${esc(t('demo.exit', L))}</button></div>` : '';
   return `<div class="stack-lg">${banner}${pendingCard(data, today, L)}${backupCard(data, L, now)}${section(t('home.today', L), todayCard(data, today, L))}${section(t('sc.title', L), shortcutGrid(data.shortcuts || [], L))}${balanceCard(data, today, L)}${section(t('home.week', L), weekCard(data, today, L, weekOffset, selectedDay))}<details class="more"><summary>${icon('chevron', 'i-sm')}${esc(t('home.more', L))}</summary><div class="stack-lg" style="padding-top:var(--s-2)">${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}</div></details></div>`;
+}
+
+/** Body of the "this week" sheet opened from the dial. @param {any} d @param {string} today @param {string} L */
+export function weekSheetHtml(d, today, L) {
+  const w = weekSummary(d.work, d.rules, today);
+  const rows = w.days.map((x) => `<div class="row"><span class="row-main"><span class="row-title">${esc(dayLabel(x.day, L))}${x.day === today ? ' · ' + esc(t('dial.today', L)) : ''}</span><br><span class="t-sub muted">${esc(x.place || '')}${x.time ? ' · ' + esc(x.time) : ''}</span></span><span class="stack" style="gap:2px;text-align:right"><span class="badge badge-${BADGE[x.status] || 'neutral'}">${esc(t('st.' + x.status, L))}</span>${x.status === 'worked' || x.status === 'planned' ? `<span class="t-sub num">${hours(x.hours)} ${esc(t('home.hours', L))}</span>` : ''}</span></div>`).join('');
+  return `<div class="between"><h2 class="t-title3" id="wk-t">${esc(t('wk.thisweek', L))}</h2><button class="btn btn-ghost btn-icon" data-close aria-label="${esc(t('close', L))}">${icon('close')}</button></div>
+    <p class="t-footnote muted num">${hours(w.workedHours)} ${esc(t('home.hours', L))} ${esc(t('home.worked', L))} · ${esc(t('home.planned', L))} ${hours(w.plannedHours)} · ${esc(t('home.tips', L))} ${esc(money(w.tips))}</p>
+    <div class="list">${rows}</div>`;
 }

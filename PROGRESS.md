@@ -70,3 +70,6 @@ Pay periods are 1-15 and 16-end of month. Home dial middle ring + third ring now
 
 ## Pay rates per workplace: DONE (awaiting approval)
 `tavon-pay-rates` (in backups): [{id, place ('' = every workplace), rate, from ('' = since start)}]; `src/data/pay.js` (CRUD with undo, rateFor, periodPay), `src/app/pay-ui.js` (Settings > Pay rates). Matching is by the day's workplace text (ignoring case/spaces). Own-place rate beats the "every workplace" rate; newest start date <= the day wins, so a raise never changes old periods. Pay period view shows "earned so far" (confirmed hours) and "if you work the plan", labelled before tax / estimate; hours with no rate are reported ("N h not counted"), never guessed. Hours grouped by rate and rounded to the cent once per group. No overtime/holiday pay. 93 tests + e2e (hand-checked $503.00 / $1,223.00).
+
+## Phase 08.5 step 2: DONE (awaiting approval)
+Tap the Home dial -> "this week" sheet (7 days, status, place/time, hours, week totals). Day off/leave/swapped: Today card shows "next work day" (looks 28 days ahead, `nextWorkDay` in stats.js). 94 tests, e2e checked.

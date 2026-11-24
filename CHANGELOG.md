@@ -45,3 +45,6 @@
 
 ## Pay rates
 - Hourly pay per workplace with start dates; gross estimate in the pay period view.
+
+## Home dial
+- Tap the dial for a week detail sheet; on days off the Today card shows the next work day.

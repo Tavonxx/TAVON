@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { todayKey, weekStartKey, addDays, monthSummary, recentItems, dueDate, upcomingRecurring, dayInfo, weekSummary, backupAgeDays, readDashboardData, hasData, nextMonth } from '../src/data/stats.js';
+import { todayKey, weekStartKey, addDays, monthSummary, recentItems, dueDate, upcomingRecurring, dayInfo, weekSummary, backupAgeDays, readDashboardData, hasData, nextMonth, nextWorkDay } from '../src/data/stats.js';
 
 const rules = [{ weekday: 1, place: 'Cafe A', time: '9-5', hours: 8 }, { weekday: 5, place: 'Cafe A', time: '9-5', hours: 8 }];
 
@@ -156,4 +156,11 @@ test('periodSummary: exact hundredths, confirmed vs planned kept apart, covers e
 test('periodLabel reads like people write it', () => {
   assert.equal(periodLabel('2026-11-16', '2026-11-30', 'en'), 'Nov 16-30');
   assert.match(periodLabel('2026-11-01', '2026-11-15', 'th'), /^1-15 .+/);
+});
+
+test('nextWorkDay finds the next planned day, or null', () => {
+  const rules = [{ weekday: 1, place: 'A', time: '10:00-18:00', hours: 8 }, { weekday: 4, place: 'A', time: '10:00-18:00', hours: 8 }];
+  assert.equal(nextWorkDay({}, rules, '2026-11-25')?.day, '2026-11-26'); // Wed -> Thu
+  assert.equal(nextWorkDay({}, rules, '2026-11-26')?.day, '2026-11-30'); // Thu -> next Mon
+  assert.equal(nextWorkDay({}, [], '2026-11-25'), null);
 });

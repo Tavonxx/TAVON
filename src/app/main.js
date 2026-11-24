@@ -5,7 +5,7 @@ import { openSheet, closeSheet, toast, segmented, switchControl } from '../ui/ui
 import { parseRoute } from './router.js';
 import { money } from './format.js';
 import { t, getLang, setLang } from './i18n.js';
-import { renderHome } from './dashboard.js';
+import { renderHome, weekSheetHtml } from './dashboard.js';
 import { readDashboardData } from '../data/stats.js';
 import { demoData } from './demo.js';
 import { renderWork, wireWork, renderMoney, wireMoney, openWorkEditor, openMoneyEditor } from './datapages.js';
@@ -147,6 +147,11 @@ function wire(name) {
     }));
     document.getElementById('sel-edit')?.addEventListener('click', () => openWorkEditor({ day: homeSel, data: getData(), demo, onDone: rerender }));
     document.getElementById('sel-confirm')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: [dayInfo(d.work, d.rules, homeSel)], data: d, demo, onDone: rerender }); });
+    document.getElementById('dial-open')?.addEventListener('click', () => {
+      let dlg = /** @type {HTMLDialogElement|null} */ (document.getElementById('wk-sheet'));
+      if (!dlg) { dlg = document.createElement('dialog'); dlg.id = 'wk-sheet'; dlg.className = 'sheet'; dlg.setAttribute('aria-labelledby', 'wk-t'); document.body.append(dlg); }
+      dlg.innerHTML = weekSheetHtml(getData(), todayKey(), getLang()); openSheet(dlg);
+    });
     document.getElementById('confirm-today')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: [dayInfo(d.work, d.rules, todayKey())], data: d, demo, onDone: rerender }); });
     document.getElementById('confirm-all')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: pendingPastDays(d.work, d.rules, todayKey(), 14), data: d, demo, onDone: rerender }); });
     document.getElementById('tip-today')?.addEventListener('click', () => openWorkEditor({ day: todayKey(), data: getData(), demo, focus: 'tips', onDone: rerender }));
