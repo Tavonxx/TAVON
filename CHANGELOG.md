@@ -5,3 +5,6 @@
 - Legacy app: R1 fix deployed to the Claude link
 - Phase 02: data layer `src/data/` (schema v3, backup/import/snapshot/restore, weekly schedule), tests, legacy R1 fix (not deployed)
 - Phase 01: audit + project memory docs
+
+## Phase 05
+- Add design tokens (light/dark, 4 accents, type, spacing, motion, density), components, icons, UI helpers, appearance settings, style guide, contrast tests, bundled Inter subset fonts.

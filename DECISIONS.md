@@ -17,3 +17,8 @@
 - 2026-11-23 · ฟอนต์ตัวหนังสือ TAVON: ยังไม่เลือก (ตัวเลือกอยู่ในแชท: Inter Display, Montserrat, DM Sans, Adventor, Poppins) — เปลี่ยนได้ทุกเมื่อ
 - 2026-11-23 · โลโก้สุดท้าย: สัญลักษณ์ C ขาวดำ ช่องว่าง 5 + wordmark ฟอนต์ 1 (Inter Display Medium, tracking 0.12em) · ไอคอนแอปพื้น Ink + สัญลักษณ์ Paper
 - 2026-11-23 · พาเลตต์แบรนด์ = Ink / Paper / Graphite / Stone / Line · สี accent ของ UI ตัดสินใน Phase 05
+
+## D-Phase05
+- Appearance stored in separate key `tavon-appearance`; legacy keys untouched.
+- Accent default terracotta; 4 options kept so Pee can choose in the live style guide.
+- Native `<dialog>` for sheets/alerts; no component library.

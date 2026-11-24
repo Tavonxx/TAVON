@@ -1,0 +1,51 @@
+/* TAVON base: reset, typography, layout helpers. Uses only tokens.css values. */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--text);font:400 var(--fs-body)/var(--lh-body) var(--font);
+  -webkit-font-smoothing:antialiased;min-height:100dvh;overflow-wrap:anywhere;
+  transition:background-color var(--dur-2) var(--ease-io),color var(--dur-2) var(--ease-io)}
+h1,h2,h3,h4,p,figure,ul,ol{margin:0}
+ul,ol{padding:0;list-style:none}
+button,input,select,textarea{font:inherit;color:inherit;margin:0}
+button{background:none;border:0;padding:0;cursor:pointer;touch-action:manipulation}
+img,svg{display:block;max-width:100%}
+a{color:var(--accent);text-underline-offset:.2em}
+::selection{background:var(--accent-soft)}
+
+/* Keyboard focus: always visible, never colour-only */
+:focus{outline:none}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:var(--r-sm)}
+
+/* Type scale */
+.t-caption{font-size:var(--fs-caption);line-height:var(--lh-caption)}
+.t-footnote{font-size:var(--fs-footnote);line-height:var(--lh-footnote)}
+.t-sub{font-size:var(--fs-sub);line-height:var(--lh-sub)}
+.t-body{font-size:var(--fs-body);line-height:var(--lh-body)}
+.t-headline{font-size:var(--fs-headline);line-height:var(--lh-headline);font-weight:600}
+.t-title3{font-size:var(--fs-title3);line-height:var(--lh-title3);font-weight:600}
+.t-title2{font-size:var(--fs-title2);line-height:var(--lh-title2);font-weight:600;letter-spacing:-.01em}
+.t-title1{font-size:var(--fs-title1);line-height:var(--lh-title1);font-weight:600;letter-spacing:-.015em}
+.t-large{font-family:var(--font-display);font-size:var(--fs-large);line-height:var(--lh-large);font-weight:500;letter-spacing:-.02em}
+.t-number{font-family:var(--font-display);font-size:var(--fs-number);line-height:var(--lh-number);font-weight:500;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.t-label{font-size:var(--fs-caption);line-height:var(--lh-caption);font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--text-3)}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--text-2)}.faint{color:var(--text-3)}
+.pos{color:var(--success)}.neg{color:var(--danger)}
+
+/* Layout helpers */
+.page{max-width:var(--content-max);margin-inline:auto;padding:var(--s-4) calc(var(--s-4) + var(--safe-l)) calc(var(--tabbar-h) + var(--safe-b) + var(--s-8)) calc(var(--s-4) + var(--safe-r))}
+.stack{display:flex;flex-direction:column;gap:var(--gap)}
+.stack-lg{display:flex;flex-direction:column;gap:var(--s-6)}
+.cluster{display:flex;flex-wrap:wrap;align-items:center;gap:var(--s-2)}
+.between{display:flex;align-items:center;justify-content:space-between;gap:var(--s-3)}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:var(--gap)}
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
+[hidden]{display:none!important}
+
+/* Icons (sprite symbols, stroke follows text colour) */
+.i{width:1.5rem;height:1.5rem;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.i-sm{width:1.125rem;height:1.125rem}.i-lg{width:1.75rem;height:1.75rem}
+
+/* Scroll-in: subtle, purposeful; disabled when motion is off */
+@keyframes rise{from{opacity:0;transform:translateY(.5rem)}to{opacity:1;transform:none}}
+.rise{animation:rise var(--dur-3) var(--ease) both}

@@ -24,3 +24,6 @@
 
 ## ▶ ถัดไป: Phase 05 — Global Design System
 - design tokens (สี/ตัวอักษร/ระยะ/มุม/motion), สี accent, components พื้นฐาน, หน้าตัวอย่าง (style guide)
+
+## Phase 05 - Global Design System: DONE (awaiting approval)
+Tokens, base + component CSS, icon sprite, UI helpers, appearance settings, styleguide.html, 34 passing tests, typecheck clean. Open item: choose accent colour (Pee).
