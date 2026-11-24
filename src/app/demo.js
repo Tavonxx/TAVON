@@ -18,6 +18,7 @@ export function demoData(today = todayKey()) {
       { id: 'd6', type: 'expense', date: `${month}-04`, amount: 62, category: 'transport' },
     ],
     recurring: [{ id: 'r1', amount: 55, day: Number(addDays(today, 3).slice(8)), startMonth: '2026-01', category: 'bills' }],
+    shortcuts: [{ id: 's1', label: 'TTC', type: 'expense', category: 'transport', amount: 3.3, count: 2, sort: 1 }, { id: 's2', label: 'Vape', type: 'expense', category: 'other-expense', amount: 25, count: 1, sort: 2 }],
     lastBackup: String(Date.now() - 9 * 86400000),
   };
 }

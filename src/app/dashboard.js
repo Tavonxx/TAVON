@@ -2,12 +2,12 @@
 // Home dashboard. Pure rendering: takes data in, returns HTML out. Never writes anything.
 import { icon } from '../ui/icons.js';
 import { t } from './i18n.js';
-import { money, hours, dayLabel, weekdayShort, shortDate } from './format.js';
+import { money, hours, dayLabel, weekdayShort, shortDate, esc } from './format.js';
+import { shortcutGrid } from './shortcuts.js';
 import { readCategories, categoryLabel } from '../data/store.js';
 import { addDays, pendingPastDays, todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData } from '../data/stats.js';
 
-/** @param {any} s */
-export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c));
+export { esc };
 const BADGE = { worked: 'success', planned: 'info', off: 'neutral', leave: 'warning', swapped: 'info' };
 
 /** @param {string} title @param {string} body */
@@ -91,5 +91,5 @@ export function renderHome({ data, demo, lang, now = new Date(), weekOffset = 0,
     return `<div class="card state"><div class="state-icon">${icon('shield', 'i-lg')}</div><p class="t-headline">${esc(t('empty.title', L))}</p><p class="t-sub muted">${esc(t('empty.sub', L))}</p><button class="btn btn-primary" id="demo-on">${esc(t('empty.demo', L))}</button></div>`;
   }
   const banner = demo ? `<div class="card-flat between"><span class="t-sub">${esc(t('demo.banner', L))}</span><button class="btn btn-ghost btn-sm" id="demo-off">${esc(t('demo.exit', L))}</button></div>` : '';
-  return `<div class="stack-lg">${banner}${section(t('home.today', L), todayCard(data, today, L))}${pendingCard(data, today, L)}${balanceCard(data, today, L)}${section(t('home.week', L), weekCard(data, today, L, weekOffset, selectedDay))}${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}${backupCard(data, L, now)}</div>`;
+  return `<div class="stack-lg">${banner}${section(t('home.today', L), todayCard(data, today, L))}${section(t('sc.title', L), shortcutGrid(data.shortcuts || [], L))}${pendingCard(data, today, L)}${balanceCard(data, today, L)}${section(t('home.week', L), weekCard(data, today, L, weekOffset, selectedDay))}${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}${backupCard(data, L, now)}</div>`;
 }

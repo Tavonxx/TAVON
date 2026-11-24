@@ -4,6 +4,7 @@
 // recurring expenses are shown as "upcoming" and are never generated here (the old app generated them on load).
 import { LEGACY_KEYS, TAVON_KEYS, readKey } from './schema.js';
 import { shiftForDate } from './schedule.js';
+import { readShortcuts } from './shortcuts.js';
 
 export const TZ = 'America/Toronto';
 const pad = (n) => String(n).padStart(2, '0');
@@ -108,7 +109,7 @@ export function backupAgeDays(iso, now = new Date()) {
 /** Read everything the dashboard needs. Reads only. @param {Storage} storage */
 export function readDashboardData(storage) {
   const g = (k) => readKey(storage, k).value;
-  return { work: g(LEGACY_KEYS.work), items: g(LEGACY_KEYS.finance), recurring: g(LEGACY_KEYS.recurring), rules: g(TAVON_KEYS.shiftSchedule), lastBackup: storage.getItem('bk-last') };
+  return { work: g(LEGACY_KEYS.work), items: g(LEGACY_KEYS.finance), recurring: g(LEGACY_KEYS.recurring), rules: g(TAVON_KEYS.shiftSchedule), lastBackup: storage.getItem('bk-last'), shortcuts: readShortcuts(storage) };
 }
 /** Is there any real data at all? @param {ReturnType<typeof readDashboardData>} d */
 export const hasData = (d) => (isObj(d.work) && Object.keys(d.work).length > 0) || validItems(d.items).length > 0;

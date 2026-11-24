@@ -43,3 +43,7 @@ Note: data typed into the new site now is TEST data; Phase 12 import replaces it
 
 ## Phase 08 (part 1b) - feedback round: DONE (awaiting approval)
 Labels: planned -> "วันทำงาน", leave -> "วันลา". Less typing: Home "confirm worked" one-tap + banner "N past days not confirmed" with confirm-all (batch, one undo); week rows have a one-tap check; day editor = status + hours + tips (place/note hidden), tap-to-fill recent tip chips. Finance: calendar view (per-day counts, income = green circle, expense = red square, number = entries, tap a day to see/add), quick "repeat frequent entry" chips (one tap, undo), editor focuses amount, category chips ranked by use with the most-used preselected, "Save & add another", "Repeat today" on edit. Tests: 68 + e2e.
+
+## Phase 08 (part 2a) - Shortcut buttons: DONE (awaiting approval)
+`tavon-shortcuts` key (in backups), `src/data/shortcuts.js` (validated CRUD, order, use = N plain entries in one write, optional "keep this price"), `src/app/shortcuts.js` (adaptive grid 1/2/3 columns, confirm sheet with editable price and x1-x3, editor, manage page Settings > Shortcuts with up/down order, "make a shortcut" from an entry). Shown on Home and Finance. Entries use the old item shape exactly (note = shortcut name). Undo removes all entries of one tap. 73 tests + e2e.
+Still pending in part 2: recurring bills, category/workplace/weekly-schedule editors, swap shift, category chart, suggestion banner for repeated entries.

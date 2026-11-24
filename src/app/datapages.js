@@ -3,11 +3,12 @@
 import { icon } from '../ui/icons.js';
 import { segmented } from '../ui/ui.js';
 import { t } from './i18n.js';
-import { esc } from './dashboard.js';
+import { esc } from './format.js';
 import { money, hours, shortDate, dayLabel, weekdayShort, monthLabel } from './format.js';
-import { todayKey, weekStartKey, addDays, weekSummary, monthWork, monthSummary, filterItems, nextMonth, frequentTemplates, itemsByDay, pendingPastDays } from '../data/stats.js';
+import { todayKey, weekStartKey, addDays, weekSummary, monthWork, monthSummary, filterItems, nextMonth, itemsByDay, pendingPastDays } from '../data/stats.js';
 import { readCategories, categoryLabel, addItem } from '../data/store.js';
 import { openWorkEditor, openMoneyEditor, confirmDays } from './editors.js';
+import { shortcutGrid, wireShortcuts } from './shortcuts.js';
 import { toast } from '../ui/ui.js';
 import { deleteQuietly } from '../data/store.js';
 
@@ -69,8 +70,7 @@ export function renderMoney({ data, lang }) {
   const label = (tp, code) => categoryLabel(cats, tp, code, lang);
   const s = monthSummary(data.items, M.month);
   const tabs = `<div class="seg" id="mn-view" role="group" aria-label="${esc(t('nav.money'))}"><button data-value="list" aria-pressed="${M.view === 'list'}">${esc(t('mn.list'))}</button><button data-value="cal" aria-pressed="${M.view === 'cal'}">${esc(t('mn.cal'))}</button></div>`;
-  const quick = frequentTemplates(data.items, today, 4);
-  const quickHtml = quick.length ? `<div class="stack" style="gap:var(--s-1)"><span class="t-footnote muted">${esc(t('mn.quick'))} · ${esc(t('mn.quick.sub'))}</span><div class="chips">${quick.map((q, i) => `<button class="chip" data-quick="${i}">${esc(label(q.type, q.category))} ${esc(money(q.amount))}</button>`).join('')}</div></div>` : '';
+  const quickHtml = `<div class="stack" style="gap:var(--s-2)"><span class="t-label">${esc(t('sc.title'))}</span>${shortcutGrid(data.shortcuts || [], lang)}</div>`;
   const top = `${navBar(monthLabel(M.month, lang), 'mn')}
     <div class="card-accent stack"><span class="t-label" style="color:inherit">${esc(t('home.balance'))}</span><span class="t-number">${esc(money(s.balance))}</span>
     <div class="grid-2 t-footnote"><span>${esc(t('home.income'))} <b class="num">${esc(money(s.income))}</b></span><span>${esc(t('home.expense'))} <b class="num">${esc(money(s.expense))}</b></span></div>
@@ -112,16 +112,7 @@ export function wireMoney({ data, demo, rerender }) {
   document.getElementById('mn-add')?.addEventListener('click', () => open(M.view === 'cal' && M.day ? { date: M.day } : {}));
   document.getElementById('mn-day-add')?.addEventListener('click', () => open({ date: M.day }));
   document.querySelectorAll('[data-d]').forEach((b) => b.addEventListener('click', () => { M.day = /** @type {HTMLElement} */ (b).dataset.d || ''; rerender(); }));
-  const templates = frequentTemplates(data.items, today, 4);
-  document.querySelectorAll('[data-quick]').forEach((b) => b.addEventListener('click', () => {
-    if (demo) { toast(t('ed.demo')); return; }
-    const q = templates[Number(/** @type {HTMLElement} */ (b).dataset.quick)]; if (!q) return;
-    try {
-      const added = addItem(localStorage, { type: q.type, amount: q.amount, category: q.category, note: q.note, date: M.view === 'cal' && M.day ? M.day : today });
-      rerender();
-      toast(t('ed.saved'), { action: t('ap.undo'), ms: 5000, onAction: () => { try { deleteQuietly(localStorage, added.id); rerender(); toast(t('ed.restored')); } catch { toast(t('ed.invalid')); } } });
-    } catch { toast(t('ed.invalid')); }
-  }));
+  wireShortcuts({ data, demo, rerender });
   const q = /** @type {HTMLInputElement|null} */ (document.getElementById('mn-q'));
   q?.addEventListener('input', () => { M.q = q.value; const pos = q.selectionStart; rerender(); const n = /** @type {HTMLInputElement} */ (document.getElementById('mn-q')); n.focus(); n.setSelectionRange(pos, pos); });
   document.querySelectorAll('#mn-type .chip').forEach((b) => b.addEventListener('click', () => { M.type = /** @type {HTMLElement} */ (b).dataset.value || ''; M.category = ''; rerender(); }));

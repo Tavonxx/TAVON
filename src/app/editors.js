@@ -3,8 +3,9 @@
 import { icon } from '../ui/icons.js';
 import { openSheet, closeSheet, toast, segmented } from '../ui/ui.js';
 import { t, getLang } from './i18n.js';
-import { esc } from './dashboard.js';
+import { esc } from './format.js';
 import { dayLabel } from './format.js';
+import { openShortcutEditor } from './shortcuts.js';
 import { dayInfo, recentTips, categoryRanking, todayKey } from '../data/stats.js';
 import { saveWorkDay, restoreWorkDay, saveWorkDays, restoreWorkDays, addItem, updateItem, removeItem, reinsertItem, deleteQuietly, readCategories, categoryLabel, DataError } from '../data/store.js';
 
@@ -82,7 +83,7 @@ export function openMoneyEditor({ item, type, date, items, demo, onDone }) {
     <div class="field"><label for="e-date">${esc(t('ed.date'))}</label><input class="input" id="e-date" type="date" value="${esc(item?.date || date || today)}"></div>
     <details class="more"><summary>${icon('chevron', 'i-sm')}${esc(t('ed.more'))}</summary><div class="field" style="padding-top:var(--s-2)"><label for="e-note">${esc(t('ed.note'))}</label><input class="input" id="e-note" value="${esc(item?.note || '')}" maxlength="500"></div></details>
     <button class="btn btn-primary btn-block" type="submit">${esc(t('ed.save'))}</button>
-    ${item ? `<button class="btn btn-secondary btn-block" type="button" id="e-dup">${esc(t('ed.dup'))}</button><button class="btn btn-danger btn-block" type="button" id="e-del">${esc(t('ed.delete'))}</button>` : `<button class="btn btn-secondary btn-block" type="button" id="e-more">${esc(t('ed.saveadd'))}</button>`}</form>`;
+    ${item ? `<button class="btn btn-secondary btn-block" type="button" id="e-dup">${esc(t('ed.dup'))}</button><button class="btn btn-secondary btn-block" type="button" id="e-sc">${esc(t('sc.fromentry'))}</button><button class="btn btn-danger btn-block" type="button" id="e-del">${esc(t('ed.delete'))}</button>` : `<button class="btn btn-secondary btn-block" type="button" id="e-more">${esc(t('ed.saveadd'))}</button>`}</form>`;
   const chipsEl = /** @type {HTMLElement} */ (d.querySelector('#e-cats'));
   chipsEl.addEventListener('click', (e) => { const b = /** @type {HTMLElement} */ (e.target).closest('.chip'); if (b) { cat = /** @type {HTMLElement} */ (b).dataset.v || ''; chipsEl.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c === b))); } });
   segmented(/** @type {HTMLElement} */ (d.querySelector('#e-type')), (v) => { cur = v; cat = pickDefault(cur); chipsEl.innerHTML = chipsHtml(); });
@@ -107,6 +108,7 @@ export function openMoneyEditor({ item, type, date, items, demo, onDone }) {
   d.querySelector('#e-dup')?.addEventListener('click', () => {
     try { const added = addItem(localStorage, { ...fields(), date: today }); closeSheet(d); onDone(); toast(t('ed.saved'), undoAdd(added)); } catch (e) { fail(e); }
   });
+  d.querySelector('#e-sc')?.addEventListener('click', () => { const f = fields(); closeSheet(d); setTimeout(() => openShortcutEditor({ prefill: { label: item.note || '', type: f.type, category: f.category, amount: Number(f.amount) || null, count: 1 }, demo, onDone }), 220); });
   d.querySelector('#e-del')?.addEventListener('click', () => {
     try {
       const { item: gone, index } = removeItem(localStorage, item.id);

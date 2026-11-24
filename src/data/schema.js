@@ -24,6 +24,7 @@ export const TAVON_KEYS = Object.freeze({
   meta: 'tavon-meta',                 // { schema, migrations: [{id, at}] }
   shiftSchedule: 'tavon-shift-schedule', // weekly shift rules (replaces the schedule hard-coded in the old app)
   snapshots: 'tavon-snapshots',       // automatic safety copies taken before imports/migrations
+  shortcuts: 'tavon-shortcuts',       // the person's one-tap entries: [{id,label,type,category,amount|null,count,sort}]
 });
 
 export const SCHEMA_VERSION = 3;
@@ -83,6 +84,10 @@ export const validators = {
     if (!Array.isArray(v)) return ['recurring must be a list'];
     return v.flatMap((r, i) => (isObj(r) && typeof r.id === 'string' && Number(r.amount) > 0 &&
       Number(r.day) >= 1 && Number(r.day) <= 31 && MONTH.test(r.startMonth || '')) ? [] : [`recurring #${i}: invalid rule`]);
+  },
+  [TAVON_KEYS.shortcuts](v) {
+    if (!Array.isArray(v)) return ['shortcuts must be a list'];
+    return v.flatMap((r, i) => (isObj(r) && typeof r.id === 'string' && typeof r.label === 'string' && ['income', 'expense'].includes(r.type) && typeof r.category === 'string') ? [] : [`shortcut #${i}: invalid`]);
   },
   [TAVON_KEYS.shiftSchedule](v) {
     if (!Array.isArray(v)) return ['shift schedule must be a list'];

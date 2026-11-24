@@ -25,7 +25,7 @@ export function isRealDate(s) {
 export const newId = () => globalThis.crypto?.randomUUID?.() || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
 
 /** @param {Storage} st @param {string} key @param {'object'|'array'} kind */
-function read(st, key, kind) {
+export function read(st, key, kind) {
   const raw = st.getItem(key);
   if (raw === null) return kind === 'array' ? [] : {};
   let v; try { v = JSON.parse(raw); } catch { throw new DataError(`${key} is damaged, nothing was changed`, 'damaged'); }
@@ -33,14 +33,14 @@ function read(st, key, kind) {
   return v;
 }
 /** @param {Storage} st @param {string} key @param {any} value */
-function write(st, key, value) {
+export function write(st, key, value) {
   const s = JSON.stringify(value);
   try { st.setItem(key, s); } catch { throw new DataError('Could not save (storage full or blocked)', 'storage'); }
   if (st.getItem(key) !== s) throw new DataError('Save could not be verified', 'storage');
 }
 const snapped = new WeakSet();
 /** One snapshot per session before the first edit. @param {Storage} st @param {Date} now */
-function guard(st, now) {
+export function guard(st, now) {
   if (snapped.has(st)) return;
   try { takeSnapshot(st, 'before editing', now); } catch { throw new DataError('Could not make a safety copy first, so nothing was changed', 'snapshot'); }
   snapped.add(st);
@@ -117,6 +117,20 @@ export function addItem(st, fields, now = new Date()) {
   const item = { id: newId(), ...base, updatedAt: now.toISOString() };
   items.push(item); write(st, LEGACY_KEYS.finance, items);
   return item;
+}
+/** Add several entries in ONE write (all or nothing), e.g. a shortcut used twice. @param {Storage} st @param {any[]} list @param {Date} [now] */
+export function addItems(st, list, now = new Date()) {
+  const bases = list.map(cleanItem);
+  const items = read(st, LEGACY_KEYS.finance, 'array');
+  guard(st, now);
+  const added = bases.map((b) => ({ id: newId(), ...b, updatedAt: now.toISOString() }));
+  items.push(...added); write(st, LEGACY_KEYS.finance, items);
+  return added;
+}
+/** Undo for addItems. @param {Storage} st @param {string[]} ids */
+export function deleteMany(st, ids) {
+  const set = new Set(ids);
+  write(st, LEGACY_KEYS.finance, read(st, LEGACY_KEYS.finance, 'array').filter((x) => !(isObj(x) && set.has(x.id))));
 }
 /** Edit keeps every other field (e.g. recurringId). @param {Storage} st @param {string} id @param {any} fields @param {Date} [now] */
 export function updateItem(st, id, fields, now = new Date()) {

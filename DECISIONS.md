@@ -46,3 +46,8 @@
 
 ## D-Roadmap
 - Added Phase 08.5 (Visual Identity Refresh) at Pee request, after Phase 08 and before 09, so customization and animation use the final look. Numbering of other phases unchanged. Style is token-driven, so the refresh does not touch data or features.
+
+## D-Phase08c
+- Shortcuts replace the auto-picked "frequent entries" chips: Pee controls the buttons; order never reorders itself (muscle memory).
+- Shortcut entries use the legacy item shape unchanged (note = label), so no schema change for money data. Shortcut definitions live in new key tavon-shortcuts.
+- Superseded the "commute bundle on confirm" idea: pressing a shortcut only when it really happened avoids fixing wrong auto-entries.

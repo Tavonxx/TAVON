@@ -1,7 +1,7 @@
 // @ts-check
 // Hash router: pure parsing (testable) + which tab a route belongs to.
 export const TABS = ['home', 'work', 'money', 'settings'];
-export const SETTINGS_PAGES = ['appearance', 'language'];
+export const SETTINGS_PAGES = ['appearance', 'language', 'shortcuts'];
 
 /** @param {string} hash e.g. "#/settings/appearance"
  * @returns {{name:string, tab:string, parent:string|null, known:boolean}} */
