@@ -2,9 +2,9 @@
 // Home dashboard. Pure rendering: takes data in, returns HTML out. Never writes anything.
 import { icon } from '../ui/icons.js';
 import { t } from './i18n.js';
-import { money, hours, dayLabel, weekdayShort } from './format.js';
+import { money, hours, dayLabel, weekdayShort, shortDate } from './format.js';
 import { readCategories, categoryLabel } from '../data/store.js';
-import { pendingPastDays, todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData } from '../data/stats.js';
+import { addDays, pendingPastDays, todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData } from '../data/stats.js';
 
 /** @param {any} s */
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c));
@@ -39,14 +39,16 @@ function balanceCard(d, today, L) {
     <div class="grid-2 t-footnote"><span>${esc(t('home.income', L))} <b class="num">${esc(money(s.income))}</b></span><span>${esc(t('home.expense', L))} <b class="num">${esc(money(s.expense))}</b></span></div>
     <span class="t-footnote">${esc(t('home.carry', L))} <span class="num">${esc(money(s.opening))}</span></span></div>`;
 }
-/** @param {any} d @param {string} today @param {string} L */
-function weekCard(d, today, L) {
-  const w = weekSummary(d.work, d.rules, today);
+/** @param {any} d @param {string} today @param {string} L @param {number} off weeks away from this week */
+function weekCard(d, today, L, off) {
+  const w = weekSummary(d.work, d.rules, addDays(today, 7 * off));
   const cells = w.days.map((x) => {
     const mark = x.status === 'worked' ? '<i class="dot"></i>' : x.status === 'planned' ? '<i class="dot ring"></i>' : x.status === 'leave' ? '<i class="dot sq"></i>' : '';
-    return `<div class="cal-d${x.day === today ? ' today' : ''}" role="img" aria-label="${esc(dayLabel(x.day, L) + ': ' + t('st.' + x.status, L))}"><span class="t-caption muted">${esc(weekdayShort(x.day, L))}</span>${mark}</div>`;
+    return `<button class="cal-d cal-w${x.day === today ? ' today' : ''}" data-day="${x.day}" aria-label="${esc(dayLabel(x.day, L) + ': ' + t('st.' + x.status, L))}"><span class="t-caption muted">${esc(weekdayShort(x.day, L))}</span><span class="t-footnote num">${Number(x.day.slice(8))}</span>${mark}</button>`;
   }).join('');
-  return `<div class="card stack"><div class="grid-2">
+  const range = `${shortDate(w.days[0].day, L)} – ${shortDate(w.days[6].day, L)}`;
+  const nav = `<div class="between"><button class="btn btn-secondary btn-icon" id="hw-prev" aria-label="${esc(t('wk.prev', L))}">${icon('back')}</button><button class="btn btn-ghost btn-sm" id="hw-now"${off === 0 ? ' aria-current="date"' : ''} aria-live="polite">${esc(off === 0 ? t('wk.thisweek', L) + ' · ' + range : range)}</button><button class="btn btn-secondary btn-icon" id="hw-next" aria-label="${esc(t('wk.next', L))}">${icon('chevron')}</button></div>`;
+  return `<div class="card stack">${nav}<div class="grid-2">
     <div class="stat"><span class="t-label">${esc(t('home.worked', L))}</span><span class="t-title2 num">${hours(w.workedHours)} <span class="t-sub muted">${esc(t('home.hours', L))}</span></span><span class="t-footnote muted num">${esc(t('home.planned', L))} ${hours(w.plannedHours)}</span></div>
     <div class="stat"><span class="t-label">${esc(t('home.tips', L))}</span><span class="t-title2 num">${esc(money(w.tips))}</span><span class="t-footnote muted">${esc(t('home.tipsnote', L))}</span></div></div>
     <div class="cal" style="grid-template-columns:repeat(7,1fr)">${cells}</div></div>`;
@@ -72,12 +74,12 @@ function backupCard(d, L, now) {
   return `<div class="card-flat"><div class="between"><div class="row-main"><p class="t-headline">${esc(t('bk.title', L))}</p><p class="t-sub muted">${esc(msg)}</p></div><span class="row-icon accent">${icon('shield')}</span></div></div>`;
 }
 
-/** The whole Home page body (below the header). @param {{data:any, demo:boolean, lang:string, now?:Date}} o */
-export function renderHome({ data, demo, lang, now = new Date() }) {
+/** The whole Home page body (below the header). @param {{data:any, demo:boolean, lang:string, now?:Date, weekOffset?:number}} o */
+export function renderHome({ data, demo, lang, now = new Date(), weekOffset = 0 }) {
   const L = lang, today = todayKey(now);
   if (!demo && !hasData(data)) {
     return `<div class="card state"><div class="state-icon">${icon('shield', 'i-lg')}</div><p class="t-headline">${esc(t('empty.title', L))}</p><p class="t-sub muted">${esc(t('empty.sub', L))}</p><button class="btn btn-primary" id="demo-on">${esc(t('empty.demo', L))}</button></div>`;
   }
   const banner = demo ? `<div class="card-flat between"><span class="t-sub">${esc(t('demo.banner', L))}</span><button class="btn btn-ghost btn-sm" id="demo-off">${esc(t('demo.exit', L))}</button></div>` : '';
-  return `<div class="stack-lg">${banner}${section(t('home.today', L), todayCard(data, today, L))}${pendingCard(data, today, L)}${balanceCard(data, today, L)}${section(t('home.week', L), weekCard(data, today, L))}${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}${backupCard(data, L, now)}</div>`;
+  return `<div class="stack-lg">${banner}${section(t('home.today', L), todayCard(data, today, L))}${pendingCard(data, today, L)}${balanceCard(data, today, L)}${section(t('home.week', L), weekCard(data, today, L, weekOffset))}${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}${backupCard(data, L, now)}</div>`;
 }

@@ -13,6 +13,7 @@ import { confirmDays } from './editors.js';
 import { todayKey, dayInfo, pendingPastDays } from '../data/stats.js';
 import { animateNumber } from '../ui/ui.js';
 
+let homeWeek = 0; // which week the Home strip shows (0 = this week)
 let demo = false; // preview with sample data: memory only, never saved
 const getData = () => (demo ? demoData() : readDashboardData(localStorage));
 const rerender = () => render(false, false);
@@ -79,7 +80,7 @@ const row = (ic, title, sub, href) => {
 const seg = (id, labelKey, opts) => `<div class="field"><span class="label" id="l-${id}">${esc(t(labelKey))}</span><div class="seg" id="${id}" role="group" aria-labelledby="l-${id}">${opts.map(([v, k]) => `<button data-value="${v}" aria-pressed="false">${esc(t(k))}</button>`).join('')}</div></div>`;
 
 const VIEWS = {
-  home: () => header(t('nav.home'), '', null) + renderHome({ data: getData(), demo, lang: getLang() }),
+  home: () => header(t('nav.home'), '', null) + renderHome({ data: getData(), demo, lang: getLang(), weekOffset: homeWeek }),
   work: () => header(t('nav.work'), t('work.sub'), null) + renderWork({ data: getData(), lang: getLang() }),
   money: () => header(t('nav.money'), t('money.sub'), null) + renderMoney({ data: getData(), lang: getLang() }),
   settings: () => header(t('nav.settings'), t('settings.sub'), null) + `<div class="list">
@@ -120,6 +121,10 @@ function wire(name) {
   if (name === 'home') {
     document.getElementById('demo-on')?.addEventListener('click', () => { demo = true; render(false); });
     document.getElementById('demo-off')?.addEventListener('click', () => { demo = false; render(false); });
+    document.getElementById('hw-prev')?.addEventListener('click', () => { homeWeek--; rerender(); });
+    document.getElementById('hw-next')?.addEventListener('click', () => { homeWeek++; rerender(); });
+    document.getElementById('hw-now')?.addEventListener('click', () => { homeWeek = 0; rerender(); });
+    document.querySelectorAll('.cal-d[data-day]').forEach((b) => b.addEventListener('click', () => openWorkEditor({ day: /** @type {HTMLElement} */ (b).dataset.day || '', data: getData(), demo, onDone: rerender })));
     document.getElementById('confirm-today')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: [dayInfo(d.work, d.rules, todayKey())], data: d, demo, onDone: rerender }); });
     document.getElementById('confirm-all')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: pendingPastDays(d.work, d.rules, todayKey(), 14), data: d, demo, onDone: rerender }); });
     document.getElementById('tip-today')?.addEventListener('click', () => openWorkEditor({ day: todayKey(), data: getData(), demo, focus: 'tips', onDone: rerender }));

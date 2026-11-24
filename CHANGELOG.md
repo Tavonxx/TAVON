@@ -20,3 +20,5 @@
 
 ## Phase 08 (feedback round)
 - Renamed statuses; one-tap/batch confirm of scheduled work days; recent tip chips; finance calendar with counts; quick repeat entries; faster entry editor.
+
+- Home week strip can move to other weeks (prev/next/this week) and tapping a day opens its editor.

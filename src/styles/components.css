@@ -177,3 +177,5 @@ details.more>summary .i{transition:transform var(--dur-2) var(--ease)}
 .cnt.out{color:var(--danger)}.cnt.out i{border-radius:1px}
 .cal-d[aria-pressed="true"] .cnt{color:inherit}
 .chips{display:flex;flex-wrap:wrap;gap:var(--s-2)}
+
+.cal-w{min-height:3.75rem;justify-content:flex-start;padding-top:.375rem;gap:2px}
