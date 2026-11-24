@@ -2,9 +2,28 @@
 // Small UI behaviours: sheet, confirm alert, toast with undo, segmented control, switch, animated number.
 const reduced = () => document.documentElement.dataset.motion === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-/** Bottom sheet from a <dialog class="sheet">. Closes on backdrop tap, Esc, or [data-close]. @param {HTMLDialogElement} d */
+/** Where a centred dialog goes so it sits in the middle of what is actually visible (above the keyboard).
+ * @param {number} vvTop top of the visible area @param {number} vvH its height @param {number} dlgH the dialog's height */
+export function centerTop(vvTop, vvH, dlgH) { return Math.max(vvTop + 12, vvTop + (vvH - dlgH) / 2); }
+
+/** Keep a `.sheet.center` dialog centred in the visible area, also when the keyboard opens/closes or the content grows. @param {HTMLDialogElement} d */
+function fitCenter(d) {
+  const vv = window.visualViewport;
+  const place = () => {
+    const h = vv ? vv.height : innerHeight, top0 = vv ? vv.offsetTop : 0;
+    d.style.maxHeight = Math.max(200, h - 24) + 'px';
+    d.style.top = centerTop(top0, h, d.offsetHeight) + 'px';
+  };
+  place(); // the dialog is already open here, so its height is real
+  const ro = typeof ResizeObserver === 'function' ? new ResizeObserver(place) : null; ro?.observe(d);
+  vv?.addEventListener('resize', place); vv?.addEventListener('scroll', place);
+  d.addEventListener('close', () => { ro?.disconnect(); vv?.removeEventListener('resize', place); vv?.removeEventListener('scroll', place); d.style.top = ''; d.style.maxHeight = ''; }, { once: true });
+}
+
+/** Bottom sheet (or centred card with class "center") from a <dialog class="sheet">. Closes on backdrop tap, Esc, or [data-close]. @param {HTMLDialogElement} d */
 export function openSheet(d) {
   if (!d.open) d.showModal();
+  if (d.classList.contains('center')) fitCenter(d);
   const close = () => closeSheet(d);
   d.onclick = (e) => { if (e.target === d || /** @type {HTMLElement} */ (e.target).closest('[data-close]')) close(); };
   d.oncancel = (e) => { e.preventDefault(); close(); };

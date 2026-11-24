@@ -33,3 +33,11 @@ test('icons: sprite contains every icon, unknown name throws', () => {
   assert.throws(() => icon('nope'));
   assert.ok(icon('home').includes('aria-hidden="true"'));
 });
+
+import { centerTop } from '../src/ui/ui.js';
+test('centerTop centres in the visible area and never goes above it', () => {
+  assert.equal(centerTop(0, 800, 400), 200);
+  assert.equal(centerTop(0, 500, 400), 50);   // keyboard up: centred in the 500px that is visible
+  assert.equal(centerTop(0, 420, 400), 12);   // too tall: stays at the top margin
+  assert.equal(centerTop(60, 500, 400), 110); // page scrolled by the browser
+});

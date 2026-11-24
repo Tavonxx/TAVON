@@ -15,7 +15,7 @@ const wdName = (wd, lang) => new Intl.DateTimeFormat(lang === 'en' ? 'en-CA' : '
 /** @returns {HTMLDialogElement} */
 function sheet() {
   let d = /** @type {HTMLDialogElement|null} */ (document.getElementById('pl-sheet'));
-  if (!d) { d = document.createElement('dialog'); d.id = 'pl-sheet'; d.className = 'sheet'; d.setAttribute('aria-labelledby', 'pl-t'); document.body.append(d); }
+  if (!d) { d = document.createElement('dialog'); d.id = 'pl-sheet'; d.className = 'sheet center'; d.setAttribute('aria-labelledby', 'pl-t'); document.body.append(d); }
   return d;
 }
 const head = (title) => `<div class="between"><h2 class="t-title3" id="pl-t">${esc(title)}</h2><button class="btn btn-ghost btn-icon" data-close aria-label="${esc(t('close'))}">${icon('close')}</button></div>`;

@@ -10,7 +10,7 @@ import { addRate, updateRate, removeRate, restoreRate, normPlace } from '../data
 /** @returns {HTMLDialogElement} */
 function sheet() {
   let d = /** @type {HTMLDialogElement|null} */ (document.getElementById('pay-sheet'));
-  if (!d) { d = document.createElement('dialog'); d.id = 'pay-sheet'; d.className = 'sheet'; d.setAttribute('aria-labelledby', 'pay-t'); document.body.append(d); }
+  if (!d) { d = document.createElement('dialog'); d.id = 'pay-sheet'; d.className = 'sheet center'; d.setAttribute('aria-labelledby', 'pay-t'); document.body.append(d); }
   return d;
 }
 const head = (title) => `<div class="between"><h2 class="t-title3" id="pay-t">${esc(title)}</h2><button class="btn btn-ghost btn-icon" data-close aria-label="${esc(t('close'))}">${icon('close')}</button></div>`;

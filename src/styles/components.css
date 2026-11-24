@@ -225,7 +225,7 @@ a.card,a.card-flat,button.card,button.card-flat{transition:transform var(--dur-1
 a.card:active,a.card-flat:active,button.card:active,button.card-flat:active{transform:scale(.98)}
 /* Entry dialogs with a keyboard (tip, shortcut, add/edit): a floating card in the upper-middle, so the
    keyboard never hides the fields or the Save button. */
-.sheet.center{inset:9dvh 0 auto 0;width:min(calc(100% - 2rem),var(--content-max));max-height:78dvh;border-radius:var(--r-xl);border:var(--hairline) solid var(--line);padding:var(--s-5)}
+.sheet.center{inset:9dvh 0 auto 0;width:min(calc(100% - 2rem),var(--content-max));max-height:78dvh;border-radius:var(--r-xl);border:var(--hairline) solid var(--line);padding:var(--s-4) var(--s-5)}
 .sheet.center::before{display:none}
 .sheet.center[open]{animation:pop var(--dur-3) var(--ease) both}
 .sheet.center.closing{animation:popOut var(--dur-2) var(--ease-io) both}

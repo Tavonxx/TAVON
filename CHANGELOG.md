@@ -54,3 +54,4 @@
 - Drag-to-reorder by the grip handle (arrows stay for accessibility).
 - Press feedback (2% squeeze) on tappable cards. Buttons, tabs, shortcut tiles and the page fade-in already existed.
 - Entry dialogs (tip/work/money editors, shortcut) float in the upper-middle instead of a bottom sheet, so the keyboard does not cover them.
+- All fill-in dialogs (tip, work, money, shortcut, quick add, pay rates, schedule/recurring/categories, backup) are centred in the visible area and re-centre when the keyboard opens (visualViewport). Week detail stays a bottom sheet.

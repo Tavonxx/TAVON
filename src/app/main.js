@@ -42,7 +42,7 @@ function chrome() {
       <button class="tab-plus" id="plus" aria-label="${esc(t('nav.add'))}" aria-haspopup="dialog">${icon('plus')}</button>
       ${tab('money', 'money')}${tab('settings', 'settings')}
     </div></nav>
-    <dialog class="sheet" id="qa" aria-labelledby="qa-t"></dialog>`);
+    <dialog class="sheet center" id="qa" aria-labelledby="qa-t"></dialog>`);
   document.getElementById('plus')?.addEventListener('click', openQuick);
   document.querySelectorAll('.tab').forEach((a) => a.addEventListener('click', () => {
     if (a.getAttribute('aria-current') === 'page') window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' }); // tap current tab = back to top

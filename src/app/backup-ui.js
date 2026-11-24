@@ -48,7 +48,7 @@ export function wireBackupPage({ demo, rerender }) {
     if (!parsed.ok) { toast(t('bk.import.bad')); return; }
     const now = currentSummary(localStorage), inFile = parsed.summary;
     let d = /** @type {HTMLDialogElement|null} */ (document.getElementById('bk-sheet'));
-    if (!d) { d = document.createElement('dialog'); d.id = 'bk-sheet'; d.className = 'sheet'; d.setAttribute('aria-labelledby', 'bk-t'); document.body.append(d); }
+    if (!d) { d = document.createElement('dialog'); d.id = 'bk-sheet'; d.className = 'sheet center'; d.setAttribute('aria-labelledby', 'bk-t'); document.body.append(d); }
     const line = (k, a, b) => `<div class="row"><span class="row-main"><span class="row-title">${esc(t(k))}</span></span><span class="num">${a} → <b>${b}</b></span></div>`;
     d.innerHTML = `<div class="stack"><div class="between"><h2 class="t-title3" id="bk-t">${esc(t('bk.import.title'))}</h2><button class="btn btn-ghost btn-icon" data-close aria-label="${esc(t('close'))}">${icon('close')}</button></div>
       <p class="t-sub">${esc(t('bk.import.warn'))}</p>
