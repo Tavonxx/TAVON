@@ -5,8 +5,9 @@ import { segmented } from '../ui/ui.js';
 import { t } from './i18n.js';
 import { esc } from './format.js';
 import { money, hours, shortDate, dayLabel, weekdayShort, monthLabel } from './format.js';
-import { todayKey, weekStartKey, addDays, weekSummary, monthWork, monthSummary, filterItems, categoryShare, nextMonth, itemsByDay, pendingPastDays } from '../data/stats.js';
+import { todayKey, weekStartKey, addDays, weekSummary, monthWork, monthSummary, payPeriod, stepPeriod, periodSummary, filterItems, categoryShare, nextMonth, itemsByDay, pendingPastDays } from '../data/stats.js';
 import { readCategories, categoryLabel, addItem } from '../data/store.js';
+import { periodLabel } from './format.js';
 import { openWorkEditor, openMoneyEditor, confirmDays } from './editors.js';
 import { shortcutGrid, wireShortcuts } from './shortcuts.js';
 import { toast } from '../ui/ui.js';
@@ -18,21 +19,33 @@ const navBar = (label, id) => `<div class="between"><button class="btn btn-secon
 const mark = (s) => (s === 'worked' ? '<i class="dot"></i>' : s === 'planned' ? '<i class="dot ring"></i>' : s === 'leave' ? '<i class="dot sq"></i>' : '');
 
 /* ---------------- Work hours ---------------- */
-const W = { view: 'week', week: '', month: '' };
+const W = { view: 'week', week: '', month: '', period: '' };
+/** One day row (shared by the week and pay-period views). @param {any} x @param {string} today @param {string} lang */
+const dayRow = (x, today, lang) => {
+  const pending = x.status === 'planned' && x.day < today;
+  return `<div class="row split"><button class="row-hit" data-day="${x.day}"><span class="row-icon${x.day === today ? ' accent' : ''}"><span class="t-footnote">${esc(weekdayShort(x.day, lang))}</span></span><span class="row-main"><span class="row-title">${esc(dayLabel(x.day, lang))}</span><br><span class="row-sub">${esc(x.place || '—')}${x.time ? ' · ' + esc(x.time) : ''}</span></span><span class="row-trail"><span class="stack" style="gap:2px;align-items:flex-end"><span class="badge badge-${BADGE[x.status] || 'neutral'}">${esc(t('st.' + x.status))}</span><span class="t-footnote num">${x.status === 'worked' || x.status === 'planned' ? hours(x.hours) + ' ' + esc(t('home.hours')) : ''}${x.tips ? ' · ' + esc(money(x.tips)) : ''}</span></span>${pending ? '' : icon('chevron', 'i-sm')}</span></button>${pending ? `<button class="btn btn-tonal btn-icon row-act" data-confirm="${x.day}" aria-label="${esc(t('cf.one') + ': ' + dayLabel(x.day, lang))}">${icon('check')}</button>` : ''}</div>`;
+};
 /** @param {{data:any, lang:string}} c */
 export function renderWork({ data, lang }) {
-  const today = todayKey(); if (!W.week) W.week = weekStartKey(today); if (!W.month) W.month = today.slice(0, 7);
-  const tabs = `<div class="seg" id="wk-view" role="group" aria-label="${esc(t('nav.work'))}"><button data-value="week" aria-pressed="${W.view === 'week'}">${esc(t('wk.week'))}</button><button data-value="month" aria-pressed="${W.view === 'month'}">${esc(t('wk.month'))}</button></div>`;
+  const today = todayKey(); if (!W.week) W.week = weekStartKey(today); if (!W.month) W.month = today.slice(0, 7); if (!W.period) W.period = payPeriod(today).start;
+  const tabs = `<div class="seg" id="wk-view" role="group" aria-label="${esc(t('nav.work'))}"><button data-value="week" aria-pressed="${W.view === 'week'}">${esc(t('wk.week'))}</button><button data-value="period" aria-pressed="${W.view === 'period'}">${esc(t('wk.period'))}</button><button data-value="month" aria-pressed="${W.view === 'month'}">${esc(t('wk.month'))}</button></div>`;
   if (W.view === 'week') {
     const s = weekSummary(data.work, data.rules, W.week);
-    const rows = s.days.map((x) => {
-      const pending = x.status === 'planned' && x.day < today;
-      return `<div class="row split"><button class="row-hit" data-day="${x.day}"><span class="row-icon${x.day === today ? ' accent' : ''}"><span class="t-footnote">${esc(weekdayShort(x.day, lang))}</span></span><span class="row-main"><span class="row-title">${esc(dayLabel(x.day, lang))}</span><br><span class="row-sub">${esc(x.place || '—')}${x.time ? ' · ' + esc(x.time) : ''}</span></span><span class="row-trail"><span class="stack" style="gap:2px;align-items:flex-end"><span class="badge badge-${BADGE[x.status] || 'neutral'}">${esc(t('st.' + x.status))}</span><span class="t-footnote num">${x.status === 'worked' || x.status === 'planned' ? hours(x.hours) + ' ' + esc(t('home.hours')) : ''}${x.tips ? ' · ' + esc(money(x.tips)) : ''}</span></span>${pending ? '' : icon('chevron', 'i-sm')}</span></button>${pending ? `<button class="btn btn-tonal btn-icon row-act" data-confirm="${x.day}" aria-label="${esc(t('cf.one') + ': ' + dayLabel(x.day, lang))}">${icon('check')}</button>` : ''}</div>`;
-    }).join('');
+    const rows = s.days.map((x) => dayRow(x, today, lang)).join('');
     const pend = pendingPastDays(data.work, data.rules, today, 14);
     return `<div class="stack-lg">${tabs}${navBar(shortDate(W.week, lang) + ' – ' + shortDate(addDays(W.week, 6), lang), 'wk')}
       <div class="card"><div class="grid-2"><div class="stat"><span class="t-label">${esc(t('home.worked'))}</span><span class="t-title2 num">${hours(s.workedHours)}</span><span class="t-footnote muted num">${esc(t('home.planned'))} ${hours(s.plannedHours)}</span></div><div class="stat"><span class="t-label">${esc(t('home.tips'))}</span><span class="t-title2 num">${esc(money(s.tips))}</span></div></div></div>
       ${pend.length ? `<button class="btn btn-primary btn-block" id="wk-confirm-all">${icon('check', 'i-sm')}${esc(t('cf.all'))} (${pend.length})</button>` : ''}<div class="list">${rows}</div><button class="btn btn-ghost btn-block" id="wk-today">${esc(t('wk.thisweek'))}</button></div>`;
+  }
+  if (W.view === 'period') {
+    const s = periodSummary(data.work, data.rules, W.period), pend = pendingPastDays(data.work, data.rules, today, 400).filter((x) => x.day >= s.start && x.day <= s.end);
+    const cur = payPeriod(today).start === s.start;
+    return `<div class="stack-lg">${tabs}${navBar(periodLabel(s.start, s.end, lang), 'wk')}
+      <div class="card stack"><div class="grid-2"><div class="stat"><span class="t-label">${esc(t('home.worked'))}</span><span class="t-title2 num">${hours(s.workedHours)} <span class="t-sub muted">${esc(t('home.hours'))}</span></span><span class="t-footnote muted num">${esc(t('wk.unconf'))} ${hours(s.plannedHours)}</span></div>
+      <div class="stat"><span class="t-label">${esc(t('wk.days'))}</span><span class="t-title2 num">${s.workedDays}</span><span class="t-footnote muted num">${esc(t('wk.unconf'))} ${s.plannedDays}</span></div></div>
+      <div class="between"><span class="t-sub muted">${esc(t('home.tips'))}</span><span class="t-headline num">${esc(money(s.tips))}</span></div><p class="t-footnote muted">${esc(t('wk.period.note'))}</p></div>
+      ${pend.length ? `<button class="btn btn-primary btn-block" id="wk-confirm-period">${icon('check', 'i-sm')}${esc(t('cf.all'))} (${pend.length})</button>` : ''}
+      <div class="list">${s.days.filter((x) => x.status !== 'off' || x.hours || x.tips || x.note).map((x) => dayRow(x, today, lang)).join('')}</div>${cur ? '' : `<button class="btn btn-ghost btn-block" id="wk-today">${esc(t('wk.thisperiod'))}</button>`}</div>`;
   }
   const m = monthWork(data.work, data.rules, W.month);
   const [y, mo] = W.month.split('-').map(Number); const lead = (new Date(y, mo - 1, 1).getDay() + 6) % 7;
@@ -49,12 +62,13 @@ export function renderWork({ data, lang }) {
 /** @param {{data:any, demo:boolean, rerender:()=>void}} c */
 export function wireWork({ data, demo, rerender }) {
   const seg = document.getElementById('wk-view'); if (seg) segmented(seg, (v) => { W.view = v; rerender(); });
-  const step = (dir) => { if (W.view === 'week') W.week = addDays(W.week, 7 * dir); else W.month = dir > 0 ? nextMonth(W.month) : prevMonth(W.month); rerender(); };
+  const step = (dir) => { if (W.view === 'week') W.week = addDays(W.week, 7 * dir); else if (W.view === 'period') W.period = stepPeriod(W.period, dir).start; else W.month = dir > 0 ? nextMonth(W.month) : prevMonth(W.month); rerender(); };
   document.getElementById('wk-prev')?.addEventListener('click', () => step(-1));
   document.getElementById('wk-next')?.addEventListener('click', () => step(1));
-  document.getElementById('wk-today')?.addEventListener('click', () => { W.week = ''; W.month = ''; rerender(); });
+  document.getElementById('wk-today')?.addEventListener('click', () => { W.week = ''; W.month = ''; W.period = ''; rerender(); });
   document.querySelectorAll('[data-day]').forEach((b) => b.addEventListener('click', () => openWorkEditor({ day: /** @type {HTMLElement} */ (b).dataset.day || '', data, demo, onDone: rerender })));
   document.querySelectorAll('[data-confirm]').forEach((b) => b.addEventListener('click', () => { const day = /** @type {HTMLElement} */ (b).dataset.confirm; confirmDays({ days: pendingPastDays(data.work, data.rules, todayKey(), 400).filter((x) => x.day === day), data, demo, onDone: rerender }); }));
+  document.getElementById('wk-confirm-period')?.addEventListener('click', () => { const p = payPeriod(W.period); confirmDays({ days: pendingPastDays(data.work, data.rules, todayKey(), 400).filter((x) => x.day >= p.start && x.day <= p.end), data, demo, onDone: rerender }); });
   document.getElementById('wk-confirm-all')?.addEventListener('click', () => confirmDays({ days: pendingPastDays(data.work, data.rules, todayKey(), 14), data, demo, onDone: rerender }));
 }
 

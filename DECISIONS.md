@@ -67,3 +67,6 @@
 - Direction: dial (A) in warm tone, concentric rings (3). Rings = today hours / week hours / week work days. Tips live in the detail view, not a ring.
 - Outer ring cannot show partial progress: data model has confirmed days only. Not faked.
 - Home slimmed by folding recent + upcoming bills into a details block (nothing deleted).
+
+## D-PayPeriod
+- Per Pee: only hours matter, no breaks, no pay date, no copy/share. Confirmed ("worked") and planned hours are never mixed in the worked total.

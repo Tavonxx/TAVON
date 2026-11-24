@@ -2,7 +2,7 @@
 // Home dashboard. Pure rendering: takes data in, returns HTML out. Never writes anything.
 import { icon } from '../ui/icons.js';
 import { t } from './i18n.js';
-import { money, hours, dayLabel, weekdayShort, shortDate, esc } from './format.js';
+import { money, hours, dayLabel, weekdayShort, shortDate, periodLabel, esc } from './format.js';
 import { shortcutGrid } from './shortcuts.js';
 import { ringDial } from '../ui/dial.js';
 import { readCategories, categoryLabel } from '../data/store.js';
@@ -24,13 +24,13 @@ function dayBody(i, L, withHours = true) {
 /** Today as a dial: rings + the three numbers written out + place/tips + the two actions. @param {any} d @param {string} today @param {string} L */
 function todayCard(d, today, L) {
   const i = dayInfo(d.work, d.rules, today), r = ringStats(d.work, d.rules, today);
-  const h = (n) => hours(n);
+  const h = (n) => hours(n), plabel = periodLabel(r.period.start, r.period.end, L);
   const center = i.status === 'off' || i.status === 'leave' || i.status === 'swapped' ? '–' : h(r.today.done || r.today.target);
   const sub = i.status === 'worked' ? t('dial.done', L) : i.status === 'planned' ? t('dial.plan', L) : t('st.' + i.status, L);
-  const aria = t('dial.aria', L).replace('{a}', h(r.today.done)).replace('{b}', h(r.today.target)).replace('{c}', h(r.hours.done)).replace('{d}', h(r.hours.total)).replace('{e}', String(r.days.done)).replace('{f}', String(r.days.total));
+  const aria = t('dial.aria', L).replace('{a}', h(r.today.done)).replace('{b}', h(r.today.target)).replace('{p}', plabel).replace('{c}', h(r.hours.done)).replace('{d}', h(r.hours.total)).replace('{e}', String(r.days.done)).replace('{f}', String(r.days.total));
   const dial = ringDial({ rings: [{ done: r.today.done, total: r.today.target }, { done: r.hours.done, total: r.hours.total }, { done: r.days.done, total: r.days.total }], center: esc(center), sub: esc(sub), label: aria });
   const leg = (k, label, a, b, unit) => `<div><span class="v num">${esc(a)} / ${esc(b)}</span><span class="l"><i class="k ${k}"></i>${esc(label)} ${esc(unit)}</span></div>`;
-  const legend = `<div class="legend">${leg('k1', t('dial.today', L), h(r.today.done), h(r.today.target), t('home.hours', L))}${leg('k2', t('dial.week', L), h(r.hours.done), h(r.hours.total), t('home.hours', L))}${leg('k3', t('dial.days', L), String(r.days.done), String(r.days.total), t('dial.unit.d', L))}</div>`;
+  const legend = `<div class="legend">${leg('k1', t('dial.today', L), h(r.today.done), h(r.today.target), t('home.hours', L))}${leg('k2', plabel, h(r.hours.done), h(r.hours.total), t('home.hours', L))}${leg('k3', t('dial.days', L), String(r.days.done), String(r.days.total), t('dial.unit.d', L))}</div>`;
   return `<div class="card stack" id="today-card"><div class="between"><span class="t-headline">${esc(dayLabel(today, L))}</span><span class="badge badge-${BADGE[i.status] || 'neutral'}">${esc(t('st.' + i.status, L))}</span></div>${dial}${legend}${dayBody(i, L, false)}
     ${i.status === 'planned' ? `<button class="btn btn-primary btn-block" id="confirm-today">${icon('check', 'i-sm')}${esc(t('cf.one', L))}</button>` : ''}
     <button class="btn btn-tonal btn-block" id="tip-today">${icon('plus', 'i-sm')}${esc(t('home.addtip', L))}</button></div>`;

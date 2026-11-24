@@ -64,3 +64,6 @@ Pee chose direction "A, warm tone" then "concentric rings (style 3) as the main 
 - `ringStats` (stats.js, tested), `src/ui/dial.js` (pure SVG, tested), ring draw-in animation (off with reduced motion / motion=off).
 - Warmer tokens: light bg/surface warmed, dark theme is now warm brown instead of neutral black; forest accent darkened slightly to keep AA. Logo now switches ink/paper by theme (was invisible in dark mode).
 Honest limit: the outer ring is 0 or full (the app records confirmed days, not live hours). Partial fill would need a clock-in feature.
+
+## Pay periods (Pee's payroll check): DONE (awaiting approval)
+Pay periods are 1-15 and 16-end of month. Home dial middle ring + third ring now = this pay period (hours, work days); legend label reads like "16-30 พ.ย."; week hours stay in the line under the week strip. Work tab has a new "Pay period" view (สัปดาห์ / รอบเงินเดือน / เดือน): period navigation, confirmed hours vs planned-not-confirmed kept apart, tips, per-day list, "confirm all in this period". No copy/share button, no break deduction, no pay date (Pee: hours only, no breaks). `payPeriod/stepPeriod/periodSummary` tested incl. Feb, leap year, year change; hours summed in hundredths.

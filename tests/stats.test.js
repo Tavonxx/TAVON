@@ -117,11 +117,43 @@ test('ringStats: today/week/days from confirmed vs planned; off day has no targe
   const rules = [1, 2, 4].map((weekday) => ({ weekday, place: 'K', time: '', hours: 8 })); // Mon Tue Thu
   const work = { '2026-11-23': { status: 'worked', hours: 8 } };
   const r = ringStats(work, rules, '2026-11-24'); // Tuesday, planned
-  assert.deepEqual(r.today, { done: 0, target: 8 }); assert.deepEqual(r.hours, { done: 8, total: 24 }); assert.deepEqual(r.days, { done: 1, total: 3 });
+  assert.deepEqual(r.today, { done: 0, target: 8 }); assert.deepEqual(r.hours, { done: 8, total: 56 }); assert.deepEqual(r.days, { done: 1, total: 7 }); assert.deepEqual(r.period, { start: '2026-11-16', end: '2026-11-30' });
   const off = ringStats(work, rules, '2026-11-25'); assert.deepEqual(off.today, { done: 0, target: 0 }); assert.equal(off.status, 'off');
   assert.deepEqual(ringStats({}, [], '2026-11-24').hours, { done: 0, total: 0 });
 });
 test('ringDial: arcs only for progress > 0, clamped, label escaped', () => {
   const h = ringDial({ rings: [{ done: 5, total: 8 }, { done: 0, total: 8 }, { done: 9, total: 4 }], center: '5', sub: 'x', label: 'a "q"' });
   assert.equal((h.match(/class="ring-arc/g) || []).length, 2); assert.ok(h.includes('stroke-dasharray="100.00 100"')); assert.ok(h.includes('stroke-dasharray="62.50 100"')); assert.ok(h.includes('a &quot;q&quot;'));
+});
+
+import { payPeriod, stepPeriod, periodSummary } from '../src/data/stats.js';
+import { periodLabel } from '../src/app/format.js';
+test('payPeriod: 1-15 and 16-end, leap/short/long months, boundaries', () => {
+  assert.deepEqual(payPeriod('2026-11-15'), { start: '2026-11-01', end: '2026-11-15' });
+  assert.deepEqual(payPeriod('2026-11-16'), { start: '2026-11-16', end: '2026-11-30' });
+  assert.deepEqual(payPeriod('2026-12-31'), { start: '2026-12-16', end: '2026-12-31' });
+  assert.deepEqual(payPeriod('2026-02-20'), { start: '2026-02-16', end: '2026-02-28' });
+  assert.deepEqual(payPeriod('2028-02-29'), { start: '2028-02-16', end: '2028-02-29' });
+  assert.deepEqual(payPeriod('2026-01-01'), { start: '2026-01-01', end: '2026-01-15' });
+});
+test('stepPeriod walks back and forward across months and years', () => {
+  assert.deepEqual(stepPeriod('2026-11-20', -1), { start: '2026-11-01', end: '2026-11-15' });
+  assert.deepEqual(stepPeriod('2026-11-03', -1), { start: '2026-10-16', end: '2026-10-31' });
+  assert.deepEqual(stepPeriod('2026-01-05', -1), { start: '2025-12-16', end: '2025-12-31' });
+  assert.deepEqual(stepPeriod('2026-12-20', 1), { start: '2027-01-01', end: '2027-01-15' });
+  assert.deepEqual(stepPeriod('2026-02-10', 1), { start: '2026-02-16', end: '2026-02-28' });
+});
+test('periodSummary: exact hundredths, confirmed vs planned kept apart, covers every day once', () => {
+  const rules = [{ weekday: 1, place: 'K', time: '', hours: 7.5 }]; // Mondays
+  const work = { '2026-11-16': { status: 'worked', hours: 7.25, tips: 10.1 }, '2026-11-17': { status: 'worked', hours: 0.1, tips: 0.2 }, '2026-11-18': { status: 'worked', hours: 0.2 } };
+  const p = periodSummary(work, rules, '2026-11-20');
+  assert.equal(p.days.length, 15); assert.equal(p.start, '2026-11-16'); assert.equal(p.end, '2026-11-30');
+  assert.equal(p.workedHours, 7.55); assert.equal(p.workedDays, 3); assert.equal(p.tips, 10.3);
+  assert.equal(p.plannedHours, 15); assert.equal(p.plannedDays, 2); // Mon 23 and Mon 30
+  assert.equal(periodSummary({}, [], '2026-02-03').days.length, 15);
+  assert.equal(periodSummary({}, [], '2026-02-20').days.length, 13);
+});
+test('periodLabel reads like people write it', () => {
+  assert.equal(periodLabel('2026-11-16', '2026-11-30', 'en'), 'Nov 16-30');
+  assert.match(periodLabel('2026-11-01', '2026-11-15', 'th'), /^1-15 .+/);
 });

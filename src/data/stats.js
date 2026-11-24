@@ -207,16 +207,36 @@ export function categoryShare(items, month, type = 'expense', top = 5) {
   return { total: total / 100, rows: rows.map((r) => ({ category: r.category, amount: r.cents / 100, pct: Math.round((r.cents / total) * 100) })) };
 }
 
-/** What the three Home rings show: today's hours, this week's hours, this week's work days. "done" = confirmed as worked.
- * @param {any} work @param {any} rules @param {string} today */
+/** The pay period a date falls in: the 1st-15th or the 16th-end of that month. @param {string} key */
+export function payPeriod(key) {
+  const [y, m, d] = key.split('-').map(Number), last = new Date(y, m, 0).getDate(), ym = `${y}-${pad(m)}`;
+  return d <= 15 ? { start: `${ym}-01`, end: `${ym}-15` } : { start: `${ym}-16`, end: `${ym}-${pad(last)}` };
+}
+/** The period right before / after the one that contains `key`. @param {string} key @param {-1|1} dir */
+export function stepPeriod(key, dir) { const p = payPeriod(key); return payPeriod(dir < 0 ? addDays(p.start, -1) : addDays(p.end, 1)); }
+/** Hours, days and tips of one pay period. "worked" = confirmed days, "planned" = still only planned. Hours are summed in hundredths.
+ * @param {any} work @param {any} rules @param {string} key any date inside the period */
+export function periodSummary(work, rules, key) {
+  const { start, end } = payPeriod(key); let wh = 0, ph = 0, wd = 0, pd = 0, tips = 0; const days = [];
+  for (let d = start; d <= end; d = addDays(d, 1)) {
+    const i = dayInfo(work, rules, d); days.push(i);
+    if (i.status === 'worked') { wh += Math.round(i.hours * 100); wd++; } else if (i.status === 'planned') { ph += Math.round(i.hours * 100); pd++; }
+    tips += Math.round(i.tips * 100);
+  }
+  return { start, end, days, workedHours: wh / 100, plannedHours: ph / 100, workedDays: wd, plannedDays: pd, tips: tips / 100 };
+}
+
+/** What the three Home rings show: today's hours, this PAY PERIOD's hours, this period's work days. "done" = confirmed as worked.
+ * Week numbers are still returned for the week summary line. @param {any} work @param {any} rules @param {string} today */
 export function ringStats(work, rules, today) {
-  const i = dayInfo(work, rules, today), w = weekSummary(work, rules, today);
+  const i = dayInfo(work, rules, today), w = weekSummary(work, rules, today), p = periodSummary(work, rules, today);
   const works = i.status === 'worked' || i.status === 'planned';
   return {
     status: i.status,
     today: { done: i.status === 'worked' ? i.hours : 0, target: works ? i.hours : 0 },
-    hours: { done: w.workedHours, total: Math.round((w.workedHours + w.plannedHours) * 100) / 100 },
-    days: { done: w.workedDays, total: w.workedDays + w.plannedDays },
+    hours: { done: p.workedHours, total: Math.round((p.workedHours + p.plannedHours) * 100) / 100 },
+    days: { done: p.workedDays, total: p.workedDays + p.plannedDays },
+    period: { start: p.start, end: p.end },
     tips: w.tips,
   };
 }

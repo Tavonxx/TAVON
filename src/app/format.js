@@ -20,5 +20,11 @@ export const weekdayShort = (key, lang) => { const [y, m, d] = key.split('-').ma
 export function monthLabel(month, lang) { const [y, m] = month.split('-').map(Number); return new Intl.DateTimeFormat(lang === 'en' ? 'en-CA' : 'th-TH-u-ca-gregory', { month: 'long', year: 'numeric' }).format(new Date(y, m - 1, 1, 12)); }
 /** "23 พ.ย." / "Nov 23". @param {string} key @param {string} lang */
 export function shortDate(key, lang) { const [y, m, d] = key.split('-').map(Number); return new Intl.DateTimeFormat(lang === 'en' ? 'en-CA' : 'th-TH-u-ca-gregory', { day: 'numeric', month: 'short' }).format(new Date(y, m - 1, d, 12)); }
+/** A pay period as people write it: "16-30 พ.ย." / "Nov 16-30". @param {string} start @param {string} end @param {string} lang */
+export function periodLabel(start, end, lang) {
+  const [y, m, d1] = start.split('-').map(Number), d2 = Number(end.slice(8));
+  const mon = new Intl.DateTimeFormat(lang === 'en' ? 'en-CA' : 'th-TH-u-ca-gregory', { month: 'short' }).format(new Date(y, m - 1, 1, 12));
+  return lang === 'en' ? `${mon} ${d1}-${d2}` : `${d1}-${d2} ${mon}`;
+}
 /** HTML-escape any text before it goes into markup. @param {any} s */
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c));

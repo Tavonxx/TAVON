@@ -39,3 +39,6 @@
 
 ## Phase 08.5 step 1
 - Home redesigned with a 3-ring dial; warmer light/dark themes; dark-mode logo fix.
+
+## Pay periods
+- Dial rings 2-3 follow the pay period (1-15 / 16-end); new Pay period view in the Work tab.
