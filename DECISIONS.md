@@ -43,3 +43,6 @@
 ## D-Phase08b
 - Reducing typing is a core requirement: smart defaults (schedule hours, most-used category, today/selected date), one-tap repeat and batch confirm, all undoable. Never auto-confirm silently: the person taps once.
 - Calendar colours: income green, expense red (same as the +/- amounts) plus shape (circle/square) and a number, so it is not colour-only.
+
+## D-Roadmap
+- Added Phase 08.5 (Visual Identity Refresh) at Pee request, after Phase 08 and before 09, so customization and animation use the final look. Numbering of other phases unchanged. Style is token-driven, so the refresh does not touch data or features.
