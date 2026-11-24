@@ -15,12 +15,12 @@ manifest.webmanifest, sw.js   PWA (Phase 11)
 assets/brand/              โลโก้ SVG, icons (Phase 04)
 src/
   app.js                   boot: โหลด settings → ธีม → router
-  router.js                hash router (#/today, #/work/week …) — ใช้ได้บน GitHub Pages, ปุ่ม back ทำงาน
+  router.js                hash router (#/home, #/work/week …) — ใช้ได้บน GitHub Pages, ปุ่ม back ทำงาน
   store.js                 state กลาง + subscribe; เขียน localStorage ผ่าน data layer เท่านั้น
   data/                    ✅ schema, backup, schedule (+ work.js, finance.js คำนวณ — ย้าย logic เดิมมาแบบเทียบผลกับแอปเดิม)
   i18n/th.js, en.js        คำแปลแบบ key (แทนระบบแทนข้อความเดิม)
   ui/                      components: button, card, sheet, dialog, toast, segmented, list-row, number, chart…
-  features/today|work|money|settings/   แต่ละหน้า
+  features/home|work|money|settings/   แต่ละหน้า
   styles/tokens.css        design tokens (สี ขนาด ระยะ เงา motion) — แก้ที่เดียวเปลี่ยนทั้งแอป
   styles/base.css, components.css
 tests/                     node:test (logic) + browser tests (playwright, ใช้ในเครื่อง Claude)

@@ -13,9 +13,10 @@
 - Data layer ใหม่ `src/data/` (schema, backup/import/snapshot/restore, ตารางกะ) · `npm test` 11/11 ผ่าน
 - แผนเต็มใน DATA_MIGRATION.md
 
-## ✅ Phase 03 — Product Strategy & UX Architecture (23 พ.ย. 2026) · รออนุมัติ
+## ✅ Phase 03 — Product Strategy & UX Architecture (23 พ.ย. 2026) · อนุมัติแล้ว
 - Stack: Vanilla ES Modules + JSDoc + tsc (ARCHITECTURE.md) · `npm run typecheck` ผ่าน
 - IA, navigation, quick actions, flows, feature mapping (UX_ARCHITECTURE.md)
 
 ## ▶ ถัดไป: Phase 04 — TAVON Branding & Logo Design
 - สำรวจทิศทางโลโก้ (สัญลักษณ์จากตัว T + negative space) 3 แบบให้พีเลือก → SVG, wordmark, app icon, สีและฟอนต์แบรนด์
+- Phase 04 เริ่ม: logo concepts A Keystone / B Ascent / C Modules ใน assets/brand/concepts (รอพีเลือก)
