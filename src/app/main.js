@@ -74,7 +74,7 @@ function openQuick() {
 }
 
 /** @param {string} title @param {string} sub @param {string|null} back */
-const header = (title, sub, back) => `<header class="navbar">${back ? `<a class="btn btn-ghost btn-sm" style="margin-left:calc(var(--s-4)*-1)" href="#/${back}">${icon('back', 'i-sm')}${esc(t('nav.back'))}</a>` : `<img src="assets/brand/tavon-logo.svg" alt="TAVON" style="height:20px;width:auto">`}<h1 class="t-large" id="page-title" tabindex="-1">${esc(title)}</h1>${sub ? `<p class="t-sub muted">${esc(sub)}</p>` : ''}</header>`;
+const header = (title, sub, back) => `<header class="navbar">${back ? `<a class="btn btn-ghost btn-sm" style="margin-left:calc(var(--s-4)*-1)" href="#/${back}">${icon('back', 'i-sm')}${esc(t('nav.back'))}</a>` : `<img class="logo logo-ink" src="assets/brand/tavon-logo-ink.svg" alt="TAVON"><img class="logo logo-paper" src="assets/brand/tavon-logo-paper.svg" alt="TAVON">`}<h1 class="t-large" id="page-title" tabindex="-1">${esc(title)}</h1>${sub ? `<p class="t-sub muted">${esc(sub)}</p>` : ''}</header>`;
 /** @param {string} ic @param {string} title @param {string} sub */
 const stateCard = (ic, title, sub) => `<div class="card state">${`<div class="state-icon">${icon(ic, 'i-lg')}</div>`}<p class="t-headline">${esc(title)}</p><p class="t-sub muted">${esc(sub)}</p></div>`;
 /** @param {string} ic @param {string} title @param {string} sub @param {string} [href] */
@@ -99,7 +99,7 @@ const VIEWS = {
   'settings/appearance': () => header(t('settings.appearance'), '', 'settings') + `<div class="card stack">
     ${seg('s-theme', 'ap.theme', [['auto', 'ap.auto'], ['light', 'ap.light'], ['dark', 'ap.dark']])}
     <div class="field"><span class="label" id="l-acc">${esc(t('ap.accent'))}</span><div class="cluster" id="accents" role="group" aria-labelledby="l-acc">
-      ${[['terracotta', '#9F4019'], ['forest', '#2F6B54'], ['ocean', '#2C5F8F'], ['mono', '#141414']].map(([v, c]) => `<button class="chip" data-value="${v}" aria-pressed="false"><i class="swatch" style="background:${c}"></i>${esc(t('ap.' + v))}</button>`).join('')}</div></div>
+      ${[['terracotta', '#9F4019'], ['forest', '#2A634D'], ['ocean', '#2C5F8F'], ['mono', '#141414']].map(([v, c]) => `<button class="chip" data-value="${v}" aria-pressed="false"><i class="swatch" style="background:${c}"></i>${esc(t('ap.' + v))}</button>`).join('')}</div></div>
     ${seg('s-size', 'ap.size', [['small', 'S'], ['default', 'M'], ['large', 'L'], ['xlarge', 'XL']].map(([v, k]) => [v, k]))}
     ${seg('s-den', 'ap.density', [['compact', 'ap.compact'], ['comfortable', 'ap.normal'], ['spacious', 'ap.spacious']])}
     <div class="between"><span id="l-mo">${esc(t('ap.motion'))}</span><button class="switch" id="sw-motion" aria-labelledby="l-mo"></button></div>

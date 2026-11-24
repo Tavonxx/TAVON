@@ -206,3 +206,17 @@ export function categoryShare(items, month, type = 'expense', top = 5) {
   if (rows.length > top) { const rest = rows.slice(top).reduce((s, r) => s + r.cents, 0); rows = [...rows.slice(0, top), { category: '', cents: rest }]; }
   return { total: total / 100, rows: rows.map((r) => ({ category: r.category, amount: r.cents / 100, pct: Math.round((r.cents / total) * 100) })) };
 }
+
+/** What the three Home rings show: today's hours, this week's hours, this week's work days. "done" = confirmed as worked.
+ * @param {any} work @param {any} rules @param {string} today */
+export function ringStats(work, rules, today) {
+  const i = dayInfo(work, rules, today), w = weekSummary(work, rules, today);
+  const works = i.status === 'worked' || i.status === 'planned';
+  return {
+    status: i.status,
+    today: { done: i.status === 'worked' ? i.hours : 0, target: works ? i.hours : 0 },
+    hours: { done: w.workedHours, total: Math.round((w.workedHours + w.plannedHours) * 100) / 100 },
+    days: { done: w.workedDays, total: w.workedDays + w.plannedDays },
+    tips: w.tips,
+  };
+}

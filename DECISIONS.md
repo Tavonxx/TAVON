@@ -62,3 +62,8 @@
 ## D-Backup
 - Reminder fixed at 7 days (Pee chose weekly); no interval setting (not needed).
 - Import REPLACES (no merge, no duplicates), always snapshots first. Phase 12 still owns the careful migration of the old app data, with its own backup and explicit permission.
+
+## D-Phase085a
+- Direction: dial (A) in warm tone, concentric rings (3). Rings = today hours / week hours / week work days. Tips live in the detail view, not a ring.
+- Outer ring cannot show partial progress: data model has confirmed days only. Not faked.
+- Home slimmed by folding recent + upcoming bills into a details block (nothing deleted).

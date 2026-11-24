@@ -110,3 +110,18 @@ test('planSwap: moves a work day, refuses wrong days', () => {
   assert.throws(() => planSwap({}, rules, '2026-11-24', '2026-11-24'), { code: 'swapsame' });
   assert.throws(() => planSwap({}, [...rules, { weekday: 3, place: 'K', time: '', hours: 4 }], '2026-11-24', '2026-11-25'), { code: 'swapto' });
 });
+
+import { ringStats } from '../src/data/stats.js';
+import { ringDial } from '../src/ui/dial.js';
+test('ringStats: today/week/days from confirmed vs planned; off day has no target', () => {
+  const rules = [1, 2, 4].map((weekday) => ({ weekday, place: 'K', time: '', hours: 8 })); // Mon Tue Thu
+  const work = { '2026-11-23': { status: 'worked', hours: 8 } };
+  const r = ringStats(work, rules, '2026-11-24'); // Tuesday, planned
+  assert.deepEqual(r.today, { done: 0, target: 8 }); assert.deepEqual(r.hours, { done: 8, total: 24 }); assert.deepEqual(r.days, { done: 1, total: 3 });
+  const off = ringStats(work, rules, '2026-11-25'); assert.deepEqual(off.today, { done: 0, target: 0 }); assert.equal(off.status, 'off');
+  assert.deepEqual(ringStats({}, [], '2026-11-24').hours, { done: 0, total: 0 });
+});
+test('ringDial: arcs only for progress > 0, clamped, label escaped', () => {
+  const h = ringDial({ rings: [{ done: 5, total: 8 }, { done: 0, total: 8 }, { done: 9, total: 4 }], center: '5', sub: 'x', label: 'a "q"' });
+  assert.equal((h.match(/class="ring-arc/g) || []).length, 2); assert.ok(h.includes('stroke-dasharray="100.00 100"')); assert.ok(h.includes('stroke-dasharray="62.50 100"')); assert.ok(h.includes('a &quot;q&quot;'));
+});

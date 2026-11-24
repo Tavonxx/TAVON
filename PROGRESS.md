@@ -57,3 +57,10 @@ Quick action "สลับวันทำงาน" (planSwap in stats.js + save
 
 ## Backup UI (pulled forward from Phase 12 at Pee's request): DONE (awaiting approval)
 Settings > Data & backup (`src/app/backup-ui.js`): "Back up now" builds one dated JSON file and opens the iPhone share sheet (Save to Files / iCloud), falling back to a download; `bk-last` (ms) is only set after the share/download succeeds. Import: file picker, validation, now-vs-file counts, explicit confirm, automatic snapshot first, undo button after. Accepts TAVON and PP Space 2.0 files. Home backup card now links to this page; reminder after 7 days (Pee's choice). Not yet tested on a real iPhone.
+
+## Phase 08.5 (Visual Identity Refresh): step 1 DONE (awaiting approval)
+Pee chose direction "A, warm tone" then "concentric rings (style 3) as the main dial". Built in the real app:
+- Home restructured: banners (pending days / backup, only when relevant) -> Today card with 3-ring dial (today hours, week hours, week work days; legend writes every number so colour is never the only signal) -> shortcut buttons -> compact balance row -> week strip (navigation + day panel kept) -> "Latest and upcoming bills" folded in a details block. No feature removed.
+- `ringStats` (stats.js, tested), `src/ui/dial.js` (pure SVG, tested), ring draw-in animation (off with reduced motion / motion=off).
+- Warmer tokens: light bg/surface warmed, dark theme is now warm brown instead of neutral black; forest accent darkened slightly to keep AA. Logo now switches ink/paper by theme (was invisible in dark mode).
+Honest limit: the outer ring is 0 or full (the app records confirmed days, not live hours). Partial fill would need a clock-in feature.

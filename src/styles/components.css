@@ -193,3 +193,26 @@ details.more>summary .i{transition:transform var(--dur-2) var(--ease)}
 /* Share bars: the number and % are always written out, the bar is only a visual aid */
 .meter{height:.5rem;border-radius:var(--r-pill);background:var(--surface-2);overflow:hidden}
 .meter>span{display:block;height:100%;background:var(--accent);border-radius:var(--r-pill)}
+
+/* Home dial: three rings (today / week / work days). Colour is never the only carrier: the legend writes every number. */
+.dial{display:block;width:min(15rem,72vw);height:auto;margin:0 auto}
+.ring-track{stroke:var(--line)}
+.ring-1{stroke:var(--accent)}.ring-2{stroke:var(--text-2)}.ring-3{stroke:var(--ring-3)}
+.ring-arc{animation:ring-in calc(var(--dur-3)*2) var(--ease) both}
+@keyframes ring-in{from{stroke-dasharray:0 100}}
+.dial-n{font:600 2.125rem/1 var(--font-display);fill:var(--text);font-variant-numeric:tabular-nums}
+.dial-s{font:400 .8125rem/1.4 var(--font);fill:var(--text-3)}
+.legend{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--s-2);text-align:center}
+.legend .v{display:block;font-size:var(--fs-headline);font-weight:600;font-variant-numeric:tabular-nums}
+.legend .l{display:block;font-size:var(--fs-caption);color:var(--text-3);line-height:1.5}
+.legend .k{display:inline-block;width:.5rem;height:.5rem;border-radius:50%;margin-right:.3rem;vertical-align:baseline}
+.k1{background:var(--accent)}.k2{background:var(--text-2)}.k3{background:var(--ring-3)}
+.bal{display:flex;justify-content:space-between;align-items:center;gap:var(--s-3)}
+
+/* Logo: dark ink on light themes, light paper on dark themes */
+.logo{height:20px;width:auto}
+.logo-paper{display:none}
+html[data-theme="dark"] .logo-ink{display:none}
+html[data-theme="dark"] .logo-paper{display:block}
+.bal .t-title2{white-space:nowrap;flex:none}
+.bal>div{min-width:0}

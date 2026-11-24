@@ -59,7 +59,7 @@ html[data-font-size="xlarge"]{font-size:125%}
 html[data-density="compact"]{--row-h:2.75rem;--pad-card:var(--s-3);--gap:var(--s-2)}
 html[data-density="spacious"]{--row-h:3.75rem;--pad-card:var(--s-5);--gap:var(--s-4)}
 html[data-accent="terracotta"]{--acc-light:#9F4019;--acc-dark:#E58A5F}
-html[data-accent="forest"]{--acc-light:#2F6B54;--acc-dark:#6FBF9F}
+html[data-accent="forest"]{--acc-light:#2A634D;--acc-dark:#6FBF9F}
 html[data-accent="ocean"]{--acc-light:#2C5F8F;--acc-dark:#7DB0E0}
 html[data-accent="mono"]{--acc-light:#141414;--acc-dark:#F4F1EA}
 
@@ -70,10 +70,10 @@ html[data-motion="off"]{--dur-1:.01ms;--dur-2:.01ms;--dur-3:.01ms}
 /* ---------- Light theme (default) ---------- */
 :root{
   color-scheme:light;
-  --bg:#F4F1EA;--surface:#FBFAF7;--surface-2:#ECE8DF;
-  --line:#DDD8CC;--line-strong:#85827A;
-  --text:#141414;--text-2:#3A3936;--text-3:#5F5C54;
-  --accent:var(--acc-light);--on-accent:#FBFAF7;
+  --bg:#F6EFE6;--surface:#FBF7F1;--surface-2:#EDE5D8;
+  --line:#E0D5C5;--line-strong:#80736A;
+  --text:#1E1813;--text-2:#3E352D;--text-3:#5F5449;
+  --accent:var(--acc-light);--on-accent:#FBF7F1;--ring-3:#A66A12;
   --accent-soft:color-mix(in srgb,var(--accent) 10%,transparent);
   --success:#256B45;--danger:#A8321C;--warning:#7F5200;--info:#2C5F8F;
   --success-soft:color-mix(in srgb,var(--success) 10%,transparent);
@@ -88,12 +88,12 @@ html[data-motion="off"]{--dur-1:.01ms;--dur-2:.01ms;--dur-3:.01ms}
 /* ---------- Dark theme ---------- */
 html[data-theme="dark"]{
   color-scheme:dark;
-  --bg:#141414;--surface:#1D1D1C;--surface-2:#272725;
-  --line:#34332F;--line-strong:#85827A;
-  --text:#F4F1EA;--text-2:#CFCAC0;--text-3:#A29E94;
-  --accent:var(--acc-dark);--on-accent:#141414;
+  --bg:#1C1511;--surface:#261D17;--surface-2:#30251D;
+  --line:#3A2E26;--line-strong:#8C7E70;
+  --text:#F3EADF;--text-2:#D5C8B8;--text-3:#B5A797;
+  --accent:var(--acc-dark);--on-accent:#1C1511;--ring-3:#E0A94A;
   --success:#6CC08B;--danger:#F0867A;--warning:#E3B04B;--info:#7DB0E0;
-  --inverse-bg:#F4F1EA;--inverse-text:#141414;
+  --inverse-bg:#F3EADF;--inverse-text:#1C1511;
   --scrim:rgba(0,0,0,.6);
   --chart-1:#E58A5F;--chart-2:#7DB0E0;--chart-3:#6FBF9F;--chart-4:#E3B04B;--chart-5:#B79AD0;--chart-6:#A29E94;
 }

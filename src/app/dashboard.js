@@ -4,8 +4,9 @@ import { icon } from '../ui/icons.js';
 import { t } from './i18n.js';
 import { money, hours, dayLabel, weekdayShort, shortDate, esc } from './format.js';
 import { shortcutGrid } from './shortcuts.js';
+import { ringDial } from '../ui/dial.js';
 import { readCategories, categoryLabel } from '../data/store.js';
-import { addDays, pendingPastDays, todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData } from '../data/stats.js';
+import { addDays, pendingPastDays, todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData, ringStats } from '../data/stats.js';
 
 export { esc };
 const BADGE = { worked: 'success', planned: 'info', off: 'neutral', leave: 'warning', swapped: 'info' };
@@ -14,16 +15,23 @@ const BADGE = { worked: 'success', planned: 'info', off: 'neutral', leave: 'warn
 const section = (title, body) => `<section class="stack" aria-label="${esc(title)}"><h2 class="t-label">${esc(title)}</h2>${body}</section>`;
 
 /** The details of one day (same markup for the Today card and the week-strip panel). @param {any} i @param {string} L */
-function dayBody(i, L) {
+function dayBody(i, L, withHours = true) {
   const place = i.place ? `<p class="t-sub muted">${esc(i.place)}${i.time ? ' · ' + esc(i.time) : ''}</p>` : '';
-  const hrs = i.status === 'worked' || i.status === 'planned' ? `<p class="t-sub muted num">${hours(i.hours)} ${esc(t('home.hours', L))}</p>` : '';
+  const hrs = !withHours ? '' : i.status === 'worked' || i.status === 'planned' ? `<p class="t-sub muted num">${hours(i.hours)} ${esc(t('home.hours', L))}</p>` : '';
   const note = i.note ? `<p class="t-sub">${esc(i.note)}</p>` : '';
   return `${place}${hrs}${note}<div class="between"><span class="t-sub muted">${esc(t('home.tips', L))}</span><span class="t-headline num">${esc(money(i.tips))}</span></div>`;
 }
-/** @param {any} d @param {string} today @param {string} L */
+/** Today as a dial: rings + the three numbers written out + place/tips + the two actions. @param {any} d @param {string} today @param {string} L */
 function todayCard(d, today, L) {
-  const i = dayInfo(d.work, d.rules, today);
-  return `<div class="card stack" id="today-card"><div class="between"><span class="t-headline">${esc(dayLabel(today, L))}</span><span class="badge badge-${BADGE[i.status] || 'neutral'}">${esc(t('st.' + i.status, L))}</span></div>${dayBody(i, L)}
+  const i = dayInfo(d.work, d.rules, today), r = ringStats(d.work, d.rules, today);
+  const h = (n) => hours(n);
+  const center = i.status === 'off' || i.status === 'leave' || i.status === 'swapped' ? '–' : h(r.today.done || r.today.target);
+  const sub = i.status === 'worked' ? t('dial.done', L) : i.status === 'planned' ? t('dial.plan', L) : t('st.' + i.status, L);
+  const aria = t('dial.aria', L).replace('{a}', h(r.today.done)).replace('{b}', h(r.today.target)).replace('{c}', h(r.hours.done)).replace('{d}', h(r.hours.total)).replace('{e}', String(r.days.done)).replace('{f}', String(r.days.total));
+  const dial = ringDial({ rings: [{ done: r.today.done, total: r.today.target }, { done: r.hours.done, total: r.hours.total }, { done: r.days.done, total: r.days.total }], center: esc(center), sub: esc(sub), label: aria });
+  const leg = (k, label, a, b, unit) => `<div><span class="v num">${esc(a)} / ${esc(b)}</span><span class="l"><i class="k ${k}"></i>${esc(label)} ${esc(unit)}</span></div>`;
+  const legend = `<div class="legend">${leg('k1', t('dial.today', L), h(r.today.done), h(r.today.target), t('home.hours', L))}${leg('k2', t('dial.week', L), h(r.hours.done), h(r.hours.total), t('home.hours', L))}${leg('k3', t('dial.days', L), String(r.days.done), String(r.days.total), t('dial.unit.d', L))}</div>`;
+  return `<div class="card stack" id="today-card"><div class="between"><span class="t-headline">${esc(dayLabel(today, L))}</span><span class="badge badge-${BADGE[i.status] || 'neutral'}">${esc(t('st.' + i.status, L))}</span></div>${dial}${legend}${dayBody(i, L, false)}
     ${i.status === 'planned' ? `<button class="btn btn-primary btn-block" id="confirm-today">${icon('check', 'i-sm')}${esc(t('cf.one', L))}</button>` : ''}
     <button class="btn btn-tonal btn-block" id="tip-today">${icon('plus', 'i-sm')}${esc(t('home.addtip', L))}</button></div>`;
 }
@@ -44,10 +52,9 @@ function pendingCard(d, today, L) {
 /** @param {any} d @param {string} today @param {string} L */
 function balanceCard(d, today, L) {
   const s = monthSummary(d.items, today.slice(0, 7));
-  return `<div class="card-accent stack"><span class="t-label" style="color:inherit">${esc(t('home.balance', L))}</span>
-    <span class="t-number" data-count="${s.balance}">${esc(money(s.balance))}</span>
-    <div class="grid-2 t-footnote"><span>${esc(t('home.income', L))} <b class="num">${esc(money(s.income))}</b></span><span>${esc(t('home.expense', L))} <b class="num">${esc(money(s.expense))}</b></span></div>
-    <span class="t-footnote">${esc(t('home.carry', L))} <span class="num">${esc(money(s.opening))}</span></span></div>`;
+  return `<div class="card bal"><div class="stack" style="gap:var(--s-1)"><span class="t-label">${esc(t('home.balance', L))}</span>
+    <span class="t-footnote muted">${esc(t('home.income', L))} <b class="num">${esc(money(s.income))}</b> · ${esc(t('home.expense', L))} <b class="num">${esc(money(s.expense))}</b></span></div>
+    <span class="t-title2 num" data-count="${s.balance}">${esc(money(s.balance))}</span></div>`;
 }
 /** @param {any} d @param {string} today @param {string} L @param {number} off weeks away from this week @param {string} sel selected day or '' */
 function weekCard(d, today, L, off, sel) {
@@ -58,10 +65,9 @@ function weekCard(d, today, L, off, sel) {
   }).join('');
   const range = `${shortDate(w.days[0].day, L)} – ${shortDate(w.days[6].day, L)}`;
   const nav = `<div class="between"><button class="btn btn-secondary btn-icon" id="hw-prev" aria-label="${esc(t('wk.prev', L))}">${icon('back')}</button><button class="btn btn-ghost btn-sm" id="hw-now"${off === 0 ? ' aria-current="date"' : ''} aria-live="polite">${esc(off === 0 ? t('wk.thisweek', L) + ' · ' + range : range)}</button><button class="btn btn-secondary btn-icon" id="hw-next" aria-label="${esc(t('wk.next', L))}">${icon('chevron')}</button></div>`;
-  return `<div class="card stack">${nav}<div class="grid-2">
-    <div class="stat"><span class="t-label">${esc(t('home.worked', L))}</span><span class="t-title2 num">${hours(w.workedHours)} <span class="t-sub muted">${esc(t('home.hours', L))}</span></span><span class="t-footnote muted num">${esc(t('home.planned', L))} ${hours(w.plannedHours)}</span></div>
-    <div class="stat"><span class="t-label">${esc(t('home.tips', L))}</span><span class="t-title2 num">${esc(money(w.tips))}</span><span class="t-footnote muted">${esc(t('home.tipsnote', L))}</span></div></div>
-    <div class="cal" style="grid-template-columns:repeat(7,1fr)">${cells}</div>${sel && sel !== today && w.days.some((x) => x.day === sel) ? dayPanel(d, sel, today, L) : ''}</div>`;
+  const sum = `<p class="t-footnote muted num">${hours(w.workedHours)} ${esc(t('home.hours', L))} ${esc(t('home.worked', L))} · ${esc(t('home.planned', L))} ${hours(w.plannedHours)} · ${esc(t('home.tips', L))} ${esc(money(w.tips))}</p>`;
+  return `<div class="card stack">${nav}
+    <div class="cal" style="grid-template-columns:repeat(7,1fr)">${cells}</div>${sum}${sel && sel !== today && w.days.some((x) => x.day === sel) ? dayPanel(d, sel, today, L) : ''}</div>`;
 }
 /** @param {any} d @param {string} L */
 function recentList(d, L) {
@@ -91,5 +97,5 @@ export function renderHome({ data, demo, lang, now = new Date(), weekOffset = 0,
     return `<div class="card state"><div class="state-icon">${icon('shield', 'i-lg')}</div><p class="t-headline">${esc(t('empty.title', L))}</p><p class="t-sub muted">${esc(t('empty.sub', L))}</p><button class="btn btn-primary" id="demo-on">${esc(t('empty.demo', L))}</button></div>`;
   }
   const banner = demo ? `<div class="card-flat between"><span class="t-sub">${esc(t('demo.banner', L))}</span><button class="btn btn-ghost btn-sm" id="demo-off">${esc(t('demo.exit', L))}</button></div>` : '';
-  return `<div class="stack-lg">${banner}${section(t('home.today', L), todayCard(data, today, L))}${section(t('sc.title', L), shortcutGrid(data.shortcuts || [], L))}${pendingCard(data, today, L)}${balanceCard(data, today, L)}${section(t('home.week', L), weekCard(data, today, L, weekOffset, selectedDay))}${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}${backupCard(data, L, now)}</div>`;
+  return `<div class="stack-lg">${banner}${pendingCard(data, today, L)}${backupCard(data, L, now)}${section(t('home.today', L), todayCard(data, today, L))}${section(t('sc.title', L), shortcutGrid(data.shortcuts || [], L))}${balanceCard(data, today, L)}${section(t('home.week', L), weekCard(data, today, L, weekOffset, selectedDay))}<details class="more"><summary>${icon('chevron', 'i-sm')}${esc(t('home.more', L))}</summary><div class="stack-lg" style="padding-top:var(--s-2)">${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}</div></details></div>`;
 }

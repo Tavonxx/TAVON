@@ -36,3 +36,6 @@
 
 ## Backup UI
 - Back up now (share sheet to iCloud Files), import with confirmation + undo, Home card links to it.
+
+## Phase 08.5 step 1
+- Home redesigned with a 3-ring dial; warmer light/dark themes; dark-mode logo fix.
