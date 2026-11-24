@@ -12,6 +12,7 @@ import { renderWork, wireWork, renderMoney, wireMoney, openWorkEditor, openMoney
 import { confirmDays } from './editors.js';
 import { wireShortcuts, renderShortcutManage, wireShortcutManage } from './shortcuts.js';
 import { renderPay, wirePay } from './pay-ui.js';
+import { renderHomeLayout, wireHomeLayout } from './home-ui.js';
 import { renderBackupPage, wireBackupPage } from './backup-ui.js';
 import { renderSchedule, wireSchedule, renderRecurring, wireRecurring, openSwap, renderCategories, wireCategories } from './plans.js';
 import { todayKey, dayInfo, pendingPastDays } from '../data/stats.js';
@@ -90,6 +91,7 @@ const VIEWS = {
   work: () => header(t('nav.work'), t('work.sub'), null) + renderWork({ data: getData(), lang: getLang() }),
   money: () => header(t('nav.money'), t('money.sub'), null) + renderMoney({ data: getData(), lang: getLang() }),
   settings: () => header(t('nav.settings'), t('settings.sub'), null) + `<div class="list">
+    ${row('home', t('hl.title'), t('hl.sub'), '#/settings/home')}
     ${row('bolt', t('settings.shortcuts'), t('settings.shortcuts.sub'), '#/settings/shortcuts')}
     ${row('sun', t('settings.appearance'), t('settings.appearance.sub'), '#/settings/appearance')}
     ${row('search', t('settings.language'), getLang() === 'th' ? 'ไทย' : 'English', '#/settings/language')}
@@ -106,6 +108,7 @@ const VIEWS = {
     ${seg('s-den', 'ap.density', [['compact', 'ap.compact'], ['comfortable', 'ap.normal'], ['spacious', 'ap.spacious']])}
     <div class="between"><span id="l-mo">${esc(t('ap.motion'))}</span><button class="switch" id="sw-motion" aria-labelledby="l-mo"></button></div>
     <button class="btn btn-secondary btn-block" id="reset">${esc(t('ap.reset'))}</button></div>`,
+  'settings/home': () => header(t('hl.title'), '', 'settings') + renderHomeLayout({ data: getData(), lang: getLang() }),
   'settings/shortcuts': () => header(t('settings.shortcuts'), '', 'settings') + renderShortcutManage({ data: getData(), lang: getLang() }),
   'settings/schedule': () => header(t('pl.sched'), t('pl.sched.sub'), 'settings') + renderSchedule({ data: getData(), lang: getLang() }),
   'settings/recurring': () => header(t('pl.rec'), t('pl.rec.sub'), 'settings') + renderRecurring({ data: getData(), lang: getLang() }),
@@ -162,6 +165,7 @@ function wire(name) {
   if (name === 'settings/categories') wireCategories({ demo, rerender });
   if (name === 'settings/pay') wirePay({ data: getData(), demo, rerender });
   if (name === 'settings/data') wireBackupPage({ demo, rerender });
+  if (name === 'settings/home') wireHomeLayout({ demo, rerender });
   if (name === 'settings/shortcuts') wireShortcutManage({ data: getData(), demo, rerender });
   if (name === 'work') wireWork({ data: getData(), demo, rerender });
   if (name === 'money') wireMoney({ data: getData(), demo, rerender });

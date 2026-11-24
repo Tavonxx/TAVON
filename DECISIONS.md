@@ -73,3 +73,6 @@
 
 ## D-Pay
 - Rates keyed by workplace name text (days store place as free text). Start-dated rows so raises do not rewrite history. Unmatched hours are shown as not counted instead of guessed. Estimate only: no overtime/holiday rules, no tax.
+
+## D-Layout
+- Today card pinned on top (core of the app); only 4 lower sections customisable. Up/down buttons instead of drag (works with VoiceOver and on small screens).

@@ -100,7 +100,15 @@ export function renderHome({ data, demo, lang, now = new Date(), weekOffset = 0,
     return `<div class="card state"><div class="state-icon">${icon('shield', 'i-lg')}</div><p class="t-headline">${esc(t('empty.title', L))}</p><p class="t-sub muted">${esc(t('empty.sub', L))}</p><button class="btn btn-primary" id="demo-on">${esc(t('empty.demo', L))}</button></div>`;
   }
   const banner = demo ? `<div class="card-flat between"><span class="t-sub">${esc(t('demo.banner', L))}</span><button class="btn btn-ghost btn-sm" id="demo-off">${esc(t('demo.exit', L))}</button></div>` : '';
-  return `<div class="stack-lg">${banner}${pendingCard(data, today, L)}${backupCard(data, L, now)}${section(t('home.today', L), todayCard(data, today, L))}${section(t('sc.title', L), shortcutGrid(data.shortcuts || [], L))}${balanceCard(data, today, L)}${section(t('home.week', L), weekCard(data, today, L, weekOffset, selectedDay))}<details class="more"><summary>${icon('chevron', 'i-sm')}${esc(t('home.more', L))}</summary><div class="stack-lg" style="padding-top:var(--s-2)">${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}</div></details></div>`;
+  const lay = data.layout || { order: ['shortcuts', 'balance', 'week', 'more'], hidden: [] };
+  const parts = {
+    shortcuts: () => section(t('sc.title', L), shortcutGrid(data.shortcuts || [], L)),
+    balance: () => balanceCard(data, today, L),
+    week: () => section(t('home.week', L), weekCard(data, today, L, weekOffset, selectedDay)),
+    more: () => `<details class="more"><summary>${icon('chevron', 'i-sm')}${esc(t('home.more', L))}</summary><div class="stack-lg" style="padding-top:var(--s-2)">${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}</div></details>`,
+  };
+  const body = lay.order.filter((id) => !lay.hidden.includes(id) && parts[id]).map((id) => parts[id]()).join('');
+  return `<div class="stack-lg">${banner}${pendingCard(data, today, L)}${backupCard(data, L, now)}${section(t('home.today', L), todayCard(data, today, L))}${body}</div>`;
 }
 
 /** Body of the "this week" sheet opened from the dial. @param {any} d @param {string} today @param {string} L */

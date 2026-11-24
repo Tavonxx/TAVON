@@ -6,6 +6,7 @@ import { LEGACY_KEYS, TAVON_KEYS, readKey } from './schema.js';
 import { DataError } from './store.js';
 import { shiftForDate } from './schedule.js';
 import { readShortcuts } from './shortcuts.js';
+import { readLayout } from './homelayout.js';
 import { readPayRates } from './pay.js';
 
 export const TZ = 'America/Toronto';
@@ -117,7 +118,7 @@ export function backupAgeDays(iso, now = new Date()) {
 /** Read everything the dashboard needs. Reads only. @param {Storage} storage */
 export function readDashboardData(storage) {
   const g = (k) => readKey(storage, k).value;
-  return { work: g(LEGACY_KEYS.work), items: g(LEGACY_KEYS.finance), recurring: g(LEGACY_KEYS.recurring), rules: g(TAVON_KEYS.shiftSchedule), lastBackup: storage.getItem('bk-last'), shortcuts: readShortcuts(storage), payRates: readPayRates(storage) };
+  return { work: g(LEGACY_KEYS.work), items: g(LEGACY_KEYS.finance), recurring: g(LEGACY_KEYS.recurring), rules: g(TAVON_KEYS.shiftSchedule), lastBackup: storage.getItem('bk-last'), shortcuts: readShortcuts(storage), payRates: readPayRates(storage), layout: readLayout(storage) };
 }
 /** Is there any real data at all? @param {ReturnType<typeof readDashboardData>} d */
 export const hasData = (d) => (isObj(d.work) && Object.keys(d.work).length > 0) || validItems(d.items).length > 0;

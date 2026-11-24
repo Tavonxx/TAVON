@@ -73,3 +73,6 @@ Pay periods are 1-15 and 16-end of month. Home dial middle ring + third ring now
 
 ## Phase 08.5 step 2: DONE (awaiting approval)
 Tap the Home dial -> "this week" sheet (7 days, status, place/time, hours, week totals). Day off/leave/swapped: Today card shows "next work day" (looks 28 days ahead, `nextWorkDay` in stats.js). 94 tests, e2e checked.
+
+## Phase 09 step 1: Arrange Home: DONE (awaiting approval)
+`tavon-home-layout` {order, hidden} (in backups); `src/data/homelayout.js`, `src/app/home-ui.js`, Settings > Arrange Home. 4 sections (shortcuts, balance, week, recent/bills) can be hidden and reordered; Today card, confirm-days card and backup reminder stay fixed. Read cleans odd data; hiding never deletes data. 99 tests + e2e.

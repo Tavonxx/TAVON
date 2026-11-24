@@ -48,3 +48,6 @@
 
 ## Home dial
 - Tap the dial for a week detail sheet; on days off the Today card shows the next work day.
+
+## Arrange Home
+- Show/hide and reorder Home sections from Settings.
