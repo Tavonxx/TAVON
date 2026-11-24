@@ -1,7 +1,7 @@
 // @ts-check
 import { spriteMarkup, icon } from '../ui/icons.js';
 import { load, save, apply, watchSystem, DEFAULTS } from '../ui/appearance.js';
-import { openSheet, closeSheet, toast, segmented, switchControl } from '../ui/ui.js';
+import { openSheet, closeSheet, toast, segmented, switchControl, runFlash } from '../ui/ui.js';
 import { parseRoute } from './router.js';
 import { money } from './format.js';
 import { t, getLang, setLang } from './i18n.js';
@@ -180,6 +180,7 @@ function render(moveFocus = true, animate = moveFocus) {
   const r = parseRoute(location.hash);
   const view = VIEWS[r.name] || VIEWS.notfound;
   app.innerHTML = `<div class="${reducedMotion() || !animate ? '' : 'rise'}">${view()}</div>`;
+  runFlash(app);
   document.querySelectorAll('.tab').forEach((a) => { if (/** @type {HTMLElement} */ (a).dataset.tab === r.tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.title = `${t(r.tab === 'home' && r.name === 'notfound' ? 'nf.title' : 'nav.' + r.tab)} · TAVON`;
   wire(r.name);

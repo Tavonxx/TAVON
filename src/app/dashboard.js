@@ -77,7 +77,7 @@ function recentList(d, L) {
   const cats = readCategories(globalThis.localStorage);
   const rows = recentItems(d.items, 5);
   if (!rows.length) return `<div class="card"><p class="t-sub muted">${esc(t('home.nothing', L))}</p></div>`;
-  return `<div class="list">${rows.map((r) => `<div class="row"><span class="row-icon">${icon(r.type === 'income' ? 'download' : 'upload')}</span><span class="row-main"><span class="row-title">${esc(categoryLabel(cats, r.type, r.category, L))}</span><br><span class="row-sub">${esc(dayLabel(r.date, L))}</span></span><span class="row-trail ${r.type === 'income' ? 'pos' : 'neg'}">${esc(money(r.type === 'income' ? r.amount : -r.amount, { sign: true }))}</span></div>`).join('')}</div>`;
+  return `<div class="list">${rows.map((r) => `<div class="row" data-id="${esc(r.id)}"><span class="row-icon">${icon(r.type === 'income' ? 'download' : 'upload')}</span><span class="row-main"><span class="row-title">${esc(categoryLabel(cats, r.type, r.category, L))}</span><br><span class="row-sub">${esc(dayLabel(r.date, L))}</span></span><span class="row-trail ${r.type === 'income' ? 'pos' : 'neg'}">${esc(money(r.type === 'income' ? r.amount : -r.amount, { sign: true }))}</span></div>`).join('')}</div>`;
 }
 /** @param {any} d @param {string} today @param {string} L */
 function upcomingList(d, today, L) {

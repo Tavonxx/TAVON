@@ -94,3 +94,14 @@ export function animateNumber(el, to, fmt = (n) => String(Math.round(n))) {
   const step = (t) => { const p = Math.min(1, (t - t0) / dur), e = 1 - (1 - p) ** 3; el.textContent = fmt(from + (to - from) * e); if (p < 1) requestAnimationFrame(step); };
   requestAnimationFrame(step);
 }
+
+/** "Something just changed here" cue: a short highlight on what was just added or confirmed.
+ * Call flashNext(selector) before the page re-renders; runFlash() (after render) plays it once. Skipped when motion is off. */
+let pendingFlash = /** @type {string[]} */ ([]);
+/** @param {string} selector */
+export function flashNext(selector) { pendingFlash.push(selector); }
+export function runFlash(/** @type {ParentNode} */ root = document) {
+  const list = pendingFlash; pendingFlash = [];
+  if (reduced()) return;
+  for (const sel of list) root.querySelectorAll(sel).forEach((el) => { el.classList.remove('flash'); void /** @type {HTMLElement} */ (el).offsetWidth; el.classList.add('flash'); el.addEventListener('animationend', () => el.classList.remove('flash'), { once: true }); });
+}

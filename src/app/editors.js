@@ -1,7 +1,7 @@
 // @ts-check
 // Edit sheets for a work day and a money entry. All saving goes through src/data/store.js.
 import { icon } from '../ui/icons.js';
-import { openSheet, closeSheet, toast, segmented } from '../ui/ui.js';
+import { openSheet, closeSheet, toast, segmented, flashNext } from '../ui/ui.js';
 import { t, getLang } from './i18n.js';
 import { esc } from './format.js';
 import { dayLabel } from './format.js';
@@ -29,6 +29,7 @@ export function confirmDays({ days, demo, onDone }) {
   if (!days.length) return;
   try {
     const { prev } = saveWorkDays(localStorage, days.map((x) => ({ day: x.day, patch: { status: 'worked', hours: x.hours, place: x.place, time: x.time } })));
+    days.forEach((x) => flashNext(`[data-day="${x.day}"]`)); flashNext('#today-card');
     onDone();
     toast(t('cf.count').replace('{n}', String(days.length)), { action: t('ap.undo'), ms: 6000, onAction: () => { try { restoreWorkDays(localStorage, prev); onDone(); toast(t('ed.restored')); } catch (e) { fail(e); } } });
   } catch (e) { fail(e); }
@@ -98,7 +99,7 @@ export function openMoneyEditor({ item, type, date, items, demo, onDone }) {
         toast(t('ed.saved'), { action: t('ap.undo'), ms: 5000, onAction: () => { try { reinsertItem(localStorage, prev, index); onDone(); toast(t('ed.restored')); } catch (e) { fail(e); } } });
       } else {
         const added = addItem(localStorage, fields());
-        onDone(); toast(t('ed.saved'), undoAdd(added));
+        flashNext(`[data-id="${added.id}"]`); onDone(); toast(t('ed.saved'), undoAdd(added));
         if (keepOpen) { /** @type {HTMLInputElement} */ (d.querySelector('#e-amount')).value = ''; /** @type {HTMLInputElement} */ (d.querySelector('#e-note')).value = ''; /** @type {HTMLElement} */ (d.querySelector('#e-amount')).focus(); } else closeSheet(d);
       }
     } catch (e) { fail(e); }
@@ -106,7 +107,7 @@ export function openMoneyEditor({ item, type, date, items, demo, onDone }) {
   /** @type {HTMLFormElement} */ (d.querySelector('form')).addEventListener('submit', (ev) => { ev.preventDefault(); submit(false); });
   d.querySelector('#e-more')?.addEventListener('click', () => submit(true));
   d.querySelector('#e-dup')?.addEventListener('click', () => {
-    try { const added = addItem(localStorage, { ...fields(), date: today }); closeSheet(d); onDone(); toast(t('ed.saved'), undoAdd(added)); } catch (e) { fail(e); }
+    try { const added = addItem(localStorage, { ...fields(), date: today }); closeSheet(d); flashNext(`[data-id="${added.id}"]`); onDone(); toast(t('ed.saved'), undoAdd(added)); } catch (e) { fail(e); }
   });
   d.querySelector('#e-sc')?.addEventListener('click', () => { const f = fields(); closeSheet(d); setTimeout(() => openShortcutEditor({ prefill: { label: item.note || '', type: f.type, category: f.category, amount: Number(f.amount) || null, count: 1 }, demo, onDone }), 220); });
   d.querySelector('#e-del')?.addEventListener('click', () => {

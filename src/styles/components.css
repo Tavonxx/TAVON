@@ -230,3 +230,6 @@ a.card:active,a.card-flat:active,button.card:active,button.card-flat:active{tran
 .sheet.center[open]{animation:pop var(--dur-3) var(--ease) both}
 .sheet.center.closing{animation:popOut var(--dur-2) var(--ease-io) both}
 @keyframes popOut{to{opacity:0;transform:scale(.96)}}
+/* Just added / just confirmed: a soft accent wash that fades out */
+@keyframes flash{0%{background-color:color-mix(in srgb,var(--accent) 22%,transparent);transform:scale(1.015)}100%{background-color:transparent;transform:none}}
+.flash{animation:flash calc(var(--dur-3) * 3) var(--ease) both}
