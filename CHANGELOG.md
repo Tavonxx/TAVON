@@ -53,3 +53,4 @@
 - Show/hide and reorder Home sections from Settings.
 - Drag-to-reorder by the grip handle (arrows stay for accessibility).
 - Press feedback (2% squeeze) on tappable cards. Buttons, tabs, shortcut tiles and the page fade-in already existed.
+- Entry dialogs (tip/work/money editors, shortcut) float in the upper-middle instead of a bottom sheet, so the keyboard does not cover them.
