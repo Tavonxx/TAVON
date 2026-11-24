@@ -11,6 +11,7 @@ import { demoData } from './demo.js';
 import { renderWork, wireWork, renderMoney, wireMoney, openWorkEditor, openMoneyEditor } from './datapages.js';
 import { confirmDays } from './editors.js';
 import { wireShortcuts, renderShortcutManage, wireShortcutManage } from './shortcuts.js';
+import { renderPay, wirePay } from './pay-ui.js';
 import { renderBackupPage, wireBackupPage } from './backup-ui.js';
 import { renderSchedule, wireSchedule, renderRecurring, wireRecurring, openSwap, renderCategories, wireCategories } from './plans.js';
 import { todayKey, dayInfo, pendingPastDays } from '../data/stats.js';
@@ -93,6 +94,7 @@ const VIEWS = {
     ${row('sun', t('settings.appearance'), t('settings.appearance.sub'), '#/settings/appearance')}
     ${row('search', t('settings.language'), getLang() === 'th' ? 'ไทย' : 'English', '#/settings/language')}
     ${row('work', t('settings.work'), t('settings.work.sub'), '#/settings/schedule')}
+    ${row('money', t('pay.title'), t('pay.sub'), '#/settings/pay')}
     ${row('tag', t('cat.title'), t('cat.sub'), '#/settings/categories')}
     ${row('money', t('settings.money'), t('settings.money.sub'), '#/settings/recurring')}
     ${row('shield', t('settings.data'), t('settings.data.sub'), '#/settings/data')}</div>`,
@@ -109,6 +111,7 @@ const VIEWS = {
   'settings/recurring': () => header(t('pl.rec'), t('pl.rec.sub'), 'settings') + renderRecurring({ data: getData(), lang: getLang() }),
   'settings/categories': () => header(t('cat.title'), t('cat.sub'), 'settings') + renderCategories({ lang: getLang() }),
   'settings/data': () => header(t('bk.page'), '', 'settings') + renderBackupPage({ lang: getLang() }),
+  'settings/pay': () => header(t('pay.title'), t('pay.sub'), 'settings') + renderPay({ data: getData(), lang: getLang() }),
   'settings/language': () => header(t('settings.language'), '', 'settings') + `<div class="card stack">${seg('s-lang', 'settings.language', [['th', 'ไทย'], ['en', 'English']])}</div>`,
   notfound: () => header(t('nf.title'), '', null) + `<div class="card state"><div class="state-icon">${icon("alert", "i-lg")}</div><a class="btn btn-primary" href="#/">${esc(t('nf.btn'))}</a></div>`,
 };
@@ -152,6 +155,7 @@ function wire(name) {
   if (name === 'settings/schedule') wireSchedule({ data: getData(), demo, rerender });
   if (name === 'settings/recurring') wireRecurring({ data: getData(), demo, rerender });
   if (name === 'settings/categories') wireCategories({ demo, rerender });
+  if (name === 'settings/pay') wirePay({ data: getData(), demo, rerender });
   if (name === 'settings/data') wireBackupPage({ demo, rerender });
   if (name === 'settings/shortcuts') wireShortcutManage({ data: getData(), demo, rerender });
   if (name === 'work') wireWork({ data: getData(), demo, rerender });

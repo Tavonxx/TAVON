@@ -24,6 +24,7 @@ export const TAVON_KEYS = Object.freeze({
   meta: 'tavon-meta',                 // { schema, migrations: [{id, at}] }
   shiftSchedule: 'tavon-shift-schedule', // weekly shift rules (replaces the schedule hard-coded in the old app)
   snapshots: 'tavon-snapshots',       // automatic safety copies taken before imports/migrations
+  payRates: 'tavon-pay-rates',        // hourly pay per workplace: [{id,place('' = every workplace),rate,from('' = since the start)}]
   shortcuts: 'tavon-shortcuts',       // the person's one-tap entries: [{id,label,type,category,amount|null,count,sort}]
 });
 
@@ -88,6 +89,10 @@ export const validators = {
   [TAVON_KEYS.shortcuts](v) {
     if (!Array.isArray(v)) return ['shortcuts must be a list'];
     return v.flatMap((r, i) => (isObj(r) && typeof r.id === 'string' && typeof r.label === 'string' && ['income', 'expense'].includes(r.type) && typeof r.category === 'string') ? [] : [`shortcut #${i}: invalid`]);
+  },
+  [TAVON_KEYS.payRates](v) {
+    if (!Array.isArray(v)) return ['pay rates must be a list'];
+    return v.flatMap((r, i) => (isObj(r) && typeof r.id === 'string' && typeof r.place === 'string' && Number(r.rate) > 0) ? [] : [`pay rate #${i}: invalid`]);
   },
   [TAVON_KEYS.shiftSchedule](v) {
     if (!Array.isArray(v)) return ['shift schedule must be a list'];

@@ -71,7 +71,7 @@ test('categories: saved shape wins, damaged falls back to defaults, labels follo
 
 test('every error code has Thai and English friendly text', async () => {
   const { t } = await import('../src/app/i18n.js');
-  for (const c of ['damaged', 'storage', 'snapshot', 'notfound', 'invalid', 'swapsame', 'swapfrom', 'swapto']) for (const l of ['th', 'en']) assert.notEqual(t('err.' + c, l), 'err.' + c);
+  for (const c of ['damaged', 'storage', 'snapshot', 'notfound', 'invalid', 'swapsame', 'swapfrom', 'swapto', 'duprate']) for (const l of ['th', 'en']) assert.notEqual(t('err.' + c, l), 'err.' + c);
   assert.equal(new DataError('x').code, 'invalid');
 });
 

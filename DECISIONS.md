@@ -70,3 +70,6 @@
 
 ## D-PayPeriod
 - Per Pee: only hours matter, no breaks, no pay date, no copy/share. Confirmed ("worked") and planned hours are never mixed in the worked total.
+
+## D-Pay
+- Rates keyed by workplace name text (days store place as free text). Start-dated rows so raises do not rewrite history. Unmatched hours are shown as not counted instead of guessed. Estimate only: no overtime/holiday rules, no tax.

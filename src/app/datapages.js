@@ -8,6 +8,7 @@ import { money, hours, shortDate, dayLabel, weekdayShort, monthLabel } from './f
 import { todayKey, weekStartKey, addDays, weekSummary, monthWork, monthSummary, payPeriod, stepPeriod, periodSummary, filterItems, categoryShare, nextMonth, itemsByDay, pendingPastDays } from '../data/stats.js';
 import { readCategories, categoryLabel, addItem } from '../data/store.js';
 import { periodLabel } from './format.js';
+import { periodPay } from '../data/pay.js';
 import { openWorkEditor, openMoneyEditor, confirmDays } from './editors.js';
 import { shortcutGrid, wireShortcuts } from './shortcuts.js';
 import { toast } from '../ui/ui.js';
@@ -39,11 +40,15 @@ export function renderWork({ data, lang }) {
   }
   if (W.view === 'period') {
     const s = periodSummary(data.work, data.rules, W.period), pend = pendingPastDays(data.work, data.rules, today, 400).filter((x) => x.day >= s.start && x.day <= s.end);
-    const cur = payPeriod(today).start === s.start;
+    const cur = payPeriod(today).start === s.start, pay = periodPay(s.days, data.payRates);
+    const payHtml = !pay.hasRates ? `<a class="btn btn-tonal btn-block" href="#/settings/pay">${icon('money', 'i-sm')}${esc(t('pay.setup'))}</a>` : `<div class="stack" style="gap:var(--s-2)">
+      <div class="between"><span class="t-sub">${esc(t('pay.earned'))}</span><span class="t-title3 num">${esc(money(pay.earned))}</span></div>
+      <div class="between"><span class="t-sub muted">${esc(t('pay.projected'))}</span><span class="t-sub muted num">${esc(money(pay.projected))}</span></div>
+      <p class="t-footnote muted">${esc(t('pay.est'))}</p>${pay.unrated.worked + pay.unrated.planned > 0 ? `<a class="t-footnote" href="#/settings/pay">${esc(t('pay.unrated').replace('{n}', hours(pay.unrated.worked + pay.unrated.planned)))}</a>` : ''}</div>`;
     return `<div class="stack-lg">${tabs}${navBar(periodLabel(s.start, s.end, lang), 'wk')}
       <div class="card stack"><div class="grid-2"><div class="stat"><span class="t-label">${esc(t('home.worked'))}</span><span class="t-title2 num">${hours(s.workedHours)} <span class="t-sub muted">${esc(t('home.hours'))}</span></span><span class="t-footnote muted num">${esc(t('wk.unconf'))} ${hours(s.plannedHours)}</span></div>
       <div class="stat"><span class="t-label">${esc(t('wk.days'))}</span><span class="t-title2 num">${s.workedDays}</span><span class="t-footnote muted num">${esc(t('wk.unconf'))} ${s.plannedDays}</span></div></div>
-      <div class="between"><span class="t-sub muted">${esc(t('home.tips'))}</span><span class="t-headline num">${esc(money(s.tips))}</span></div><p class="t-footnote muted">${esc(t('wk.period.note'))}</p></div>
+      ${payHtml}<div class="between"><span class="t-sub muted">${esc(t('home.tips'))}</span><span class="t-headline num">${esc(money(s.tips))}</span></div><p class="t-footnote muted">${esc(t('wk.period.note'))}</p></div>
       ${pend.length ? `<button class="btn btn-primary btn-block" id="wk-confirm-period">${icon('check', 'i-sm')}${esc(t('cf.all'))} (${pend.length})</button>` : ''}
       <div class="list">${s.days.filter((x) => x.status !== 'off' || x.hours || x.tips || x.note).map((x) => dayRow(x, today, lang)).join('')}</div>${cur ? '' : `<button class="btn btn-ghost btn-block" id="wk-today">${esc(t('wk.thisperiod'))}</button>`}</div>`;
   }

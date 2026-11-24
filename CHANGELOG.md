@@ -42,3 +42,6 @@
 
 ## Pay periods
 - Dial rings 2-3 follow the pay period (1-15 / 16-end); new Pay period view in the Work tab.
+
+## Pay rates
+- Hourly pay per workplace with start dates; gross estimate in the pay period view.
