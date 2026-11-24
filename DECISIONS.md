@@ -22,3 +22,4 @@
 - Appearance stored in separate key `tavon-appearance`; legacy keys untouched.
 - Accent default terracotta; 4 options kept so Pee can choose in the live style guide.
 - Native `<dialog>` for sheets/alerts; no component library.
+- Accent chosen by Pee: **Terracotta** (default). Other accents stay available as a user setting.

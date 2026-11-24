@@ -27,3 +27,4 @@
 
 ## Phase 05 - Global Design System: DONE (awaiting approval)
 Tokens, base + component CSS, icon sprite, UI helpers, appearance settings, styleguide.html, 34 passing tests, typecheck clean. Open item: choose accent colour (Pee).
+Accent decision made: Terracotta. GitHub Pages live at https://tavonxx.github.io/TAVON/ (style guide viewed on iPhone).
