@@ -27,3 +27,5 @@
 ## D-Phase06
 - Hash router (no server config needed on GitHub Pages). Language stored in its own key `tavon-lang`; legacy `pee-language` is left untouched until Phase 12 migration.
 - Quick Actions items are visible but marked "Soon" and show a toast, instead of being hidden.
+
+- Labels renamed per Pee: tab/page "งาน" -> "ชั่วโมงงาน", "เงิน" -> "การเงิน"; the word "กะ" removed from app text.
