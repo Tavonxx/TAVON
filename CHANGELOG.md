@@ -52,3 +52,4 @@
 ## Arrange Home
 - Show/hide and reorder Home sections from Settings.
 - Drag-to-reorder by the grip handle (arrows stay for accessibility).
+- Press feedback (2% squeeze) on tappable cards. Buttons, tabs, shortcut tiles and the page fade-in already existed.

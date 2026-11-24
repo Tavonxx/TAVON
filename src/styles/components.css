@@ -220,3 +220,6 @@ html[data-theme="dark"] .logo-paper{display:block}
 .row-grip{flex:none;touch-action:none;cursor:grab;color:var(--text-3);margin-left:calc(var(--s-2) * -1)}
 .row-grip svg{stroke-width:3.2}
 .row.dragging{background:var(--surface-2,var(--bg));box-shadow:var(--shadow-2,0 6px 20px rgba(0,0,0,.18));position:relative;z-index:2}
+/* Press feedback for tappable cards (links) and the Home dial legend area: same 3% squeeze as buttons */
+a.card,a.card-flat,button.card,button.card-flat{transition:transform var(--dur-1) var(--ease),background-color var(--dur-2) var(--ease-io)}
+a.card:active,a.card-flat:active,button.card:active,button.card-flat:active{transform:scale(.98)}
