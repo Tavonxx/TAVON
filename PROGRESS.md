@@ -9,9 +9,13 @@
 - หมายเหตุ: source เดิมมีข้อมูลส่วนตัวฝังอยู่ → ไม่ commit ไฟล์เดิมลง repo public
 
 ## ✅ Phase 02 — Data Backup & Compatibility Planning (23 พ.ย. 2026)
-- แก้บั๊ก R1 ในแอปเดิม (ทดสอบใน browser แล้ว) → `docs/legacy-fix.md` · ⏸ รออนุญาตใส่ลิงก์จริง
+- แก้บั๊ก R1 ในแอปเดิม → `docs/legacy-fix.md` · ✅ ใส่ในลิงก์จริงแล้ว (พีอนุญาต)
 - Data layer ใหม่ `src/data/` (schema, backup/import/snapshot/restore, ตารางกะ) · `npm test` 11/11 ผ่าน
 - แผนเต็มใน DATA_MIGRATION.md
 
-## ▶ ถัดไป: Phase 03 — Product Strategy & UX Architecture
-- เลือก tech stack (ARCHITECTURE.md) · Information architecture / navigation · user flows หลัก
+## ✅ Phase 03 — Product Strategy & UX Architecture (23 พ.ย. 2026) · รออนุมัติ
+- Stack: Vanilla ES Modules + JSDoc + tsc (ARCHITECTURE.md) · `npm run typecheck` ผ่าน
+- IA, navigation, quick actions, flows, feature mapping (UX_ARCHITECTURE.md)
+
+## ▶ ถัดไป: Phase 04 — TAVON Branding & Logo Design
+- สำรวจทิศทางโลโก้ (สัญลักษณ์จากตัว T + negative space) 3 แบบให้พีเลือก → SVG, wordmark, app icon, สีและฟอนต์แบรนด์
