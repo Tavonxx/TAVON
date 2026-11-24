@@ -139,7 +139,12 @@ function wire(name) {
     wireShortcuts({ data: getData(), demo, rerender });
     document.getElementById('hw-prev')?.addEventListener('click', () => { homeWeek--; homeSel = ''; rerender(); });
     document.getElementById('hw-next')?.addEventListener('click', () => { homeWeek++; homeSel = ''; rerender(); });
-    document.getElementById('hw-now')?.addEventListener('click', () => { homeWeek = 0; homeSel = ''; rerender(); });
+    document.getElementById('hw-now')?.addEventListener('click', () => {
+      if (homeWeek !== 0) { homeWeek = 0; homeSel = ''; rerender(); return; }
+      let dlg = /** @type {HTMLDialogElement|null} */ (document.getElementById('wk-sheet'));
+      if (!dlg) { dlg = document.createElement('dialog'); dlg.id = 'wk-sheet'; dlg.className = 'sheet'; dlg.setAttribute('aria-labelledby', 'wk-t'); document.body.append(dlg); }
+      dlg.innerHTML = weekSheetHtml(getData(), todayKey(), todayKey(), getLang()); openSheet(dlg);
+    });
     document.querySelectorAll('.cal-d[data-day]').forEach((b) => b.addEventListener('click', () => {
       const day = /** @type {HTMLElement} */ (b).dataset.day || '';
       if (day === todayKey()) { homeSel = ''; rerender(); document.getElementById('today-card')?.scrollIntoView({ behavior: reducedMotion() ? 'auto' : 'smooth', block: 'center' }); return; } // today is already shown above
@@ -147,11 +152,6 @@ function wire(name) {
     }));
     document.getElementById('sel-edit')?.addEventListener('click', () => openWorkEditor({ day: homeSel, data: getData(), demo, onDone: rerender }));
     document.getElementById('sel-confirm')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: [dayInfo(d.work, d.rules, homeSel)], data: d, demo, onDone: rerender }); });
-    document.getElementById('dial-open')?.addEventListener('click', () => {
-      let dlg = /** @type {HTMLDialogElement|null} */ (document.getElementById('wk-sheet'));
-      if (!dlg) { dlg = document.createElement('dialog'); dlg.id = 'wk-sheet'; dlg.className = 'sheet'; dlg.setAttribute('aria-labelledby', 'wk-t'); document.body.append(dlg); }
-      dlg.innerHTML = weekSheetHtml(getData(), todayKey(), getLang()); openSheet(dlg);
-    });
     document.getElementById('confirm-today')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: [dayInfo(d.work, d.rules, todayKey())], data: d, demo, onDone: rerender }); });
     document.getElementById('confirm-all')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: pendingPastDays(d.work, d.rules, todayKey(), 14), data: d, demo, onDone: rerender }); });
     document.getElementById('tip-today')?.addEventListener('click', () => openWorkEditor({ day: todayKey(), data: getData(), demo, focus: 'tips', onDone: rerender }));

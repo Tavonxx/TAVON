@@ -34,8 +34,7 @@ function todayCard(d, today, L) {
   const rest = i.status === 'off' || i.status === 'leave' || i.status === 'swapped';
   const nx = rest ? nextWorkDay(d.work, d.rules, today) : null;
   const next = !rest ? '' : `<div class="card-flat stack" id="next-work"><span class="t-label">${esc(t('dial.next', L))}</span>${nx ? `<p class="t-headline">${esc(dayLabel(nx.day, L))}</p><p class="t-sub muted">${esc(nx.place)}${nx.time ? ' · ' + esc(nx.time) : ''} · <span class="num">${hours(nx.hours)}</span> ${esc(t('home.hours', L))}</p>` : `<p class="t-sub muted">${esc(t('dial.nonext', L))}</p>`}</div>`;
-  const dialBtn = `<button class="dial-btn" id="dial-open" aria-label="${esc(t('dial.open', L))}">${dial}</button>`;
-  return `<div class="card stack" id="today-card"><div class="between"><span class="t-headline">${esc(dayLabel(today, L))}</span><span class="badge badge-${BADGE[i.status] || 'neutral'}">${esc(t('st.' + i.status, L))}</span></div>${dialBtn}${legend}${next}${dayBody(i, L, false)}
+  return `<div class="card stack" id="today-card"><div class="between"><span class="t-headline">${esc(dayLabel(today, L))}</span><span class="badge badge-${BADGE[i.status] || 'neutral'}">${esc(t('st.' + i.status, L))}</span></div>${dial}${legend}${next}${dayBody(i, L, false)}
     ${i.status === 'planned' ? `<button class="btn btn-primary btn-block" id="confirm-today">${icon('check', 'i-sm')}${esc(t('cf.one', L))}</button>` : ''}
     <button class="btn btn-tonal btn-block" id="tip-today">${icon('plus', 'i-sm')}${esc(t('home.addtip', L))}</button></div>`;
 }
@@ -68,7 +67,7 @@ function weekCard(d, today, L, off, sel) {
     return `<button class="cal-d cal-w${x.day === today ? ' today' : ''}" data-day="${x.day}" aria-pressed="${x.day === sel}" aria-label="${esc(dayLabel(x.day, L) + ': ' + t('st.' + x.status, L))}"><span class="t-caption muted">${esc(weekdayShort(x.day, L))}</span><span class="t-footnote num">${Number(x.day.slice(8))}</span>${mark}</button>`;
   }).join('');
   const range = `${shortDate(w.days[0].day, L)} – ${shortDate(w.days[6].day, L)}`;
-  const nav = `<div class="between"><button class="btn btn-secondary btn-icon" id="hw-prev" aria-label="${esc(t('wk.prev', L))}">${icon('back')}</button><button class="btn btn-ghost btn-sm" id="hw-now"${off === 0 ? ' aria-current="date"' : ''} aria-live="polite">${esc(off === 0 ? t('wk.thisweek', L) + ' · ' + range : range)}</button><button class="btn btn-secondary btn-icon" id="hw-next" aria-label="${esc(t('wk.next', L))}">${icon('chevron')}</button></div>`;
+  const nav = `<div class="between"><button class="btn btn-secondary btn-icon" id="hw-prev" aria-label="${esc(t('wk.prev', L))}">${icon('back')}</button><button class="btn btn-ghost btn-sm" id="hw-now"${off === 0 ? ' aria-current="date" aria-haspopup="dialog"' : ''} aria-label="${esc((off === 0 ? t('dial.open', L) : t('wk.thisweek', L)) + ': ' + range)}">${esc(off === 0 ? t('wk.thisweek', L) + ' · ' + range : range)}${off === 0 ? icon('chevron', 'i-sm') : ''}</button><button class="btn btn-secondary btn-icon" id="hw-next" aria-label="${esc(t('wk.next', L))}">${icon('chevron')}</button></div>`;
   const sum = `<p class="t-footnote muted num">${hours(w.workedHours)} ${esc(t('home.hours', L))} ${esc(t('home.worked', L))} · ${esc(t('home.planned', L))} ${hours(w.plannedHours)} · ${esc(t('home.tips', L))} ${esc(money(w.tips))}</p>`;
   return `<div class="card stack">${nav}
     <div class="cal" style="grid-template-columns:repeat(7,1fr)">${cells}</div>${sum}${sel && sel !== today && w.days.some((x) => x.day === sel) ? dayPanel(d, sel, today, L) : ''}</div>`;
@@ -105,10 +104,10 @@ export function renderHome({ data, demo, lang, now = new Date(), weekOffset = 0,
 }
 
 /** Body of the "this week" sheet opened from the dial. @param {any} d @param {string} today @param {string} L */
-export function weekSheetHtml(d, today, L) {
-  const w = weekSummary(d.work, d.rules, today);
+export function weekSheetHtml(d, shown, today, L) {
+  const w = weekSummary(d.work, d.rules, shown);
   const rows = w.days.map((x) => `<div class="row"><span class="row-main"><span class="row-title">${esc(dayLabel(x.day, L))}${x.day === today ? ' · ' + esc(t('dial.today', L)) : ''}</span><br><span class="t-sub muted">${esc(x.place || '')}${x.time ? ' · ' + esc(x.time) : ''}</span></span><span class="stack" style="gap:2px;text-align:right"><span class="badge badge-${BADGE[x.status] || 'neutral'}">${esc(t('st.' + x.status, L))}</span>${x.status === 'worked' || x.status === 'planned' ? `<span class="t-sub num">${hours(x.hours)} ${esc(t('home.hours', L))}</span>` : ''}</span></div>`).join('');
-  return `<div class="between"><h2 class="t-title3" id="wk-t">${esc(t('wk.thisweek', L))}</h2><button class="btn btn-ghost btn-icon" data-close aria-label="${esc(t('close', L))}">${icon('close')}</button></div>
+  return `<div class="between"><h2 class="t-title3" id="wk-t">${esc(shown === today ? t('wk.thisweek', L) : shortDate(w.days[0].day, L) + ' – ' + shortDate(w.days[6].day, L))}</h2><button class="btn btn-ghost btn-icon" data-close aria-label="${esc(t('close', L))}">${icon('close')}</button></div>
     <p class="t-footnote muted num">${hours(w.workedHours)} ${esc(t('home.hours', L))} ${esc(t('home.worked', L))} · ${esc(t('home.planned', L))} ${hours(w.plannedHours)} · ${esc(t('home.tips', L))} ${esc(money(w.tips))}</p>
     <div class="list">${rows}</div>`;
 }

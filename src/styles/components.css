@@ -217,5 +217,3 @@ html[data-theme="dark"] .logo-paper{display:block}
 .bal .t-title2{white-space:nowrap;flex:none}
 .bal>div{min-width:0}
 
-.dial-btn{display:block;margin:0 auto;padding:0;border:0;background:none;border-radius:50%;cursor:pointer;-webkit-tap-highlight-color:transparent}
-.dial-btn:focus-visible{outline:2px solid var(--accent);outline-offset:4px}
