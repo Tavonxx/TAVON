@@ -27,3 +27,6 @@
 
 ## Phase 08 (part 2a)
 - User-defined shortcut buttons (TTC x2, Vape...) on Home and Finance, with confirm sheet, manage page and undo.
+
+## Phase 08 (part 2b)
+- Weekly schedule editor (with suggestion from history) and recurring bills manager in Settings, with undo.

@@ -47,3 +47,7 @@ Labels: planned -> "วันทำงาน", leave -> "วันลา". Less 
 ## Phase 08 (part 2a) - Shortcut buttons: DONE (awaiting approval)
 `tavon-shortcuts` key (in backups), `src/data/shortcuts.js` (validated CRUD, order, use = N plain entries in one write, optional "keep this price"), `src/app/shortcuts.js` (adaptive grid 1/2/3 columns, confirm sheet with editable price and x1-x3, editor, manage page Settings > Shortcuts with up/down order, "make a shortcut" from an entry). Shown on Home and Finance. Entries use the old item shape exactly (note = shortcut name). Undo removes all entries of one tap. 73 tests + e2e.
 Still pending in part 2: recurring bills, category/workplace/weekly-schedule editors, swap shift, category chart, suggestion banner for repeated entries.
+
+## Phase 08 (part 2b) - Weekly schedule + recurring bills editors: DONE (awaiting approval)
+`src/data/plans.js` (setWeekday/replaceSchedule/restoreSchedule, add/update/remove/restoreRecurring; validated, snapshot-guarded, undo), `src/app/plans.js`, Settings > Work hours (weekly schedule, "suggest from my history") and Settings > Finance (recurring bills). Old-app recurring fields (generatedMonths etc.) preserved on edit. 79 tests + e2e.
+Still pending in part 2: category/subcategory/workplace editors, swap shift, category share chart.

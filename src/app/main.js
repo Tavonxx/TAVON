@@ -11,6 +11,7 @@ import { demoData } from './demo.js';
 import { renderWork, wireWork, renderMoney, wireMoney, openWorkEditor, openMoneyEditor } from './datapages.js';
 import { confirmDays } from './editors.js';
 import { wireShortcuts, renderShortcutManage, wireShortcutManage } from './shortcuts.js';
+import { renderSchedule, wireSchedule, renderRecurring, wireRecurring } from './plans.js';
 import { todayKey, dayInfo, pendingPastDays } from '../data/stats.js';
 import { animateNumber } from '../ui/ui.js';
 
@@ -89,8 +90,8 @@ const VIEWS = {
     ${row('bolt', t('settings.shortcuts'), t('settings.shortcuts.sub'), '#/settings/shortcuts')}
     ${row('sun', t('settings.appearance'), t('settings.appearance.sub'), '#/settings/appearance')}
     ${row('search', t('settings.language'), getLang() === 'th' ? 'ไทย' : 'English', '#/settings/language')}
-    ${row('work', t('settings.work'), t('settings.work.sub'))}
-    ${row('money', t('settings.money'), t('settings.money.sub'))}
+    ${row('work', t('settings.work'), t('settings.work.sub'), '#/settings/schedule')}
+    ${row('money', t('settings.money'), t('settings.money.sub'), '#/settings/recurring')}
     ${row('shield', t('settings.data'), t('settings.data.sub'))}</div>`,
   'settings/appearance': () => header(t('settings.appearance'), '', 'settings') + `<div class="card stack">
     ${seg('s-theme', 'ap.theme', [['auto', 'ap.auto'], ['light', 'ap.light'], ['dark', 'ap.dark']])}
@@ -101,6 +102,8 @@ const VIEWS = {
     <div class="between"><span id="l-mo">${esc(t('ap.motion'))}</span><button class="switch" id="sw-motion" aria-labelledby="l-mo"></button></div>
     <button class="btn btn-secondary btn-block" id="reset">${esc(t('ap.reset'))}</button></div>`,
   'settings/shortcuts': () => header(t('settings.shortcuts'), '', 'settings') + renderShortcutManage({ data: getData(), lang: getLang() }),
+  'settings/schedule': () => header(t('pl.sched'), t('pl.sched.sub'), 'settings') + renderSchedule({ data: getData(), lang: getLang() }),
+  'settings/recurring': () => header(t('pl.rec'), t('pl.rec.sub'), 'settings') + renderRecurring({ data: getData(), lang: getLang() }),
   'settings/language': () => header(t('settings.language'), '', 'settings') + `<div class="card stack">${seg('s-lang', 'settings.language', [['th', 'ไทย'], ['en', 'English']])}</div>`,
   notfound: () => header(t('nf.title'), '', null) + `<div class="card state"><div class="state-icon">${icon("alert", "i-lg")}</div><a class="btn btn-primary" href="#/">${esc(t('nf.btn'))}</a></div>`,
 };
@@ -141,6 +144,8 @@ function wire(name) {
     document.getElementById('tip-today')?.addEventListener('click', () => openWorkEditor({ day: todayKey(), data: getData(), demo, focus: 'tips', onDone: rerender }));
     document.querySelectorAll('[data-count]').forEach((el) => { const v = Number(/** @type {HTMLElement} */ (el).dataset.count); animateNumber(/** @type {HTMLElement} */ (el), v, (n) => money(n)); });
   }
+  if (name === 'settings/schedule') wireSchedule({ data: getData(), demo, rerender });
+  if (name === 'settings/recurring') wireRecurring({ data: getData(), demo, rerender });
   if (name === 'settings/shortcuts') wireShortcutManage({ data: getData(), demo, rerender });
   if (name === 'work') wireWork({ data: getData(), demo, rerender });
   if (name === 'money') wireMoney({ data: getData(), demo, rerender });
