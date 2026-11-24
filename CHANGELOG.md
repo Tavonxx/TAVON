@@ -51,3 +51,4 @@
 
 ## Arrange Home
 - Show/hide and reorder Home sections from Settings.
+- Drag-to-reorder by the grip handle (arrows stay for accessibility).

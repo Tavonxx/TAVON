@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { readLayout, setSectionShown, moveSection, resetLayout, SECTIONS } from '../src/data/homelayout.js';
+import { readLayout, setSectionShown, moveSection, resetLayout, setOrder, SECTIONS } from '../src/data/homelayout.js';
 import { TAVON_KEYS, validators } from '../src/data/schema.js';
 
 const mem = (init = {}) => { const m = new Map(Object.entries(init)); return { getItem: (k) => (m.has(k) ? m.get(k) : null), setItem: (k, v) => m.set(k, String(v)), removeItem: (k) => m.delete(k), key: (i) => [...m.keys()][i] ?? null, get length() { return m.size; } }; };
@@ -31,4 +31,8 @@ test('damaged layout is not overwritten', () => {
 test('validator accepts the shape and rejects others', () => {
   assert.deepEqual(validators[K]({ order: [], hidden: [] }), []);
   assert.ok(validators[K]([]).length);
+});
+test('setOrder saves a dragged order and repairs bad input', () => {
+  const s = mem(); setOrder(s, ['more', 'week', 'balance', 'shortcuts']); assert.deepEqual(readLayout(s).order, ['more', 'week', 'balance', 'shortcuts']);
+  setOrder(s, ['balance', 'x', 'balance']); assert.deepEqual(readLayout(s).order, ['balance', 'shortcuts', 'week', 'more']);
 });

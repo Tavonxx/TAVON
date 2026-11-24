@@ -34,3 +34,10 @@ export function moveSection(st, id, dir) {
 }
 /** Back to the default layout. @param {Storage} st */
 export function resetLayout(st) { save(st, { order: [...SECTIONS], hidden: [] }); }
+/** Save a whole new order (after dragging). Unknown/missing ids are fixed the same way as on read. @param {Storage} st @param {string[]} order */
+export function setOrder(st, order) {
+  const v = readLayout(st); const seen = order.filter((x, i, a) => SECTIONS.includes(x) && a.indexOf(x) === i);
+  const next = [...seen, ...SECTIONS.filter((x) => !seen.includes(x))];
+  if (next.join() === v.order.join()) return;
+  v.order = next; save(st, v);
+}

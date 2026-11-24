@@ -19,6 +19,8 @@ const D = {
   'hl.balance': { th: 'ยอดคงเหลือเดือนนี้', en: 'Balance this month' },
   'hl.week': { th: 'สัปดาห์นี้', en: 'This week' },
   'hl.more': { th: 'ล่าสุดและบิลที่ใกล้ถึง', en: 'Recent and upcoming bills' },
+  'hl.drag': { th: 'ลากเพื่อเรียง', en: 'Drag to reorder' },
+  'hl.hint': { th: 'ลากที่จุดสามคู่ทางซ้ายเพื่อเรียง หรือใช้ลูกศร', en: 'Drag the dots on the left to reorder, or use the arrows' },
   'hl.show': { th: 'แสดง', en: 'Show' },
   'hl.reset': { th: 'กลับเป็นแบบเริ่มต้น', en: 'Reset to default' },
   'dial.open': { th: 'ดูรายละเอียดสัปดาห์นี้', en: 'See this week in detail' },
