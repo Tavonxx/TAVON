@@ -161,3 +161,19 @@ dialog::backdrop{background:var(--scrim);animation:fade var(--dur-2) var(--ease-
 /* Drag & drop (widget ordering) */
 .drag-handle{touch-action:none;cursor:grab;color:var(--text-3)}
 .dragging{opacity:.9;background:var(--surface-2)}
+
+/* Split row: tap the row to open, tap the trailing button for a one-tap action */
+.row.split{padding:0}
+.row-hit{flex:1;min-width:0;display:flex;align-items:center;gap:var(--s-3);min-height:var(--row-h);padding:var(--s-2) 0 var(--s-2) var(--pad-card);text-align:left;border-radius:0}
+.row-act{margin-right:var(--s-2);flex:none}
+details.more>summary{min-height:var(--tap);display:flex;align-items:center;gap:var(--s-2);cursor:pointer;color:var(--accent);font-weight:600;font-size:var(--fs-sub);list-style:none}
+details.more>summary::-webkit-details-marker{display:none}
+details.more[open]>summary .i{transform:rotate(90deg)}
+details.more>summary .i{transition:transform var(--dur-2) var(--ease)}
+/* Finance calendar: shape + number + colour, never colour alone */
+.cal-m{min-height:3.75rem;justify-content:flex-start;padding-top:.375rem;gap:3px}
+.cnt{display:inline-flex;align-items:center;gap:3px;font-size:.6875rem;font-weight:700;line-height:1;color:var(--success)}
+.cnt i{width:.45rem;height:.45rem;border-radius:50%;background:currentColor}
+.cnt.out{color:var(--danger)}.cnt.out i{border-radius:1px}
+.cal-d[aria-pressed="true"] .cnt{color:inherit}
+.chips{display:flex;flex-wrap:wrap;gap:var(--s-2)}

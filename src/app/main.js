@@ -9,7 +9,8 @@ import { renderHome } from './dashboard.js';
 import { readDashboardData } from '../data/stats.js';
 import { demoData } from './demo.js';
 import { renderWork, wireWork, renderMoney, wireMoney, openWorkEditor, openMoneyEditor } from './datapages.js';
-import { todayKey } from '../data/stats.js';
+import { confirmDays } from './editors.js';
+import { todayKey, dayInfo, pendingPastDays } from '../data/stats.js';
 import { animateNumber } from '../ui/ui.js';
 
 let demo = false; // preview with sample data: memory only, never saved
@@ -60,7 +61,7 @@ function openQuick() {
     setTimeout(() => {
       if (a === 'tip') openWorkEditor({ day: todayKey(), data: getData(), demo, focus: 'tips', onDone: rerender });
       else if (a === 'today') openWorkEditor({ day: todayKey(), data: getData(), demo, onDone: rerender });
-      else openMoneyEditor({ type: a, demo, onDone: rerender });
+      else openMoneyEditor({ type: a, items: getData().items, demo, onDone: rerender });
     }, 220);
   }));
   openSheet(d);
@@ -119,6 +120,8 @@ function wire(name) {
   if (name === 'home') {
     document.getElementById('demo-on')?.addEventListener('click', () => { demo = true; render(false); });
     document.getElementById('demo-off')?.addEventListener('click', () => { demo = false; render(false); });
+    document.getElementById('confirm-today')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: [dayInfo(d.work, d.rules, todayKey())], data: d, demo, onDone: rerender }); });
+    document.getElementById('confirm-all')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: pendingPastDays(d.work, d.rules, todayKey(), 14), data: d, demo, onDone: rerender }); });
     document.getElementById('tip-today')?.addEventListener('click', () => openWorkEditor({ day: todayKey(), data: getData(), demo, focus: 'tips', onDone: rerender }));
     document.querySelectorAll('[data-count]').forEach((el) => { const v = Number(/** @type {HTMLElement} */ (el).dataset.count); animateNumber(/** @type {HTMLElement} */ (el), v, (n) => money(n)); });
   }

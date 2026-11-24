@@ -4,7 +4,7 @@ import { icon } from '../ui/icons.js';
 import { t } from './i18n.js';
 import { money, hours, dayLabel, weekdayShort } from './format.js';
 import { readCategories, categoryLabel } from '../data/store.js';
-import { todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData } from '../data/stats.js';
+import { pendingPastDays, todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData } from '../data/stats.js';
 
 /** @param {any} s */
 export const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] || c));
@@ -20,7 +20,16 @@ function todayCard(d, today, L) {
   const hrs = i.status === 'worked' || i.status === 'planned' ? `<p class="t-sub muted num">${hours(i.hours)} ${esc(t('home.hours', L))}</p>` : '';
   return `<div class="card stack"><div class="between"><span class="t-headline">${esc(dayLabel(today, L))}</span><span class="badge badge-${BADGE[i.status] || 'neutral'}">${esc(t('st.' + i.status, L))}</span></div>${place}${hrs}
     <div class="between"><span class="t-sub muted">${esc(t('home.tips', L))}</span><span class="t-headline num">${esc(money(i.tips))}</span></div>
+    ${i.status === 'planned' ? `<button class="btn btn-primary btn-block" id="confirm-today">${icon('check', 'i-sm')}${esc(t('cf.one', L))}</button>` : ''}
     <button class="btn btn-tonal btn-block" id="tip-today">${icon('plus', 'i-sm')}${esc(t('home.addtip', L))}</button></div>`;
+}
+/** @param {any} d @param {string} today @param {string} L */
+function pendingCard(d, today, L) {
+  const p = pendingPastDays(d.work, d.rules, today, 14);
+  if (!p.length) return '';
+  return `<div class="card stack"><div class="between"><div class="row-main"><p class="t-headline">${esc(t('cf.pending', L).replace('{n}', String(p.length)))}</p><p class="t-sub muted">${esc(t('cf.pending.sub', L))}</p></div><span class="row-icon accent">${icon('calendar')}</span></div>
+    <button class="btn btn-primary btn-block" id="confirm-all">${icon('check', 'i-sm')}${esc(t('cf.all', L))}</button>
+    <a class="btn btn-ghost btn-block" href="#/work">${esc(t('cf.review', L))}</a></div>`;
 }
 /** @param {any} d @param {string} today @param {string} L */
 function balanceCard(d, today, L) {
@@ -70,5 +79,5 @@ export function renderHome({ data, demo, lang, now = new Date() }) {
     return `<div class="card state"><div class="state-icon">${icon('shield', 'i-lg')}</div><p class="t-headline">${esc(t('empty.title', L))}</p><p class="t-sub muted">${esc(t('empty.sub', L))}</p><button class="btn btn-primary" id="demo-on">${esc(t('empty.demo', L))}</button></div>`;
   }
   const banner = demo ? `<div class="card-flat between"><span class="t-sub">${esc(t('demo.banner', L))}</span><button class="btn btn-ghost btn-sm" id="demo-off">${esc(t('demo.exit', L))}</button></div>` : '';
-  return `<div class="stack-lg">${banner}${section(t('home.today', L), todayCard(data, today, L))}${balanceCard(data, today, L)}${section(t('home.week', L), weekCard(data, today, L))}${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}${backupCard(data, L, now)}</div>`;
+  return `<div class="stack-lg">${banner}${section(t('home.today', L), todayCard(data, today, L))}${pendingCard(data, today, L)}${balanceCard(data, today, L)}${section(t('home.week', L), weekCard(data, today, L))}${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}${backupCard(data, L, now)}</div>`;
 }

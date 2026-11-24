@@ -134,3 +134,48 @@ export function filterItems(items, month, f, label) {
     && (!q || String(it.note || '').toLowerCase().includes(q) || label(it.type, it.category).toLowerCase().includes(q) || String(it.amount).includes(q)))
     .sort((a, b) => b.date.localeCompare(a.date) || String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')));
 }
+
+/** Past days (before today, within `lookback`) that the schedule says were work days but were never confirmed.
+ * @param {any} work @param {any} rules @param {string} today @param {number} [lookback] */
+export function pendingPastDays(work, rules, today, lookback = 14) {
+  const out = [];
+  for (let i = 1; i <= lookback; i++) {
+    const info = dayInfo(work, rules, addDays(today, -i));
+    if (info.status === 'planned') out.push(info);
+  }
+  return out.reverse();
+}
+/** Distinct recent tip amounts (newest first) so the person can tap instead of typing. @param {any} work @param {number} [n] */
+export function recentTips(work, n = 4) {
+  if (!isObj(work)) return [];
+  const seen = new Set(), out = [];
+  for (const day of Object.keys(work).filter((d) => DATE.test(d)).sort().reverse()) {
+    const v = Math.round((Number(work[day]?.tips) || 0) * 100) / 100;
+    if (v > 0 && !seen.has(v)) { seen.add(v); out.push(v); if (out.length >= n) break; }
+  }
+  return out;
+}
+/** Category codes of one type, most used first (last 180 days, ties: most recent). @param {any} items @param {string} type @param {string} today */
+export function categoryRanking(items, type, today) {
+  const since = addDays(today, -180), score = new Map(), last = new Map();
+  for (const it of validItems(items)) if (it.type === type && it.date >= since) { score.set(it.category, (score.get(it.category) || 0) + 1); if (!last.has(it.category) || it.date > last.get(it.category)) last.set(it.category, it.date); }
+  return [...score.keys()].sort((a, b) => score.get(b) - score.get(a) || String(last.get(b)).localeCompare(String(last.get(a))));
+}
+/** Entries the person repeats (same type + category + amount, at least twice in 90 days), most frequent first.
+ * @param {any} items @param {string} today @param {number} [n] */
+export function frequentTemplates(items, today, n = 4) {
+  const since = addDays(today, -90), m = new Map();
+  for (const it of validItems(items)) {
+    if (it.date < since || it.date > today) continue;
+    const k = JSON.stringify([it.type, it.category, cents(it.amount)]);
+    const e = m.get(k) || { type: it.type, category: it.category, amount: cents(it.amount) / 100, note: it.note || '', count: 0, last: '' };
+    e.count++; if (it.date >= e.last) { e.last = it.date; e.note = it.note || e.note; } m.set(k, e);
+  }
+  return [...m.values()].filter((e) => e.count >= 2).sort((a, b) => b.count - a.count || b.last.localeCompare(a.last)).slice(0, n);
+}
+/** Per-day entry counts for the calendar. @param {any} items @param {string} month */
+export function itemsByDay(items, month) {
+  /** @type {Record<string, {income:number, expense:number, items:any[]}>} */ const out = {};
+  for (const it of validItems(items)) if (it.date.startsWith(month)) { const e = (out[it.date] ||= { income: 0, expense: 0, items: [] }); e[it.type]++; e.items.push(it); }
+  return out;
+}

@@ -74,3 +74,15 @@ test('every error code has Thai and English friendly text', async () => {
   for (const c of ['damaged', 'storage', 'snapshot', 'notfound', 'invalid']) for (const l of ['th', 'en']) assert.notEqual(t('err.' + c, l), 'err.' + c);
   assert.equal(new DataError('x').code, 'invalid');
 });
+
+import { saveWorkDays, restoreWorkDays } from '../src/data/store.js';
+test('batch confirm: one write, keeps existing fields, undo restores every day; invalid input changes nothing', () => {
+  const orig = { '2026-11-16': { status: 'planned', note: 'keep me' } };
+  const s = mem({ [LEGACY_KEYS.work]: JSON.stringify(orig) });
+  const { prev } = saveWorkDays(s, [{ day: '2026-11-16', patch: { status: 'worked', hours: 8, place: 'A' } }, { day: '2026-11-23', patch: { status: 'worked', hours: 8, place: 'A', time: '9-5' } }]);
+  const w = J(s, LEGACY_KEYS.work); assert.deepEqual([w['2026-11-16'].status, w['2026-11-16'].note, w['2026-11-23'].time], ['worked', 'keep me', '9-5']);
+  restoreWorkDays(s, prev); assert.deepEqual(J(s, LEGACY_KEYS.work), orig);
+  const before = s.m.get(LEGACY_KEYS.work);
+  assert.throws(() => saveWorkDays(s, [{ day: '2026-11-17', patch: { status: 'worked' } }, { day: '2026-11-18', patch: { status: 'bogus' } }]), DataError);
+  assert.equal(s.m.get(LEGACY_KEYS.work), before);
+});

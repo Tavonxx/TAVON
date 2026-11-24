@@ -48,7 +48,7 @@ function guard(st, now) {
 
 /* ---------- work days ---------- */
 /** Merge a patch into one day. Unknown fields on the record are kept.
- * @param {Storage} st @param {string} day @param {{status?:string,hours?:number|string,tips?:number|string,note?:string,place?:string}} patch @param {Date} [now]
+ * @param {Storage} st @param {string} day @param {{status?:string,hours?:number|string,tips?:number|string,note?:string,place?:string,time?:string}} patch @param {Date} [now]
  * @returns {{prev: any}} */
 export function saveWorkDay(st, day, patch, now = new Date()) {
   if (!isRealDate(day)) throw new DataError('Invalid date');
@@ -61,12 +61,37 @@ export function saveWorkDay(st, day, patch, now = new Date()) {
   }
   if (patch.note !== undefined) clean.note = String(patch.note).trim().slice(0, 500);
   if (patch.place !== undefined) clean.place = String(patch.place).trim().slice(0, 80);
+  if (patch.time !== undefined) clean.time = String(patch.time).trim().slice(0, 40);
   const work = read(st, LEGACY_KEYS.work, 'object');
   const prev = work[day];
   guard(st, now);
   work[day] = { ...(isObj(prev) ? prev : {}), ...clean };
   write(st, LEGACY_KEYS.work, work);
   return { prev };
+}
+/** Apply the same kind of patch to several days in ONE write (all or nothing).
+ * @param {Storage} st @param {Array<{day:string, patch:any}>} entries @param {Date} [now] @returns {{prev: Record<string, any>}} */
+export function saveWorkDays(st, entries, now = new Date()) {
+  const work = read(st, LEGACY_KEYS.work, 'object');
+  /** @type {Record<string, any>} */ const prev = {};
+  const next = { ...work };
+  for (const { day, patch } of entries) {
+    if (!isRealDate(day)) throw new DataError('Invalid date');
+    if (!WORK_STATUSES.includes(patch.status)) throw new DataError('Invalid status');
+    const h = patch.hours === undefined ? undefined : Number(patch.hours);
+    if (h !== undefined && !(Number.isFinite(h) && h >= 0 && h <= 24)) throw new DataError('Invalid hours');
+    prev[day] = work[day];
+    next[day] = { ...(isObj(work[day]) ? work[day] : {}), status: patch.status, ...(h !== undefined ? { hours: round2(h) } : {}), ...(patch.place ? { place: String(patch.place).slice(0, 80) } : {}), ...(patch.time ? { time: String(patch.time).slice(0, 40) } : {}) };
+  }
+  guard(st, now);
+  write(st, LEGACY_KEYS.work, next);
+  return { prev };
+}
+/** Undo a batch. @param {Storage} st @param {Record<string, any>} prev */
+export function restoreWorkDays(st, prev) {
+  const work = read(st, LEGACY_KEYS.work, 'object');
+  for (const [day, p] of Object.entries(prev)) { if (p === undefined) delete work[day]; else work[day] = p; }
+  write(st, LEGACY_KEYS.work, work);
 }
 /** Undo: put the day back exactly as it was. @param {Storage} st @param {string} day @param {any} prev */
 export function restoreWorkDay(st, day, prev) {

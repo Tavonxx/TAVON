@@ -39,3 +39,7 @@
 - All writes go through src/data/store.js; damaged data is never overwritten; a snapshot is taken once per session before the first edit.
 - Undo toast (5 s) instead of confirm dialogs for entry deletes; confirm dialogs reserved for bigger deletes (categories, workplaces) in part 2.
 - Adding a tip on a day with no record preselects status "worked".
+
+## D-Phase08b
+- Reducing typing is a core requirement: smart defaults (schedule hours, most-used category, today/selected date), one-tap repeat and batch confirm, all undoable. Never auto-confirm silently: the person taps once.
+- Calendar colours: income green, expense red (same as the +/- amounts) plus shape (circle/square) and a number, so it is not colour-only.

@@ -40,6 +40,7 @@ export function confirmDialog(o) {
 export function toast(msg, o = {}) {
   let host = document.querySelector('.toasts');
   if (!host) { host = document.createElement('div'); host.className = 'toasts'; host.setAttribute('role', 'status'); host.setAttribute('aria-live', 'polite'); document.body.append(host); }
+  host.querySelectorAll('.toast').forEach((x) => x.remove()); // one message at a time
   const el = document.createElement('div'); el.className = 'toast';
   const m = document.createElement('span'); m.className = 'toast-msg'; m.textContent = msg; el.append(m);
   const remove = () => { el.classList.add('out'); setTimeout(() => el.remove(), reduced() ? 0 : 200); };

@@ -75,3 +75,27 @@ test('filter items: month, type, category, text in note/category label/amount', 
   assert.deepEqual(ids({}), [2, 1]); assert.deepEqual(ids({ type: 'expense' }), [1]); assert.deepEqual(ids({ category: 'salary' }), [2]);
   assert.deepEqual(ids({ q: 'thai' }), [1]); assert.deepEqual(ids({ q: 'sal' }), [2]); assert.deepEqual(ids({ q: '300' }), [2]); assert.deepEqual(ids({ q: 'zzz' }), []);
 });
+
+import { pendingPastDays, recentTips, categoryRanking, frequentTemplates, itemsByDay } from '../src/data/stats.js';
+test('pending past days: scheduled but never confirmed, only before today', () => {
+  const p = pendingPastDays({ '2026-11-20': { status: 'worked', hours: 8 } }, rules, '2026-11-25', 14);
+  assert.deepEqual(p.map((x) => x.day), ['2026-11-13', '2026-11-16', '2026-11-23']); // Fri 13, Mon 16, Mon 23 (Fri 20 confirmed)
+  assert.ok(p.every((x) => x.status === 'planned' && x.hours === 8));
+  assert.deepEqual(pendingPastDays(null, null, '2026-11-25'), []);
+});
+test('recent tips: distinct, newest first, ignores zero', () => {
+  assert.deepEqual(recentTips({ '2026-11-01': { tips: 20 }, '2026-11-02': { tips: 35.5 }, '2026-11-03': { tips: 20 }, '2026-11-04': { tips: 0 } }), [20, 35.5]);
+  assert.deepEqual(recentTips(null), []);
+});
+test('category ranking and frequent templates', () => {
+  const mk = (d, c, a, t = 'expense') => ({ type: t, date: d, category: c, amount: a, note: c === 'food' ? 'lunch' : '' });
+  const it = [mk('2026-11-01', 'food', 14.2), mk('2026-11-05', 'food', 14.2), mk('2026-11-09', 'food', 9), mk('2026-11-10', 'transport', 3.35), mk('2026-11-11', 'transport', 3.35), mk('2026-11-12', 'transport', 3.35), mk('2026-11-13', 'shopping', 80)];
+  assert.deepEqual(categoryRanking(it, 'expense', '2026-11-24'), ['transport', 'food', 'shopping']);
+  const f = frequentTemplates(it, '2026-11-24', 4);
+  assert.deepEqual(f.map((x) => [x.category, x.amount, x.count]), [['transport', 3.35, 3], ['food', 14.2, 2]]);
+  assert.equal(f[1].note, 'lunch');
+});
+test('items by day counts income and expense separately', () => {
+  const d = itemsByDay([{ type: 'income', date: '2026-11-05', amount: 1 }, { type: 'expense', date: '2026-11-05', amount: 2 }, { type: 'expense', date: '2026-11-05', amount: 3 }, { type: 'expense', date: '2026-10-05', amount: 3 }], '2026-11');
+  assert.deepEqual([d['2026-11-05'].income, d['2026-11-05'].expense, Object.keys(d).length], [1, 2, 1]);
+});

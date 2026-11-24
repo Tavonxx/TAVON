@@ -17,3 +17,6 @@
 
 ## Phase 08 (part 1)
 - Safe data store; Work hours (week/month) and Finance (month, search, filter, add/edit/delete+undo) pages; Quick Actions wired; friendly bilingual error messages.
+
+## Phase 08 (feedback round)
+- Renamed statuses; one-tap/batch confirm of scheduled work days; recent tip chips; finance calendar with counts; quick repeat entries; faster entry editor.
