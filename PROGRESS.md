@@ -17,6 +17,10 @@
 - Stack: Vanilla ES Modules + JSDoc + tsc (ARCHITECTURE.md) · `npm run typecheck` ผ่าน
 - IA, navigation, quick actions, flows, feature mapping (UX_ARCHITECTURE.md)
 
-## ▶ ถัดไป: Phase 04 — TAVON Branding & Logo Design
-- สำรวจทิศทางโลโก้ (สัญลักษณ์จากตัว T + negative space) 3 แบบให้พีเลือก → SVG, wordmark, app icon, สีและฟอนต์แบรนด์
-- Phase 04 กำลังทำ: สัญลักษณ์ C ขาวดำ (assets/brand/tavon-symbol.svg) · รอเลือกฟอนต์ wordmark
+## ✅ Phase 04 — TAVON Branding & Logo Design (23 พ.ย. 2026) · รออนุมัติ
+- โลโก้: สัญลักษณ์ C ขาวดำ (ช่องว่าง 5) + wordmark Inter Display Medium (outline) · lockup · โหมดสว่าง/มืด
+- ไอคอน iPhone 1024/180, PWA 192/512/maskable, favicon (svg/png/ico) · พาเลตต์แบรนด์ · BRAND_GUIDELINES.md · assets/brand/brand-sheet.png
+- ยังไม่ได้ติดตั้งในแอป (ทำใน Phase 06/11) · สี accent ของ UI ยังไม่เลือก → Phase 05
+
+## ▶ ถัดไป: Phase 05 — Global Design System
+- design tokens (สี/ตัวอักษร/ระยะ/มุม/motion), สี accent, components พื้นฐาน, หน้าตัวอย่าง (style guide)
