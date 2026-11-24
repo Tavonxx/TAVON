@@ -23,3 +23,7 @@
 - Accent default terracotta; 4 options kept so Pee can choose in the live style guide.
 - Native `<dialog>` for sheets/alerts; no component library.
 - Accent chosen by Pee: **Terracotta** (default). Other accents stay available as a user setting.
+
+## D-Phase06
+- Hash router (no server config needed on GitHub Pages). Language stored in its own key `tavon-lang`; legacy `pee-language` is left untouched until Phase 12 migration.
+- Quick Actions items are visible but marked "Soon" and show a toast, instead of being hidden.

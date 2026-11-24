@@ -1,7 +1,7 @@
 /* TAVON components. No gradients, no drop shadows: structure comes from surfaces and 1px lines. */
 
 /* ---------- Buttons ---------- */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);min-height:var(--tap);padding:0 var(--s-5);
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:var(--s-2);min-height:var(--tap);padding:0 var(--s-5);
   border-radius:var(--r-lg);font-weight:600;font-size:var(--fs-body);line-height:1;white-space:nowrap;position:relative;
   transition:transform var(--dur-1) var(--ease),background-color var(--dur-2) var(--ease-io),opacity var(--dur-2)}
 .btn:active:not(:disabled){transform:scale(.97)}

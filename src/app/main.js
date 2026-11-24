@@ -1,0 +1,124 @@
+// @ts-check
+import { spriteMarkup, icon } from '../ui/icons.js';
+import { load, save, apply, watchSystem, DEFAULTS } from '../ui/appearance.js';
+import { openSheet, toast, segmented, switchControl } from '../ui/ui.js';
+import { parseRoute } from './router.js';
+import { t, getLang, setLang } from './i18n.js';
+
+let settings = load();
+const app = /** @type {HTMLElement} */ (document.getElementById('app'));
+const reducedMotion = () => document.documentElement.dataset.motion === 'off' || matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/** @param {string} s */
+const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] || c));
+
+function chrome() {
+  const L = getLang();
+  document.documentElement.lang = L;
+  const tab = (name, ic) => `<a class="tab" href="#/${name === 'home' ? '' : name}" data-tab="${name}">${icon(ic)}<span>${esc(t('nav.' + name))}</span></a>`;
+  document.body.insertAdjacentHTML('afterbegin', spriteMarkup());
+  document.body.insertAdjacentHTML('beforeend', `
+    <nav class="tabbar" aria-label="${esc(t('nav.main'))}"><div class="tabbar-inner">
+      ${tab('home', 'home')}${tab('work', 'work')}
+      <button class="tab-plus" id="plus" aria-label="${esc(t('nav.add'))}" aria-haspopup="dialog">${icon('plus')}</button>
+      ${tab('money', 'money')}${tab('settings', 'settings')}
+    </div></nav>
+    <dialog class="sheet" id="qa" aria-labelledby="qa-t"></dialog>`);
+  document.getElementById('plus')?.addEventListener('click', openQuick);
+  document.querySelectorAll('.tab').forEach((a) => a.addEventListener('click', () => {
+    if (a.getAttribute('aria-current') === 'page') window.scrollTo({ top: 0, behavior: reducedMotion() ? 'auto' : 'smooth' }); // tap current tab = back to top
+  }));
+}
+function relabel() {
+  document.documentElement.lang = getLang();
+  document.querySelectorAll('.tab').forEach((a) => { const s = a.querySelector('span'); if (s) s.textContent = t('nav.' + /** @type {HTMLElement} */ (a).dataset.tab); });
+  document.querySelector('.tabbar')?.setAttribute('aria-label', t('nav.main'));
+  document.getElementById('plus')?.setAttribute('aria-label', t('nav.add'));
+}
+
+function openQuick() {
+  const d = /** @type {HTMLDialogElement} */ (document.getElementById('qa'));
+  const items = [['qa.tip', 'money'], ['qa.expense', 'upload'], ['qa.income', 'download'], ['qa.today', 'calendar'], ['qa.swap', 'repeat']];
+  d.innerHTML = `<div class="stack"><div class="between"><h2 class="t-title3" id="qa-t">${esc(t('qa.title'))}</h2>
+    <button class="btn btn-ghost btn-icon" data-close aria-label="${esc(t('close'))}">${icon('close')}</button></div>
+    <div class="list">${items.map(([k, ic]) => `<button class="row" data-soon><span class="row-icon accent">${icon(ic)}</span><span class="row-main"><span class="row-title">${esc(t(k))}</span></span><span class="badge badge-neutral">${esc(t('soon'))}</span></button>`).join('')}</div></div>`;
+  d.querySelectorAll('[data-soon]').forEach((b) => b.addEventListener('click', () => toast(t('soon.msg'))));
+  openSheet(d);
+}
+
+/** @param {string} title @param {string} sub @param {string|null} back */
+const header = (title, sub, back) => `<header class="navbar">${back ? `<a class="btn btn-ghost btn-sm" style="margin-left:calc(var(--s-4)*-1)" href="#/${back}">${icon('back', 'i-sm')}${esc(t('nav.back'))}</a>` : `<img src="assets/brand/tavon-logo.svg" alt="TAVON" style="height:20px;width:auto">`}<h1 class="t-large" id="page-title" tabindex="-1">${esc(title)}</h1>${sub ? `<p class="t-sub muted">${esc(sub)}</p>` : ''}</header>`;
+/** @param {string} ic @param {string} title @param {string} sub */
+const stateCard = (ic, title, sub) => `<div class="card state">${`<div class="state-icon">${icon(ic, 'i-lg')}</div>`}<p class="t-headline">${esc(title)}</p><p class="t-sub muted">${esc(sub)}</p></div>`;
+/** @param {string} ic @param {string} title @param {string} sub @param {string} [href] */
+const row = (ic, title, sub, href) => {
+  const inner = `<span class="row-icon${href ? ' accent' : ''}">${icon(ic)}</span><span class="row-main"><span class="row-title">${esc(title)}</span><br><span class="row-sub">${esc(sub)}</span></span>${href ? `<span class="row-trail">${icon('chevron', 'i-sm')}</span>` : `<span class="badge badge-neutral">${esc(t('soon'))}</span>`}`;
+  return href ? `<a class="row" href="${href}">${inner}</a>` : `<div class="row" aria-disabled="true">${inner}</div>`;
+};
+const seg = (id, labelKey, opts) => `<div class="field"><span class="label" id="l-${id}">${esc(t(labelKey))}</span><div class="seg" id="${id}" role="group" aria-labelledby="l-${id}">${opts.map(([v, k]) => `<button data-value="${v}" aria-pressed="false">${esc(t(k))}</button>`).join('')}</div></div>`;
+
+const VIEWS = {
+  home: () => header(t('nav.home'), t('home.sub'), null) + stateCard('home', t('home.state'), t('home.state.sub')),
+  work: () => header(t('nav.work'), t('work.sub'), null) + stateCard('work', t('work.state'), t('work.state.sub')),
+  money: () => header(t('nav.money'), t('money.sub'), null) + stateCard('money', t('money.state'), t('money.state.sub')),
+  settings: () => header(t('nav.settings'), t('settings.sub'), null) + `<div class="list">
+    ${row('sun', t('settings.appearance'), t('settings.appearance.sub'), '#/settings/appearance')}
+    ${row('search', t('settings.language'), getLang() === 'th' ? 'ไทย' : 'English', '#/settings/language')}
+    ${row('work', t('settings.work'), t('settings.work.sub'))}
+    ${row('money', t('settings.money'), t('settings.money.sub'))}
+    ${row('shield', t('settings.data'), t('settings.data.sub'))}</div>`,
+  'settings/appearance': () => header(t('settings.appearance'), '', 'settings') + `<div class="card stack">
+    ${seg('s-theme', 'ap.theme', [['auto', 'ap.auto'], ['light', 'ap.light'], ['dark', 'ap.dark']])}
+    <div class="field"><span class="label" id="l-acc">${esc(t('ap.accent'))}</span><div class="cluster" id="accents" role="group" aria-labelledby="l-acc">
+      ${[['terracotta', '#9F4019'], ['forest', '#2F6B54'], ['ocean', '#2C5F8F'], ['mono', '#141414']].map(([v, c]) => `<button class="chip" data-value="${v}" aria-pressed="false"><i class="swatch" style="background:${c}"></i>${esc(t('ap.' + v))}</button>`).join('')}</div></div>
+    ${seg('s-size', 'ap.size', [['small', 'S'], ['default', 'M'], ['large', 'L'], ['xlarge', 'XL']].map(([v, k]) => [v, k]))}
+    ${seg('s-den', 'ap.density', [['compact', 'ap.compact'], ['comfortable', 'ap.normal'], ['spacious', 'ap.spacious']])}
+    <div class="between"><span id="l-mo">${esc(t('ap.motion'))}</span><button class="switch" id="sw-motion" aria-labelledby="l-mo"></button></div>
+    <button class="btn btn-secondary btn-block" id="reset">${esc(t('ap.reset'))}</button></div>`,
+  'settings/language': () => header(t('settings.language'), '', 'settings') + `<div class="card stack">${seg('s-lang', 'settings.language', [['th', 'ไทย'], ['en', 'English']])}</div>`,
+  notfound: () => header(t('nf.title'), '', null) + `<div class="card state"><div class="state-icon">${icon("alert", "i-lg")}</div><a class="btn btn-primary" href="#/">${esc(t('nf.btn'))}</a></div>`,
+};
+
+/** Wire up controls after a view renders. */
+function wire(name) {
+  const set = (k, v) => { settings = { ...settings, [k]: v }; save(settings); apply(settings); };
+  const pick = (id, key) => { const el = document.getElementById(id); if (!el) return; el.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(/** @type {HTMLElement} */ (b).dataset.value === settings[key]))); segmented(el, (v) => set(key, v)); };
+  if (name === 'settings/appearance') {
+    pick('s-theme', 'theme'); pick('s-size', 'fontSize'); pick('s-den', 'density');
+    const acc = document.getElementById('accents');
+    const mark = () => acc?.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(/** @type {HTMLElement} */ (b).dataset.value === settings.accent)));
+    mark(); acc?.addEventListener('click', (e) => { const b = /** @type {HTMLElement} */ (e.target).closest('button'); if (b) { set('accent', b.dataset.value); mark(); } });
+    const sw = /** @type {HTMLElement} */ (document.getElementById('sw-motion'));
+    sw.setAttribute('aria-checked', String(settings.motion === 'off')); switchControl(sw, (on) => set('motion', on ? 'off' : 'system'));
+    document.getElementById('reset')?.addEventListener('click', () => {
+      const before = { ...settings };
+      settings = { ...DEFAULTS }; save(settings); apply(settings); render();
+      toast(t('ap.reset.done'), { action: t('ap.undo'), onAction: () => { settings = before; save(settings); apply(settings); render(); } });
+    });
+  }
+  if (name === 'settings/language') {
+    const el = document.getElementById('s-lang');
+    if (el) { el.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(/** @type {HTMLElement} */ (b).dataset.value === getLang()))); segmented(el, (v) => { setLang(v); relabel(); render(false); }); }
+  }
+}
+
+/** @param {boolean} [moveFocus] */
+function render(moveFocus = true) {
+  const r = parseRoute(location.hash);
+  const view = VIEWS[r.name] || VIEWS.notfound;
+  app.innerHTML = `<div class="${reducedMotion() ? '' : 'rise'}">${view()}</div>`;
+  document.querySelectorAll('.tab').forEach((a) => { if (/** @type {HTMLElement} */ (a).dataset.tab === r.tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  document.title = `${t(r.tab === 'home' && r.name === 'notfound' ? 'nf.title' : 'nav.' + r.tab)} · TAVON`;
+  wire(r.name);
+  if (moveFocus) { window.scrollTo(0, 0); document.getElementById('page-title')?.focus({ preventScroll: true }); } // screen readers announce the new page
+}
+
+// Swipe from the left edge = back (sub-pages only)
+let sx = 0, sy = 0, edge = false;
+addEventListener('touchstart', (e) => { const p = e.touches[0]; sx = p.clientX; sy = p.clientY; edge = sx < 24; }, { passive: true });
+addEventListener('touchend', (e) => { if (!edge) return; const p = e.changedTouches[0]; if (p.clientX - sx > 70 && Math.abs(p.clientY - sy) < 50 && parseRoute(location.hash).parent) history.back(); edge = false; }, { passive: true });
+
+chrome();
+apply(settings); watchSystem(() => settings);
+addEventListener('hashchange', () => render());
+render(false);

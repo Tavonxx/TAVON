@@ -28,3 +28,6 @@
 ## Phase 05 - Global Design System: DONE (awaiting approval)
 Tokens, base + component CSS, icon sprite, UI helpers, appearance settings, styleguide.html, 34 passing tests, typecheck clean. Open item: choose accent colour (Pee).
 Accent decision made: Terracotta. GitHub Pages live at https://tavonxx.github.io/TAVON/ (style guide viewed on iPhone).
+
+## Phase 06 - Layout & Navigation: DONE (awaiting approval)
+App shell in `index.html` + `src/app/` (main, router, i18n): 4 tabs + centre + button (Quick Actions sheet, items marked "Soon"), hash router with 404, large titles, tap current tab = scroll to top, swipe from left edge = back on sub-pages, focus moves to page title on navigation, Thai/English labels, working Settings > Appearance (+ reset with Undo) and Language. Pages Home/Work/Money are placeholders (phases 07-08). Only new keys written: `tavon-appearance`, `tavon-lang`. 37 tests pass, typecheck clean, flows verified in headless Chrome (iPhone viewport).

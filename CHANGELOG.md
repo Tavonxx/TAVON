@@ -8,3 +8,6 @@
 
 ## Phase 05
 - Add design tokens (light/dark, 4 accents, type, spacing, motion, density), components, icons, UI helpers, appearance settings, style guide, contrast tests, bundled Inter subset fonts.
+
+## Phase 06
+- Add app shell, tab bar, router, i18n (TH/EN), Quick Actions sheet, Settings > Appearance/Language, index.html with TAVON icons.
