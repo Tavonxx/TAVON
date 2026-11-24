@@ -14,3 +14,6 @@
 
 ## Phase 07
 - Home dashboard (6 widgets), read-only stats module, sample-data preview mode, honest empty state.
+
+## Phase 08 (part 1)
+- Safe data store; Work hours (week/month) and Finance (month, search, filter, add/edit/delete+undo) pages; Quick Actions wired; friendly bilingual error messages.

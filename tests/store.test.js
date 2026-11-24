@@ -68,3 +68,9 @@ test('categories: saved shape wins, damaged falls back to defaults, labels follo
   assert.equal(categoryLabel(good, 'income', 'pay', 'th'), 'เงินจ้าง'); assert.equal(categoryLabel(good, 'income', 'pay', 'en'), 'Pay');
   assert.equal(categoryLabel(good, 'income', 'zzz', 'en'), 'Other');
 });
+
+test('every error code has Thai and English friendly text', async () => {
+  const { t } = await import('../src/app/i18n.js');
+  for (const c of ['damaged', 'storage', 'snapshot', 'notfound', 'invalid']) for (const l of ['th', 'en']) assert.notEqual(t('err.' + c, l), 'err.' + c);
+  assert.equal(new DataError('x').code, 'invalid');
+});

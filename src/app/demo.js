@@ -10,14 +10,14 @@ export function demoData(today = todayKey()) {
     work: { [mon]: { status: 'worked', hours: 10.5, tips: 62.5, place: 'Sample Kitchen' }, [addDays(mon, 1)]: { status: 'worked', hours: 10.5, tips: 48 } },
     rules,
     items: [
-      { id: 'd1', type: 'income', date: `${prev}-28`, amount: 1840, category: 'Salary' },
-      { id: 'd2', type: 'expense', date: `${prev}-29`, amount: 640, category: 'Rent' },
-      { id: 'd3', type: 'income', date: `${month}-01`, amount: 520.4, category: 'Salary' },
-      { id: 'd4', type: 'expense', date: `${month}-02`, amount: 86.35, category: 'Groceries' },
-      { id: 'd5', type: 'expense', date: `${month}-03`, amount: 14.2, category: 'Food' },
-      { id: 'd6', type: 'expense', date: `${month}-04`, amount: 62, category: 'Transport' },
+      { id: 'd1', type: 'income', date: `${prev}-28`, amount: 1840, category: 'salary' },
+      { id: 'd2', type: 'expense', date: `${prev}-29`, amount: 640, category: 'bills' },
+      { id: 'd3', type: 'income', date: `${month}-01`, amount: 520.4, category: 'salary' },
+      { id: 'd4', type: 'expense', date: `${month}-02`, amount: 86.35, category: 'food' },
+      { id: 'd5', type: 'expense', date: `${month}-03`, amount: 14.2, category: 'food' },
+      { id: 'd6', type: 'expense', date: `${month}-04`, amount: 62, category: 'transport' },
     ],
-    recurring: [{ id: 'r1', amount: 55, day: Number(addDays(today, 3).slice(8)), startMonth: '2026-01', category: 'Phone' }],
+    recurring: [{ id: 'r1', amount: 55, day: Number(addDays(today, 3).slice(8)), startMonth: '2026-01', category: 'bills' }],
     lastBackup: String(Date.now() - 9 * 86400000),
   };
 }

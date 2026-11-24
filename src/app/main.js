@@ -1,16 +1,20 @@
 // @ts-check
 import { spriteMarkup, icon } from '../ui/icons.js';
 import { load, save, apply, watchSystem, DEFAULTS } from '../ui/appearance.js';
-import { openSheet, toast, segmented, switchControl } from '../ui/ui.js';
+import { openSheet, closeSheet, toast, segmented, switchControl } from '../ui/ui.js';
 import { parseRoute } from './router.js';
 import { money } from './format.js';
 import { t, getLang, setLang } from './i18n.js';
 import { renderHome } from './dashboard.js';
 import { readDashboardData } from '../data/stats.js';
 import { demoData } from './demo.js';
+import { renderWork, wireWork, renderMoney, wireMoney, openWorkEditor, openMoneyEditor } from './datapages.js';
+import { todayKey } from '../data/stats.js';
 import { animateNumber } from '../ui/ui.js';
 
 let demo = false; // preview with sample data: memory only, never saved
+const getData = () => (demo ? demoData() : readDashboardData(localStorage));
+const rerender = () => render(false, false);
 
 let settings = load();
 const app = /** @type {HTMLElement} */ (document.getElementById('app'));
@@ -45,11 +49,20 @@ function relabel() {
 
 function openQuick() {
   const d = /** @type {HTMLDialogElement} */ (document.getElementById('qa'));
-  const items = [['qa.tip', 'money'], ['qa.expense', 'upload'], ['qa.income', 'download'], ['qa.today', 'calendar'], ['qa.swap', 'repeat']];
+  const items = [['qa.tip', 'money', 'tip'], ['qa.expense', 'upload', 'expense'], ['qa.income', 'download', 'income'], ['qa.today', 'calendar', 'today'], ['qa.swap', 'repeat', '']];
   d.innerHTML = `<div class="stack"><div class="between"><h2 class="t-title3" id="qa-t">${esc(t('qa.title'))}</h2>
     <button class="btn btn-ghost btn-icon" data-close aria-label="${esc(t('close'))}">${icon('close')}</button></div>
-    <div class="list">${items.map(([k, ic]) => `<button class="row" data-soon><span class="row-icon accent">${icon(ic)}</span><span class="row-main"><span class="row-title">${esc(t(k))}</span></span><span class="badge badge-neutral">${esc(t('soon'))}</span></button>`).join('')}</div></div>`;
-  d.querySelectorAll('[data-soon]').forEach((b) => b.addEventListener('click', () => toast(t('soon.msg'))));
+    <div class="list">${items.map(([k, ic, a]) => `<button class="row" data-act="${a}"><span class="row-icon accent">${icon(ic)}</span><span class="row-main"><span class="row-title">${esc(t(k))}</span></span>${a ? '' : `<span class="badge badge-neutral">${esc(t('soon'))}</span>`}</button>`).join('')}</div></div>`;
+  d.querySelectorAll('[data-act]').forEach((b) => b.addEventListener('click', () => {
+    const a = /** @type {HTMLElement} */ (b).dataset.act;
+    if (!a) { toast(t('soon.msg')); return; }
+    closeSheet(d);
+    setTimeout(() => {
+      if (a === 'tip') openWorkEditor({ day: todayKey(), data: getData(), demo, focus: 'tips', onDone: rerender });
+      else if (a === 'today') openWorkEditor({ day: todayKey(), data: getData(), demo, onDone: rerender });
+      else openMoneyEditor({ type: a, demo, onDone: rerender });
+    }, 220);
+  }));
   openSheet(d);
 }
 
@@ -65,9 +78,9 @@ const row = (ic, title, sub, href) => {
 const seg = (id, labelKey, opts) => `<div class="field"><span class="label" id="l-${id}">${esc(t(labelKey))}</span><div class="seg" id="${id}" role="group" aria-labelledby="l-${id}">${opts.map(([v, k]) => `<button data-value="${v}" aria-pressed="false">${esc(t(k))}</button>`).join('')}</div></div>`;
 
 const VIEWS = {
-  home: () => header(t('nav.home'), '', null) + renderHome({ data: demo ? demoData() : readDashboardData(localStorage), demo, lang: getLang() }),
-  work: () => header(t('nav.work'), t('work.sub'), null) + stateCard('work', t('work.state'), t('work.state.sub')),
-  money: () => header(t('nav.money'), t('money.sub'), null) + stateCard('money', t('money.state'), t('money.state.sub')),
+  home: () => header(t('nav.home'), '', null) + renderHome({ data: getData(), demo, lang: getLang() }),
+  work: () => header(t('nav.work'), t('work.sub'), null) + renderWork({ data: getData(), lang: getLang() }),
+  money: () => header(t('nav.money'), t('money.sub'), null) + renderMoney({ data: getData(), lang: getLang() }),
   settings: () => header(t('nav.settings'), t('settings.sub'), null) + `<div class="list">
     ${row('sun', t('settings.appearance'), t('settings.appearance.sub'), '#/settings/appearance')}
     ${row('search', t('settings.language'), getLang() === 'th' ? 'ไทย' : 'English', '#/settings/language')}
@@ -106,20 +119,22 @@ function wire(name) {
   if (name === 'home') {
     document.getElementById('demo-on')?.addEventListener('click', () => { demo = true; render(false); });
     document.getElementById('demo-off')?.addEventListener('click', () => { demo = false; render(false); });
-    document.querySelectorAll('[data-soon]').forEach((b) => b.addEventListener('click', () => toast(t('soon.msg'))));
+    document.getElementById('tip-today')?.addEventListener('click', () => openWorkEditor({ day: todayKey(), data: getData(), demo, focus: 'tips', onDone: rerender }));
     document.querySelectorAll('[data-count]').forEach((el) => { const v = Number(/** @type {HTMLElement} */ (el).dataset.count); animateNumber(/** @type {HTMLElement} */ (el), v, (n) => money(n)); });
   }
+  if (name === 'work') wireWork({ data: getData(), demo, rerender });
+  if (name === 'money') wireMoney({ data: getData(), demo, rerender });
   if (name === 'settings/language') {
     const el = document.getElementById('s-lang');
     if (el) { el.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(/** @type {HTMLElement} */ (b).dataset.value === getLang()))); segmented(el, (v) => { setLang(v); relabel(); render(false); }); }
   }
 }
 
-/** @param {boolean} [moveFocus] */
-function render(moveFocus = true) {
+/** @param {boolean} [moveFocus] @param {boolean} [animate] */
+function render(moveFocus = true, animate = moveFocus) {
   const r = parseRoute(location.hash);
   const view = VIEWS[r.name] || VIEWS.notfound;
-  app.innerHTML = `<div class="${reducedMotion() ? '' : 'rise'}">${view()}</div>`;
+  app.innerHTML = `<div class="${reducedMotion() || !animate ? '' : 'rise'}">${view()}</div>`;
   document.querySelectorAll('.tab').forEach((a) => { if (/** @type {HTMLElement} */ (a).dataset.tab === r.tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.title = `${t(r.tab === 'home' && r.name === 'notfound' ? 'nf.title' : 'nav.' + r.tab)} · TAVON`;
   wire(r.name);

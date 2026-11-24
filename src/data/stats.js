@@ -112,3 +112,25 @@ export function readDashboardData(storage) {
 }
 /** Is there any real data at all? @param {ReturnType<typeof readDashboardData>} d */
 export const hasData = (d) => (isObj(d.work) && Object.keys(d.work).length > 0) || validItems(d.items).length > 0;
+
+/** Worked days/hours and tips for a month. Planned days are counted separately. @param {any} work @param {any} rules @param {string} month YYYY-MM */
+export function monthWork(work, rules, month) {
+  const [y, m] = month.split('-').map(Number); const n = new Date(y, m, 0).getDate();
+  let workedDays = 0, workedHours = 0, plannedDays = 0, plannedHours = 0, tips = 0; const days = [];
+  for (let d = 1; d <= n; d++) {
+    const info = dayInfo(work, rules, `${month}-${pad(d)}`); days.push(info);
+    if (info.status === 'worked') { workedDays++; workedHours += info.hours; } else if (info.status === 'planned') { plannedDays++; plannedHours += info.hours; }
+    tips += info.tips;
+  }
+  return { days, workedDays, workedHours, plannedDays, plannedHours, tips: Math.round(tips * 100) / 100 };
+}
+
+/** Month items after search/filter, newest first. `label(type, code)` gives the category name for text search.
+ * @param {any} items @param {string} month @param {{q?:string,type?:string,category?:string}} f @param {(type:string,code:string)=>string} label */
+export function filterItems(items, month, f, label) {
+  const q = String(f.q || '').trim().toLowerCase();
+  return validItems(items).filter((it) => it.date.startsWith(month)
+    && (!f.type || it.type === f.type) && (!f.category || it.category === f.category)
+    && (!q || String(it.note || '').toLowerCase().includes(q) || label(it.type, it.category).toLowerCase().includes(q) || String(it.amount).includes(q)))
+    .sort((a, b) => b.date.localeCompare(a.date) || String(b.updatedAt || '').localeCompare(String(a.updatedAt || '')));
+}

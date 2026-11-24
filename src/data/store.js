@@ -8,7 +8,10 @@
 import { LEGACY_KEYS } from './schema.js';
 import { takeSnapshot } from './backup.js';
 
-export class DataError extends Error {}
+export class DataError extends Error {
+  /** @param {string} message @param {string} [code] key used to show a friendly translated message */
+  constructor(message, code = 'invalid') { super(message); this.code = code; }
+}
 const WORK_STATUSES = ['worked', 'planned', 'off', 'leave', 'swapped'];
 const isObj = (v) => v !== null && typeof v === 'object' && !Array.isArray(v);
 const round2 = (n) => Math.round(Number(n) * 100) / 100;
@@ -25,21 +28,21 @@ export const newId = () => globalThis.crypto?.randomUUID?.() || `${Date.now().to
 function read(st, key, kind) {
   const raw = st.getItem(key);
   if (raw === null) return kind === 'array' ? [] : {};
-  let v; try { v = JSON.parse(raw); } catch { throw new DataError(`${key} is damaged, nothing was changed`); }
-  if (kind === 'array' ? !Array.isArray(v) : !isObj(v)) throw new DataError(`${key} has an unexpected shape, nothing was changed`);
+  let v; try { v = JSON.parse(raw); } catch { throw new DataError(`${key} is damaged, nothing was changed`, 'damaged'); }
+  if (kind === 'array' ? !Array.isArray(v) : !isObj(v)) throw new DataError(`${key} has an unexpected shape, nothing was changed`, 'damaged');
   return v;
 }
 /** @param {Storage} st @param {string} key @param {any} value */
 function write(st, key, value) {
   const s = JSON.stringify(value);
-  try { st.setItem(key, s); } catch { throw new DataError('Could not save (storage full or blocked)'); }
-  if (st.getItem(key) !== s) throw new DataError('Save could not be verified');
+  try { st.setItem(key, s); } catch { throw new DataError('Could not save (storage full or blocked)', 'storage'); }
+  if (st.getItem(key) !== s) throw new DataError('Save could not be verified', 'storage');
 }
 const snapped = new WeakSet();
 /** One snapshot per session before the first edit. @param {Storage} st @param {Date} now */
 function guard(st, now) {
   if (snapped.has(st)) return;
-  try { takeSnapshot(st, 'before editing', now); } catch { throw new DataError('Could not make a safety copy first, so nothing was changed'); }
+  try { takeSnapshot(st, 'before editing', now); } catch { throw new DataError('Could not make a safety copy first, so nothing was changed', 'snapshot'); }
   snapped.add(st);
 }
 
@@ -93,16 +96,16 @@ export function addItem(st, fields, now = new Date()) {
 /** Edit keeps every other field (e.g. recurringId). @param {Storage} st @param {string} id @param {any} fields @param {Date} [now] */
 export function updateItem(st, id, fields, now = new Date()) {
   const items = read(st, LEGACY_KEYS.finance, 'array');
-  const i = items.findIndex((x) => isObj(x) && x.id === id); if (i < 0) throw new DataError('Item not found');
+  const i = items.findIndex((x) => isObj(x) && x.id === id); if (i < 0) throw new DataError('Item not found', 'notfound');
   const prev = items[i]; const base = cleanItem({ ...prev, ...fields });
   guard(st, now);
   items[i] = { ...prev, ...base, updatedAt: now.toISOString() }; write(st, LEGACY_KEYS.finance, items);
-  return { prev, next: items[i] };
+  return { prev, next: items[i], index: i };
 }
 /** @param {Storage} st @param {string} id @param {Date} [now] */
 export function removeItem(st, id, now = new Date()) {
   const items = read(st, LEGACY_KEYS.finance, 'array');
-  const i = items.findIndex((x) => isObj(x) && x.id === id); if (i < 0) throw new DataError('Item not found');
+  const i = items.findIndex((x) => isObj(x) && x.id === id); if (i < 0) throw new DataError('Item not found', 'notfound');
   guard(st, now);
   const [item] = items.splice(i, 1); write(st, LEGACY_KEYS.finance, items);
   return { item, index: i };

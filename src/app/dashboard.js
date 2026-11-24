@@ -3,6 +3,7 @@
 import { icon } from '../ui/icons.js';
 import { t } from './i18n.js';
 import { money, hours, dayLabel, weekdayShort } from './format.js';
+import { readCategories, categoryLabel } from '../data/store.js';
 import { todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData } from '../data/stats.js';
 
 /** @param {any} s */
@@ -19,7 +20,7 @@ function todayCard(d, today, L) {
   const hrs = i.status === 'worked' || i.status === 'planned' ? `<p class="t-sub muted num">${hours(i.hours)} ${esc(t('home.hours', L))}</p>` : '';
   return `<div class="card stack"><div class="between"><span class="t-headline">${esc(dayLabel(today, L))}</span><span class="badge badge-${BADGE[i.status] || 'neutral'}">${esc(t('st.' + i.status, L))}</span></div>${place}${hrs}
     <div class="between"><span class="t-sub muted">${esc(t('home.tips', L))}</span><span class="t-headline num">${esc(money(i.tips))}</span></div>
-    <button class="btn btn-tonal btn-block" data-soon>${icon('plus', 'i-sm')}${esc(t('home.addtip', L))}<span class="badge badge-neutral">${esc(t('soon', L))}</span></button></div>`;
+    <button class="btn btn-tonal btn-block" id="tip-today">${icon('plus', 'i-sm')}${esc(t('home.addtip', L))}</button></div>`;
 }
 /** @param {any} d @param {string} today @param {string} L */
 function balanceCard(d, today, L) {
@@ -43,15 +44,16 @@ function weekCard(d, today, L) {
 }
 /** @param {any} d @param {string} L */
 function recentList(d, L) {
+  const cats = readCategories(globalThis.localStorage);
   const rows = recentItems(d.items, 5);
   if (!rows.length) return `<div class="card"><p class="t-sub muted">${esc(t('home.nothing', L))}</p></div>`;
-  return `<div class="list">${rows.map((r) => `<div class="row"><span class="row-icon">${icon(r.type === 'income' ? 'download' : 'upload')}</span><span class="row-main"><span class="row-title">${esc(r.category || (r.type === 'income' ? t('home.income', L) : t('home.expense', L)))}</span><br><span class="row-sub">${esc(dayLabel(r.date, L))}</span></span><span class="row-trail ${r.type === 'income' ? 'pos' : 'neg'}">${esc(money(r.type === 'income' ? r.amount : -r.amount, { sign: true }))}</span></div>`).join('')}</div>`;
+  return `<div class="list">${rows.map((r) => `<div class="row"><span class="row-icon">${icon(r.type === 'income' ? 'download' : 'upload')}</span><span class="row-main"><span class="row-title">${esc(categoryLabel(cats, r.type, r.category, L))}</span><br><span class="row-sub">${esc(dayLabel(r.date, L))}</span></span><span class="row-trail ${r.type === 'income' ? 'pos' : 'neg'}">${esc(money(r.type === 'income' ? r.amount : -r.amount, { sign: true }))}</span></div>`).join('')}</div>`;
 }
 /** @param {any} d @param {string} today @param {string} L */
 function upcomingList(d, today, L) {
   const rows = upcomingRecurring(d.recurring, today, 14);
   if (!rows.length) return '';
-  return section(t('home.upcoming', L), `<div class="list">${rows.map((r) => `<div class="row"><span class="row-icon">${icon('repeat')}</span><span class="row-main"><span class="row-title">${esc(r.category || '—')}</span><br><span class="row-sub">${esc(r.daysLeft === 0 ? t('home.todaydue', L) : t('home.in', L).replace('{n}', String(r.daysLeft)))} · ${esc(dayLabel(r.due, L))}</span></span><span class="row-trail num">${esc(money(r.amount))}</span></div>`).join('')}</div>`);
+  return section(t('home.upcoming', L), `<div class="list">${rows.map((r) => `<div class="row"><span class="row-icon">${icon('repeat')}</span><span class="row-main"><span class="row-title">${esc(categoryLabel(readCategories(globalThis.localStorage), 'expense', r.category, L))}</span><br><span class="row-sub">${esc(r.daysLeft === 0 ? t('home.todaydue', L) : t('home.in', L).replace('{n}', String(r.daysLeft)))} · ${esc(dayLabel(r.due, L))}</span></span><span class="row-trail num">${esc(money(r.amount))}</span></div>`).join('')}</div>`);
 }
 /** @param {any} d @param {string} L @param {Date} now */
 function backupCard(d, L, now) {

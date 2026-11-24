@@ -34,3 +34,8 @@
 - Dashboard is strictly read-only. Recurring bills shown as upcoming, never generated on load (the old app wrote them on load).
 - Tips are shown separately and not added to money, per the old business rule.
 - Preview uses in-memory sample data so Pee can judge the design without real data.
+
+## D-Phase08
+- All writes go through src/data/store.js; damaged data is never overwritten; a snapshot is taken once per session before the first edit.
+- Undo toast (5 s) instead of confirm dialogs for entry deletes; confirm dialogs reserved for bigger deletes (categories, workplaces) in part 2.
+- Adding a tip on a day with no record preselects status "worked".

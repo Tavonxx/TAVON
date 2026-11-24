@@ -18,3 +18,5 @@ export function dayLabel(key, lang) {
 export const weekdayShort = (key, lang) => { const [y, m, d] = key.split('-').map(Number); return new Intl.DateTimeFormat(lang === 'en' ? 'en-CA' : 'th-TH-u-ca-gregory', { weekday: lang === 'en' ? 'narrow' : 'narrow' }).format(new Date(y, m - 1, d, 12)); };
 /** @param {string} month YYYY-MM @param {string} lang */
 export function monthLabel(month, lang) { const [y, m] = month.split('-').map(Number); return new Intl.DateTimeFormat(lang === 'en' ? 'en-CA' : 'th-TH-u-ca-gregory', { month: 'long', year: 'numeric' }).format(new Date(y, m - 1, 1, 12)); }
+/** "23 พ.ย." / "Nov 23". @param {string} key @param {string} lang */
+export function shortDate(key, lang) { const [y, m, d] = key.split('-').map(Number); return new Intl.DateTimeFormat(lang === 'en' ? 'en-CA' : 'th-TH-u-ca-gregory', { day: 'numeric', month: 'short' }).format(new Date(y, m - 1, d, 12)); }

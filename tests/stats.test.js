@@ -61,3 +61,17 @@ test('readDashboardData only reads; empty storage = no data', () => {
   const m = new Map([['pee-finance-v1', JSON.stringify([{ type: 'income', date: '2026-11-01', amount: 5 }])], ['pee-work-tracker', '{broken']]);
   const d2 = readDashboardData({ getItem: (k) => m.get(k) ?? null }); assert.equal(hasData(d2), true); assert.equal(d2.work, undefined);
 });
+
+import { monthWork, filterItems } from '../src/data/stats.js';
+test('month work: counts worked and planned separately, tips from any day', () => {
+  const m = monthWork({ '2026-11-02': { status: 'worked', hours: 8, tips: 10 }, '2026-11-03': { status: 'off', tips: 5.5 } }, rules, '2026-11');
+  assert.equal(m.days.length, 30); assert.deepEqual([m.workedDays, m.workedHours, m.tips], [1, 8, 15.5]);
+  assert.ok(m.plannedDays >= 7); // Mondays + Fridays from the weekly rules (some already saved)
+});
+test('filter items: month, type, category, text in note/category label/amount', () => {
+  const it = [{ id: 1, type: 'expense', date: '2026-11-03', amount: 12.5, category: 'food', note: 'Pad Thai' }, { id: 2, type: 'income', date: '2026-11-05', amount: 300, category: 'salary' }, { id: 3, type: 'expense', date: '2026-10-30', amount: 9, category: 'food' }];
+  const label = (t, c) => ({ food: 'Food', salary: 'Salary' }[c]);
+  const ids = (f) => filterItems(it, '2026-11', f, label).map((x) => x.id);
+  assert.deepEqual(ids({}), [2, 1]); assert.deepEqual(ids({ type: 'expense' }), [1]); assert.deepEqual(ids({ category: 'salary' }), [2]);
+  assert.deepEqual(ids({ q: 'thai' }), [1]); assert.deepEqual(ids({ q: 'sal' }), [2]); assert.deepEqual(ids({ q: '300' }), [2]); assert.deepEqual(ids({ q: 'zzz' }), []);
+});
