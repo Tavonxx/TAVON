@@ -22,3 +22,5 @@
 - Renamed statuses; one-tap/batch confirm of scheduled work days; recent tip chips; finance calendar with counts; quick repeat entries; faster entry editor.
 
 - Home week strip can move to other weeks (prev/next/this week) and tapping a day opens its editor.
+
+- Home week strip: tap a day to see its details in a panel under the strip (same renderer as the Today card), with Edit and one-tap Confirm; tap again to close; tapping today scrolls to the Today card.
