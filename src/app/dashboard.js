@@ -6,6 +6,7 @@ import { money, hours, dayLabel, weekdayShort, shortDate, periodLabel, esc } fro
 import { shortcutGrid } from './shortcuts.js';
 import { ringDial } from '../ui/dial.js';
 import { restArt } from '../ui/restart.js';
+import { installHintNow, installCard } from './install.js';
 import { readCategories, categoryLabel } from '../data/store.js';
 import { addDays, pendingPastDays, todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData, ringStats, nextWorkDay } from '../data/stats.js';
 
@@ -111,7 +112,7 @@ export function renderHome({ data, demo, lang, now = new Date(), weekOffset = 0,
     more: () => `<details class="more"><summary>${icon('chevron', 'i-sm')}${esc(t('home.more', L))}</summary><div class="stack-lg" style="padding-top:var(--s-2)">${section(t('home.recent', L), recentList(data, L))}${upcomingList(data, today, L)}</div></details>`,
   };
   const body = lay.order.filter((id) => !lay.hidden.includes(id) && parts[id]).map((id) => parts[id]()).join('');
-  return `<div class="stack-lg">${banner}${pendingCard(data, today, L)}${backupCard(data, L, now)}${section(t('home.today', L), todayCard(data, today, L))}${body}</div>`;
+  return `<div class="stack-lg">${banner}${pendingCard(data, today, L)}${backupCard(data, L, now)}${!demo && installHintNow() ? installCard(L) : ''}${section(t('home.today', L), todayCard(data, today, L))}${body}</div>`;
 }
 
 /** Body of the "this week" sheet opened from the dial. @param {any} d @param {string} today @param {string} L */

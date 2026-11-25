@@ -23,6 +23,7 @@ export const LEGACY_KEYS = Object.freeze({
 export const TAVON_KEYS = Object.freeze({
   meta: 'tavon-meta',                 // { schema, migrations: [{id, at}] }
   shiftSchedule: 'tavon-shift-schedule', // weekly shift rules (replaces the schedule hard-coded in the old app)
+  installHint: 'tavon-install-hint',  // device-only: the user closed the 'add to Home Screen' tip
   snapshots: 'tavon-snapshots',       // automatic safety copies taken before imports/migrations
   payRates: 'tavon-pay-rates',        // hourly pay per workplace: [{id,place('' = every workplace),rate,from('' = since the start)}]
   homeLayout: 'tavon-home-layout',    // {order:[section ids], hidden:[section ids]}
@@ -31,9 +32,9 @@ export const TAVON_KEYS = Object.freeze({
 
 export const SCHEMA_VERSION = 3;
 
-/** Keys that belong in a backup file (everything except the snapshots themselves). */
+/** Keys that belong in a backup file (everything except the snapshots themselves and device-only tips). */
 export function isBackupKey(key) {
-  return (key.startsWith('pee-') || key.startsWith('tavon-')) && key !== TAVON_KEYS.snapshots;
+  return (key.startsWith('pee-') || key.startsWith('tavon-')) && key !== TAVON_KEYS.snapshots && key !== TAVON_KEYS.installHint;
 }
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;

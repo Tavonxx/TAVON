@@ -13,6 +13,7 @@ import { confirmDays } from './editors.js';
 import { wireShortcuts, renderShortcutManage, wireShortcutManage } from './shortcuts.js';
 import { renderPay, wirePay } from './pay-ui.js';
 import { renderHomeLayout, wireHomeLayout } from './home-ui.js';
+import { dismissInstallHint } from './install.js';
 import { renderBackupPage, wireBackupPage } from './backup-ui.js';
 import { renderSchedule, wireSchedule, renderRecurring, wireRecurring, openSwap, renderCategories, wireCategories } from './plans.js';
 import { todayKey, dayInfo, pendingPastDays, hasData } from '../data/stats.js';
@@ -165,6 +166,7 @@ function wire(name) {
     }));
     document.getElementById('sel-edit')?.addEventListener('click', () => openWorkEditor({ day: homeSel, data: getData(), demo, onDone: rerender }));
     document.getElementById('sel-confirm')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: [dayInfo(d.work, d.rules, homeSel)], data: d, demo, onDone: rerender }); });
+    document.getElementById('install-dismiss')?.addEventListener('click', () => { dismissInstallHint(); rerender(); });
     document.getElementById('confirm-today')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: [dayInfo(d.work, d.rules, todayKey())], data: d, demo, onDone: rerender }); });
     document.getElementById('confirm-all')?.addEventListener('click', () => { const d = getData(); confirmDays({ days: pendingPastDays(d.work, d.rules, todayKey(), 14), data: d, demo, onDone: rerender }); });
     document.getElementById('tip-today')?.addEventListener('click', () => openWorkEditor({ day: todayKey(), data: getData(), demo, focus: 'tips', onDone: rerender }));

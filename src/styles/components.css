@@ -277,3 +277,4 @@ html[data-motion="off"] .rest-art .lamp{animation:none}
 @media (prefers-reduced-motion:reduce){.rest-art .shade,.rest-art .cone,.rest-art .speck{animation:none}.rest-art .speck{opacity:0}}
 html[data-motion="off"] .rest-art .shade,html[data-motion="off"] .rest-art .cone,html[data-motion="off"] .rest-art .speck{animation:none}
 html[data-motion="off"] .rest-art .speck{opacity:0}
+ol.steps{list-style:decimal;margin:0;padding-inline-start:1.4em;display:grid;gap:var(--s-1)}

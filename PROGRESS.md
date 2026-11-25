@@ -76,3 +76,6 @@ Tap the Home dial -> "this week" sheet (7 days, status, place/time, hours, week 
 
 ## Phase 09 step 1: Arrange Home: DONE (awaiting approval)
 `tavon-home-layout` {order, hidden} (drag by grip or arrows) (in backups); `src/data/homelayout.js`, `src/app/home-ui.js`, Settings > Arrange Home. 4 sections (shortcuts, balance, week, recent/bills) can be hidden and reordered; Today card, confirm-days card and backup reminder stay fixed. Read cleans odd data; hiding never deletes data. 99 tests + e2e.
+
+## Phase 11 parts 1 and 3: DONE (awaiting approval)
+manifest.webmanifest + iOS meta (standalone, title, status bar "default"); "Add to Home Screen" tip card on Home (iPhone/iPad Safari only, hidden when opened from the icon, closable; flag tavon-install-hint is device-only and excluded from backups). Part 2 (service worker/offline) NOT built yet: separate step, riskiest (stale versions).
