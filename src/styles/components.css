@@ -235,10 +235,16 @@ a.card:active,a.card-flat:active,button.card:active,button.card-flat:active{tran
 .flash{animation:flash calc(var(--dur-3) * 3) var(--ease) both}
 /* Day off: the sleeping character replaces the dial */
 .rest-hero{display:flex;flex-direction:column;align-items:center;gap:var(--s-1);text-align:center;padding:var(--s-2) 0}
-.rest-art{width:min(16rem,76vw);height:auto;margin-bottom:var(--s-2)}
+.rest-art{width:min(18rem,82vw);height:auto;margin-bottom:var(--s-2)}
 .legend-2{grid-template-columns:repeat(2,1fr)}
 @keyframes zzf{from{transform:translateY(2px);opacity:.55}to{transform:translateY(-4px);opacity:1}}
 .rest-art .zz{animation:zzf 2.4s ease-in-out infinite alternate}
 .rest-art .z2{animation-delay:.4s}.rest-art .z3{animation-delay:.8s}
 @media (prefers-reduced-motion:reduce){.rest-art .zz{animation:none}}
 html[data-motion="off"] .rest-art .zz{animation:none}
+@keyframes bub{from{transform:scale(.7)}to{transform:scale(1.25)}}
+@keyframes tw{from{opacity:.35}to{opacity:1}}
+.rest-art .bub{transform-box:fill-box;transform-origin:left center;animation:bub 2.4s ease-in-out infinite alternate}
+.rest-art .tw{animation:tw 1.8s ease-in-out infinite alternate}.rest-art .t2{animation-delay:.7s}
+@media (prefers-reduced-motion:reduce){.rest-art .bub,.rest-art .tw{animation:none}}
+html[data-motion="off"] .rest-art .bub,html[data-motion="off"] .rest-art .tw{animation:none}
