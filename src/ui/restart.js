@@ -21,9 +21,12 @@ export function restArt() {
     <path d="M112 90v40M150 88v42M188 90v40" stroke="#7479C4" stroke-width="2.4" stroke-linecap="round" opacity=".55"/>
     <rect x="84" y="126" width="144" height="8" rx="4" fill="#7479C4"/>
     </g>
-    <rect x="238" y="121" width="22" height="8" rx="4" fill="#9A7650"/>
-    <path d="M241 121c-2-17 3-26 8-26s10 9 8 26z" fill="#FFE29A"/>
-    <circle class="lamp" cx="249" cy="108" r="66" fill="url(#ra-lamp)" style="mix-blend-mode:screen"/>
+    <ellipse cx="249" cy="128" rx="11" ry="3.2" fill="#C9A878"/>
+    <rect x="247.6" y="104" width="2.8" height="24" rx="1.4" fill="#C9A878"/>
+    <path d="M233 106c1-17 7-25 16-25s15 8 16 25z" fill="#FFE8B8"/>
+    <path d="M233 106h32" stroke="#FFD38A" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M238 106l-9 22h40l-9-22z" fill="#FFD58A" opacity=".16"/>
+    <circle class="lamp" cx="249" cy="104" r="66" fill="url(#ra-lamp)" style="mix-blend-mode:screen"/>
     <g font-family="var(--font-display)" font-weight="700" fill="var(--text-2)">
       <text class="zz z1" x="108" y="70" font-size="15">z</text><text class="zz z2" x="124" y="52" font-size="19">z</text><text class="zz z3" x="144" y="32" font-size="23">Z</text>
     </g>

@@ -62,3 +62,4 @@
 - Day-off character: back to the first design (round-faced bun under a blanket with moon and Zzz), by request.
 - Day-off character animates: breathing blanket, head bob, hair tuft sway, twinkling stars, glowing moon, rising Zzz. All off with "Reduce animations" / device Reduce Motion (Zzz then stay visible).
 - Day-off scene: a small warm night light with a softly flickering glow.
+- Night light is now a minimal cozy table lamp (cream shade, slim stand).
