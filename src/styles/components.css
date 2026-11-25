@@ -264,7 +264,16 @@ html[data-motion="off"] .rest-art .glow,html[data-motion="off"] .rest-art .tw{an
 @media (prefers-reduced-motion:reduce){.rest-art .breathe,.rest-art .bob,.rest-art .tuft,.rest-art .moon,.rest-art .tw{animation:none}.rest-art .zz{animation:none;opacity:1}}
 html[data-motion="off"] .rest-art .breathe,html[data-motion="off"] .rest-art .bob,html[data-motion="off"] .rest-art .tuft,html[data-motion="off"] .rest-art .moon,html[data-motion="off"] .rest-art .tw{animation:none}
 html[data-motion="off"] .rest-art .zz{animation:none;opacity:1}
-@keyframes lamp{0%{opacity:.82}50%{opacity:1}100%{opacity:.9}}
-.rest-art .lamp{animation:lamp 4.2s ease-in-out infinite}
+@keyframes lamp{0%{opacity:.7;transform:scale(.93)}35%{opacity:1;transform:scale(1.05)}60%{opacity:.85;transform:scale(.98)}100%{opacity:.95;transform:scale(1.04)}}
+.rest-art .lamp{transform-box:fill-box;transform-origin:center;animation:lamp 4.2s ease-in-out infinite alternate}
 @media (prefers-reduced-motion:reduce){.rest-art .lamp{animation:none}}
 html[data-motion="off"] .rest-art .lamp{animation:none}
+@keyframes shade{from{filter:brightness(.92)}to{filter:brightness(1.12)}}
+@keyframes cone{from{opacity:.08}to{opacity:.24}}
+@keyframes speck{0%{transform:translate(0,6px);opacity:0}30%{opacity:.9}100%{transform:translate(4px,-18px);opacity:0}}
+.rest-art .shade{animation:shade 3.1s ease-in-out infinite alternate}
+.rest-art .cone{animation:cone 3.1s ease-in-out infinite alternate}
+.rest-art .speck{animation:speck 4s ease-out infinite;opacity:0}.rest-art .sp2{animation-delay:1.4s}.rest-art .sp3{animation-delay:2.6s}
+@media (prefers-reduced-motion:reduce){.rest-art .shade,.rest-art .cone,.rest-art .speck{animation:none}.rest-art .speck{opacity:0}}
+html[data-motion="off"] .rest-art .shade,html[data-motion="off"] .rest-art .cone,html[data-motion="off"] .rest-art .speck{animation:none}
+html[data-motion="off"] .rest-art .speck{opacity:0}

@@ -23,9 +23,10 @@ export function restArt() {
     </g>
     <ellipse cx="249" cy="128" rx="11" ry="3.2" fill="#C9A878"/>
     <rect x="247.6" y="104" width="2.8" height="24" rx="1.4" fill="#C9A878"/>
-    <path d="M233 106c1-17 7-25 16-25s15 8 16 25z" fill="#FFE8B8"/>
+    <path class="shade" d="M233 106c1-17 7-25 16-25s15 8 16 25z" fill="#FFE8B8"/>
     <path d="M233 106h32" stroke="#FFD38A" stroke-width="2.4" stroke-linecap="round"/>
-    <path d="M238 106l-9 22h40l-9-22z" fill="#FFD58A" opacity=".16"/>
+    <path class="cone" d="M238 106l-9 22h40l-9-22z" fill="#FFD58A" opacity=".16"/>
+    <g fill="#FFE8B8"><circle class="speck sp1" cx="240" cy="96" r="1.4"/><circle class="speck sp2" cx="257" cy="92" r="1.2"/><circle class="speck sp3" cx="249" cy="100" r="1"/></g>
     <circle class="lamp" cx="249" cy="104" r="66" fill="url(#ra-lamp)" style="mix-blend-mode:screen"/>
     <g font-family="var(--font-display)" font-weight="700" fill="var(--text-2)">
       <text class="zz z1" x="108" y="70" font-size="15">z</text><text class="zz z2" x="124" y="52" font-size="19">z</text><text class="zz z3" x="144" y="32" font-size="23">Z</text>
