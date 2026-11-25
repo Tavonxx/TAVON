@@ -238,8 +238,8 @@ a.card:active,a.card-flat:active,button.card:active,button.card-flat:active{tran
 .rest-art{width:min(18rem,82vw);height:auto;margin-bottom:var(--s-2)}
 .legend-2{grid-template-columns:repeat(2,1fr)}
 @keyframes zzf{from{transform:translateY(2px);opacity:.55}to{transform:translateY(-4px);opacity:1}}
-.rest-art .zz{animation:zzf 2.4s ease-in-out infinite alternate}
-.rest-art .z2{animation-delay:.4s}.rest-art .z3{animation-delay:.8s}
+.rest-art .zz{animation:zzr 3.6s ease-in-out infinite;opacity:0}
+.rest-art .z2{animation-delay:.9s}.rest-art .z3{animation-delay:1.8s}
 @media (prefers-reduced-motion:reduce){.rest-art .zz{animation:none}}
 html[data-motion="off"] .rest-art .zz{animation:none}
 @keyframes bub{from{transform:scale(.7)}to{transform:scale(1.25)}}
@@ -249,3 +249,18 @@ html[data-motion="off"] .rest-art .zz{animation:none}
 .rest-art .tw{animation:tw 1.8s ease-in-out infinite alternate}.rest-art .t2{animation-delay:.7s}
 @media (prefers-reduced-motion:reduce){.rest-art .glow,.rest-art .tw{animation:none}}
 html[data-motion="off"] .rest-art .glow,html[data-motion="off"] .rest-art .tw{animation:none}
+/* Day-off character: breathing, head bob, tuft sway, moon glow, rising Zzz (all off when motion is off) */
+@keyframes zzr{0%{transform:translate(-4px,8px);opacity:0}25%{opacity:1}75%{opacity:1}100%{transform:translate(8px,-12px);opacity:0}}
+@keyframes breathe{from{transform:scaleY(1)}to{transform:scaleY(1.06)}}
+@keyframes bob{from{transform:translateY(0)}to{transform:translateY(1.6px)}}
+@keyframes sway{from{transform:rotate(-5deg)}to{transform:rotate(6deg)}}
+@keyframes moonglow{from{opacity:.85}to{opacity:1}}
+.rest-art .breathe,.rest-art .bob,.rest-art .tuft{transform-box:fill-box}
+.rest-art .breathe{transform-origin:50% 100%;animation:breathe 3.4s ease-in-out infinite alternate}
+.rest-art .bob{transform-origin:50% 100%;animation:bob 3.4s ease-in-out infinite alternate}
+.rest-art .tuft{transform-origin:20% 100%;animation:sway 3.4s ease-in-out infinite alternate}
+.rest-art .moon{animation:moonglow 3s ease-in-out infinite alternate}
+.rest-art .tw{animation:tw 1.8s ease-in-out infinite alternate}.rest-art .t2{animation-delay:.6s}.rest-art .t3{animation-delay:1.2s}
+@media (prefers-reduced-motion:reduce){.rest-art .breathe,.rest-art .bob,.rest-art .tuft,.rest-art .moon,.rest-art .tw{animation:none}.rest-art .zz{animation:none;opacity:1}}
+html[data-motion="off"] .rest-art .breathe,html[data-motion="off"] .rest-art .bob,html[data-motion="off"] .rest-art .tuft,html[data-motion="off"] .rest-art .moon,html[data-motion="off"] .rest-art .tw{animation:none}
+html[data-motion="off"] .rest-art .zz{animation:none;opacity:1}

@@ -60,3 +60,4 @@
 - Day-off character redrawn in a soft storybook style (original design): plush with ears, star blanket, sleepy moon, nose bubble.
 - Day-off character is now an original sleeping kitten on a blue duvet beside a night light, hand-drawn look with paper grain and warm glow.
 - Day-off character: back to the first design (round-faced bun under a blanket with moon and Zzz), by request.
+- Day-off character animates: breathing blanket, head bob, hair tuft sway, twinkling stars, glowing moon, rising Zzz. All off with "Reduce animations" / device Reduce Motion (Zzz then stay visible).
