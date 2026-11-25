@@ -58,3 +58,4 @@
 - Phase 10: a soft highlight on the row/day/card you just added or confirmed (flashNext/runFlash in ui.js). Removing a row has no exit animation (the page redraws).
 - Day off: a sleeping original character replaces the dial (period hours/days stay below), and the whole app switches to a calm dusk tone (data-rest). Setting "Calm tone on days off" in Appearance (default on). Not applied to brand-new users with no schedule/data, or in preview mode. Contrast tested for all 4 accents.
 - Day-off character redrawn in a soft storybook style (original design): plush with ears, star blanket, sleepy moon, nose bubble.
+- Day-off character is now an original sleeping kitten on a blue duvet beside a night light, hand-drawn look with paper grain and warm glow.

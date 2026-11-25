@@ -244,7 +244,8 @@ a.card:active,a.card-flat:active,button.card:active,button.card-flat:active{tran
 html[data-motion="off"] .rest-art .zz{animation:none}
 @keyframes bub{from{transform:scale(.7)}to{transform:scale(1.25)}}
 @keyframes tw{from{opacity:.35}to{opacity:1}}
-.rest-art .bub{transform-box:fill-box;transform-origin:left center;animation:bub 2.4s ease-in-out infinite alternate}
+@keyframes glow{from{opacity:.8}to{opacity:1}}
+.rest-art .glow{animation:glow 3s ease-in-out infinite alternate}
 .rest-art .tw{animation:tw 1.8s ease-in-out infinite alternate}.rest-art .t2{animation-delay:.7s}
-@media (prefers-reduced-motion:reduce){.rest-art .bub,.rest-art .tw{animation:none}}
-html[data-motion="off"] .rest-art .bub,html[data-motion="off"] .rest-art .tw{animation:none}
+@media (prefers-reduced-motion:reduce){.rest-art .glow,.rest-art .tw{animation:none}}
+html[data-motion="off"] .rest-art .glow,html[data-motion="off"] .rest-art .tw{animation:none}
