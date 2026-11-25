@@ -1,6 +1,6 @@
 // @ts-check
 import { spriteMarkup, icon } from '../ui/icons.js';
-import { load, save, apply, watchSystem, DEFAULTS } from '../ui/appearance.js';
+import { load, save, apply, applyRest, watchSystem, DEFAULTS } from '../ui/appearance.js';
 import { openSheet, closeSheet, toast, segmented, switchControl, runFlash } from '../ui/ui.js';
 import { parseRoute } from './router.js';
 import { money } from './format.js';
@@ -15,7 +15,7 @@ import { renderPay, wirePay } from './pay-ui.js';
 import { renderHomeLayout, wireHomeLayout } from './home-ui.js';
 import { renderBackupPage, wireBackupPage } from './backup-ui.js';
 import { renderSchedule, wireSchedule, renderRecurring, wireRecurring, openSwap, renderCategories, wireCategories } from './plans.js';
-import { todayKey, dayInfo, pendingPastDays } from '../data/stats.js';
+import { todayKey, dayInfo, pendingPastDays, hasData } from '../data/stats.js';
 import { animateNumber } from '../ui/ui.js';
 
 let homeSel = ''; // day tapped in the Home week strip (details shown under it)
@@ -106,6 +106,7 @@ const VIEWS = {
       ${[['terracotta', '#9F4019'], ['forest', '#2A634D'], ['ocean', '#2C5F8F'], ['mono', '#141414']].map(([v, c]) => `<button class="chip" data-value="${v}" aria-pressed="false"><i class="swatch" style="background:${c}"></i>${esc(t('ap.' + v))}</button>`).join('')}</div></div>
     ${seg('s-size', 'ap.size', [['small', 'S'], ['default', 'M'], ['large', 'L'], ['xlarge', 'XL']].map(([v, k]) => [v, k]))}
     ${seg('s-den', 'ap.density', [['compact', 'ap.compact'], ['comfortable', 'ap.normal'], ['spacious', 'ap.spacious']])}
+    <div class="between"><span class="row-main"><span id="l-rest">${esc(t('ap.rest'))}</span><br><span class="t-footnote muted">${esc(t('ap.rest.sub'))}</span></span><button class="switch" id="sw-rest" aria-labelledby="l-rest"></button></div>
     <div class="between"><span id="l-mo">${esc(t('ap.motion'))}</span><button class="switch" id="sw-motion" aria-labelledby="l-mo"></button></div>
     <button class="btn btn-secondary btn-block" id="reset">${esc(t('ap.reset'))}</button></div>`,
   'settings/home': () => header(t('hl.title'), '', 'settings') + renderHomeLayout({ data: getData(), lang: getLang() }),
@@ -119,6 +120,13 @@ const VIEWS = {
   notfound: () => header(t('nf.title'), '', null) + `<div class="card state"><div class="state-icon">${icon("alert", "i-lg")}</div><a class="btn btn-primary" href="#/">${esc(t('nf.btn'))}</a></div>`,
 };
 
+/** Day-off rest tone: on when the setting is on, there is a schedule or data (so a brand-new user is not put to bed), and today is a day off. */
+function syncRest() {
+  const d = /** @type {any} */ (readDashboardData(localStorage)); let on = false;
+  if (settings.rest === 'on' && !demo && ((Array.isArray(d.rules) && d.rules.length > 0) || hasData(d))) on = ['off', 'leave', 'swapped'].includes(dayInfo(d.work, d.rules, todayKey()).status);
+  applyRest(on);
+}
+
 /** Wire up controls after a view renders. */
 function wire(name) {
   const set = (k, v) => { settings = { ...settings, [k]: v }; save(settings); apply(settings); };
@@ -128,6 +136,8 @@ function wire(name) {
     const acc = document.getElementById('accents');
     const mark = () => acc?.querySelectorAll('button').forEach((b) => b.setAttribute('aria-pressed', String(/** @type {HTMLElement} */ (b).dataset.value === settings.accent)));
     mark(); acc?.addEventListener('click', (e) => { const b = /** @type {HTMLElement} */ (e.target).closest('button'); if (b) { set('accent', b.dataset.value); mark(); } });
+    const swr = /** @type {HTMLElement} */ (document.getElementById('sw-rest'));
+    swr.setAttribute('aria-checked', String(settings.rest === 'on')); switchControl(swr, (on) => { set('rest', on ? 'on' : 'off'); syncRest(); });
     const sw = /** @type {HTMLElement} */ (document.getElementById('sw-motion'));
     sw.setAttribute('aria-checked', String(settings.motion === 'off')); switchControl(sw, (on) => set('motion', on ? 'off' : 'system'));
     document.getElementById('reset')?.addEventListener('click', () => {
@@ -180,7 +190,7 @@ function render(moveFocus = true, animate = moveFocus) {
   const r = parseRoute(location.hash);
   const view = VIEWS[r.name] || VIEWS.notfound;
   app.innerHTML = `<div class="${reducedMotion() || !animate ? '' : 'rise'}">${view()}</div>`;
-  runFlash(app);
+  runFlash(app); syncRest();
   document.querySelectorAll('.tab').forEach((a) => { if (/** @type {HTMLElement} */ (a).dataset.tab === r.tab) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
   document.title = `${t(r.tab === 'home' && r.name === 'notfound' ? 'nf.title' : 'nav.' + r.tab)} · TAVON`;
   wire(r.name);
@@ -194,5 +204,6 @@ addEventListener('touchend', (e) => { if (!edge) return; const p = e.changedTouc
 
 chrome();
 apply(settings); watchSystem(() => settings);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) syncRest(); }); // a new day may have started
 addEventListener('hashchange', () => render());
 render(false);

@@ -2,13 +2,14 @@
 // Appearance settings: stored in tavon-meta-independent key `tavon-appearance` (never touches legacy data).
 export const KEY = 'tavon-appearance';
 /** @type {Record<string,string>} */
-export const DEFAULTS = Object.freeze({ theme: 'auto', accent: 'terracotta', fontSize: 'default', density: 'comfortable', motion: 'system' });
+export const DEFAULTS = Object.freeze({ theme: 'auto', accent: 'terracotta', fontSize: 'default', density: 'comfortable', motion: 'system', rest: 'on' });
 const ALLOWED = {
   theme: ['auto', 'light', 'dark'],
   accent: ['terracotta', 'forest', 'ocean', 'mono'],
   fontSize: ['small', 'default', 'large', 'xlarge'],
   density: ['compact', 'comfortable', 'spacious'],
   motion: ['system', 'off'],
+  rest: ['on', 'off'],
 };
 /** @param {any} raw */
 export function sanitize(raw) {
@@ -48,4 +49,12 @@ export function watchSystem(getSettings) {
   const fn = () => { if (getSettings().theme === 'auto') apply(getSettings()); };
   mq.addEventListener('change', fn);
   return () => mq.removeEventListener('change', fn);
+}
+
+export const REST_COLOR = '#151827';
+/** Day-off "rest tone": a calm dusk palette over whatever theme is chosen. @param {boolean} on @param {HTMLElement} [el] */
+export function applyRest(on, el = document.documentElement) {
+  if (on) el.dataset.rest = 'on'; else delete el.dataset.rest;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta) meta.setAttribute('content', on ? REST_COLOR : el.dataset.theme === 'dark' ? '#141414' : '#F4F1EA');
 }

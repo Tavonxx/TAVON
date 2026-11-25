@@ -212,8 +212,8 @@ details.more>summary .i{transition:transform var(--dur-2) var(--ease)}
 /* Logo: dark ink on light themes, light paper on dark themes */
 .logo{height:20px;width:auto}
 .logo-paper{display:none}
-html[data-theme="dark"] .logo-ink{display:none}
-html[data-theme="dark"] .logo-paper{display:block}
+html[data-theme="dark"] .logo-ink,html[data-rest="on"] .logo-ink{display:none}
+html[data-theme="dark"] .logo-paper,html[data-rest="on"] .logo-paper{display:block}
 .bal .t-title2{white-space:nowrap;flex:none}
 .bal>div{min-width:0}
 
@@ -233,3 +233,12 @@ a.card:active,a.card-flat:active,button.card:active,button.card-flat:active{tran
 /* Just added / just confirmed: a soft accent wash that fades out */
 @keyframes flash{0%{background-color:color-mix(in srgb,var(--accent) 22%,transparent);transform:scale(1.015)}100%{background-color:transparent;transform:none}}
 .flash{animation:flash calc(var(--dur-3) * 3) var(--ease) both}
+/* Day off: the sleeping character replaces the dial */
+.rest-hero{display:flex;flex-direction:column;align-items:center;gap:var(--s-1);text-align:center;padding:var(--s-2) 0}
+.rest-art{width:min(16rem,76vw);height:auto;margin-bottom:var(--s-2)}
+.legend-2{grid-template-columns:repeat(2,1fr)}
+@keyframes zzf{from{transform:translateY(2px);opacity:.55}to{transform:translateY(-4px);opacity:1}}
+.rest-art .zz{animation:zzf 2.4s ease-in-out infinite alternate}
+.rest-art .z2{animation-delay:.4s}.rest-art .z3{animation-delay:.8s}
+@media (prefers-reduced-motion:reduce){.rest-art .zz{animation:none}}
+html[data-motion="off"] .rest-art .zz{animation:none}

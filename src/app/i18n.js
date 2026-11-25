@@ -254,6 +254,8 @@ const D = {
   'ap.compact': { th: 'แน่น', en: 'Compact' },
   'ap.normal': { th: 'ปกติ', en: 'Normal' },
   'ap.spacious': { th: 'โปร่ง', en: 'Spacious' },
+  'ap.rest': { th: 'วันหยุดใช้โทนพักผ่อน', en: 'Calm tone on days off' },
+  'ap.rest.sub': { th: 'วันที่เป็นวันหยุด สีของแอปจะเปลี่ยนเป็นโทนม่วงน้ำเงินสบายตาโดยอัตโนมัติ', en: 'On a day off the app switches to a calm dusk tone' },
   'ap.motion': { th: 'ลด animation', en: 'Reduce animations' },
   'ap.reset': { th: 'รีเซ็ตหน้าตา', en: 'Reset appearance' },
   'ap.reset.done': { th: 'รีเซ็ตหน้าตาแล้ว', en: 'Appearance reset' },

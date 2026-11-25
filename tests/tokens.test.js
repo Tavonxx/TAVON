@@ -9,6 +9,7 @@ const parseVars = (block) => Object.fromEntries([...block.matchAll(/(--[\w-]+)\s
 const light = {};
 for (const m of css.matchAll(/(?:^|[}/])\s*:root\s*\{([^}]*)\}/g)) Object.assign(light, parseVars(m[1]));
 const dark = { ...light, ...parseVars(css.match(/html\[data-theme="dark"\]\s*\{([^}]*)\}/)[1]) };
+const rest = { ...dark, ...parseVars(css.match(/html\[data-rest="on"\]\s*\{([^}]*)\}/)[1]) };
 const accents = Object.fromEntries([...css.matchAll(/html\[data-accent="(\w+)"\]\s*\{([^}]*)\}/g)].map((m) => [m[1], parseVars(m[2])]));
 
 const hex = (h) => [1, 3, 5].map((i) => parseInt(h.slice(i, i + 2), 16));
@@ -28,7 +29,7 @@ function resolve(theme, name, accent) {
 }
 const col = (theme, name, accent) => hex(resolve(theme, name, accent));
 
-for (const [themeName, theme] of [['light', light], ['dark', dark]]) {
+for (const [themeName, theme] of [['light', light], ['dark', dark], ['rest', rest]]) {
   const bgs = ['--bg', '--surface', '--surface-2'];
   const accentSet = themeName === 'light' ? Object.entries(accents).map(([n, a]) => [n, { '--acc-light': a['--acc-light'] }]) : Object.entries(accents).map(([n, a]) => [n, { '--acc-dark': a['--acc-dark'] }]);
 

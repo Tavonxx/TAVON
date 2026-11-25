@@ -5,6 +5,7 @@ import { t } from './i18n.js';
 import { money, hours, dayLabel, weekdayShort, shortDate, periodLabel, esc } from './format.js';
 import { shortcutGrid } from './shortcuts.js';
 import { ringDial } from '../ui/dial.js';
+import { restArt } from '../ui/restart.js';
 import { readCategories, categoryLabel } from '../data/store.js';
 import { addDays, pendingPastDays, todayKey, dayInfo, weekSummary, monthSummary, recentItems, upcomingRecurring, backupAgeDays, hasData, ringStats, nextWorkDay } from '../data/stats.js';
 
@@ -32,9 +33,11 @@ function todayCard(d, today, L) {
   const leg = (k, label, a, b, unit) => `<div><span class="v num">${esc(a)} / ${esc(b)}</span><span class="l"><i class="k ${k}"></i>${esc(label)} ${esc(unit)}</span></div>`;
   const legend = `<div class="legend">${leg('k1', t('dial.today', L), h(r.today.done), h(r.today.target), t('home.hours', L))}${leg('k2', plabel, h(r.hours.done), h(r.hours.total), t('home.hours', L))}${leg('k3', t('dial.days', L), String(r.days.done), String(r.days.total), t('dial.unit.d', L))}</div>`;
   const rest = i.status === 'off' || i.status === 'leave' || i.status === 'swapped';
+  const restHero = `<div class="rest-hero">${restArt()}<p class="t-title2">${esc(t('st.' + i.status, L))}</p><p class="t-sub muted">${esc(t('dial.rest', L))}</p></div>`;
+  const restLegend = `<div class="legend legend-2">${leg('k2', plabel, h(r.hours.done), h(r.hours.total), t('home.hours', L))}${leg('k3', t('dial.days', L), String(r.days.done), String(r.days.total), t('dial.unit.d', L))}</div>`;
   const nx = rest ? nextWorkDay(d.work, d.rules, today) : null;
   const next = !rest ? '' : `<div class="card-flat stack" id="next-work"><span class="t-label">${esc(t('dial.next', L))}</span>${nx ? `<p class="t-headline">${esc(dayLabel(nx.day, L))}</p><p class="t-sub muted">${esc(nx.place)}${nx.time ? ' · ' + esc(nx.time) : ''} · <span class="num">${hours(nx.hours)}</span> ${esc(t('home.hours', L))}</p>` : `<p class="t-sub muted">${esc(t('dial.nonext', L))}</p>`}</div>`;
-  return `<div class="card stack" id="today-card"><div class="between"><span class="t-headline">${esc(dayLabel(today, L))}</span><span class="badge badge-${BADGE[i.status] || 'neutral'}">${esc(t('st.' + i.status, L))}</span></div>${dial}${legend}${next}${dayBody(i, L, false)}
+  return `<div class="card stack" id="today-card"><div class="between"><span class="t-headline">${esc(dayLabel(today, L))}</span><span class="badge badge-${BADGE[i.status] || 'neutral'}">${esc(t('st.' + i.status, L))}</span></div>${rest ? restHero : dial}${rest ? restLegend : legend}${next}${dayBody(i, L, false)}
     ${i.status === 'planned' ? `<button class="btn btn-primary btn-block" id="confirm-today">${icon('check', 'i-sm')}${esc(t('cf.one', L))}</button>` : ''}
     <button class="btn btn-tonal btn-block" id="tip-today">${icon('plus', 'i-sm')}${esc(t('home.addtip', L))}</button></div>`;
 }

@@ -97,3 +97,16 @@ html[data-theme="dark"]{
   --scrim:rgba(0,0,0,.6);
   --chart-1:#E58A5F;--chart-2:#7DB0E0;--chart-3:#6FBF9F;--chart-4:#E3B04B;--chart-5:#B79AD0;--chart-6:#A29E94;
 }
+
+/* ---------- Rest tone (days off): calm dusk blue-violet, applied automatically when today is a day off ---------- */
+html[data-rest="on"]{
+  color-scheme:dark;
+  --bg:#151827;--surface:#1C2033;--surface-2:#242840;
+  --line:#323859;--line-strong:#8A91B8;
+  --text:#ECEEF8;--text-2:#CDD1E6;--text-3:#A9AFCB;
+  --accent:var(--acc-dark);--on-accent:#151827;--ring-3:#E0A94A;
+  --success:#6CC08B;--danger:#F0867A;--warning:#E3B04B;--info:#7DB0E0;
+  --inverse-bg:#ECEEF8;--inverse-text:#151827;
+  --scrim:rgba(5,6,16,.62);
+  --chart-1:#E58A5F;--chart-2:#7DB0E0;--chart-3:#6FBF9F;--chart-4:#E3B04B;--chart-5:#B79AD0;--chart-6:#A29E94;
+}
