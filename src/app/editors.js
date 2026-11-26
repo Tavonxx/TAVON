@@ -6,6 +6,7 @@ import { t, getLang } from './i18n.js';
 import { esc } from './format.js';
 import { dayLabel } from './format.js';
 import { openShortcutEditor } from './shortcuts.js';
+import { subsFor, addSub, removeSub, restoreSubs, lastSubId } from '../data/subcategories.js';
 import { dayInfo, recentTips, categoryRanking, todayKey } from '../data/stats.js';
 import { saveWorkDay, restoreWorkDay, saveWorkDays, restoreWorkDays, addItem, updateItem, removeItem, reinsertItem, deleteQuietly, readCategories, categoryLabel, DataError } from '../data/store.js';
 
@@ -77,18 +78,59 @@ export function openMoneyEditor({ item, type, date, items, demo, onDone }) {
   const pickDefault = (tp) => ordered(tp)[0] || '';
   if (!cat) cat = pickDefault(cur);
   const chipsHtml = () => ordered(cur).map((c) => `<button type="button" class="chip" data-v="${esc(c)}" aria-pressed="${c === cat}">${esc(categoryLabel(cats, cur, c, L))}</button>`).join('');
-  d.innerHTML = `<form class="stack" novalidate>${head(item ? t('ed.edit') : t('ed.new'))}
+  // sub-category (e.g. Transport > TTC): remembered per category; the last one used is pre-picked for new entries
+  let sub = item?.subcategoryId ? { id: item.subcategoryId, name: item.subcategoryName || '' } : null, manage = false, adding = false;
+  const subList = () => { const l = subsFor(localStorage, cur, cat); return sub && sub.name && !l.some((x) => x.id === sub.id) && cat === item?.category ? [...l, { id: sub.id, name: sub.name }] : l; };
+  const pickLast = () => { const l = subsFor(localStorage, cur, cat), id = lastSubId(items, cur, cat, l); const f = l.find((x) => x.id === id); sub = f ? { id: f.id, name: f.name } : null; };
+  if (!item) pickLast();
+  const subHtml = () => {
+    const l = subList();
+    const chips = l.map((x) => manage
+      ? `<span class="chip chip-edit"><span>${esc(x.name)}</span><button type="button" class="chip-x" data-rm="${esc(x.id)}" aria-label="${esc(t('ed.delete') + ': ' + x.name)}">${icon('close', 'i-sm')}</button></span>`
+      : `<button type="button" class="chip" data-s="${esc(x.id)}" aria-pressed="${sub?.id === x.id}">${esc(x.name)}</button>`).join('');
+    const add = adding
+      ? `<span class="sub-add"><input class="input" id="e-subname" maxlength="30" autocomplete="off" placeholder="${esc(t('ed.sub.ph'))}"><button type="button" class="btn btn-tonal" id="e-subok">${esc(t('ed.sub.ok'))}</button></span>`
+      : `<button type="button" class="chip chip-add" id="e-subnew">${icon('plus', 'i-sm')}${esc(t('ed.sub.add'))}</button>`;
+    return `<div class="between"><span class="label" id="l-sub">${esc(t('ed.sub'))}</span>${l.length ? `<button type="button" class="link-btn" id="e-submanage">${esc(manage ? t('ed.sub.done') : t('ed.sub.manage'))}</button>` : ''}</div><div class="chips" id="e-sublist" role="group" aria-labelledby="l-sub">${chips}${manage ? '' : add}</div>`;
+  };
+  d.innerHTML = `<form class="stack ed-money" novalidate>${head(item ? t('ed.edit') : t('ed.new'))}
     ${segHtml('e-type', t('ed.type'), [['expense', t('home.expense')], ['income', t('home.income')]], cur)}
-    <div class="field"><label for="e-amount">${esc(t('ed.amount'))}</label><div class="input-money"><span>$</span><input class="input" id="e-amount" inputmode="decimal" autocomplete="off" value="${item ? item.amount : ''}"></div></div>
-    <div class="field"><span class="label" id="l-cat">${esc(t('ed.cat'))}</span><div class="chips" id="e-cats" role="group" aria-labelledby="l-cat">${chipsHtml()}</div></div>
-    <div class="field"><label for="e-date">${esc(t('ed.date'))}</label><input class="input" id="e-date" type="date" value="${esc(item?.date || date || today)}"></div>
-    <details class="more"><summary>${icon('chevron', 'i-sm')}${esc(t('ed.more'))}</summary><div class="field" style="padding-top:var(--s-2)"><label for="e-note">${esc(t('ed.note'))}</label><input class="input" id="e-note" value="${esc(item?.note || '')}" maxlength="500"></div></details>
+    <div class="field ed-amount"><label for="e-amount">${esc(t('ed.amount'))}</label><div class="input-money"><span>$</span><input class="input" id="e-amount" inputmode="decimal" autocomplete="off" placeholder="0.00" value="${item ? item.amount : ''}"></div></div>
+    <div class="ed-group"><div class="field"><span class="label" id="l-cat">${esc(t('ed.cat'))}</span><div class="chips" id="e-cats" role="group" aria-labelledby="l-cat">${chipsHtml()}</div></div>
+    <div class="field" id="e-subbox">${subHtml()}</div></div>
+    <div class="ed-row"><div class="field"><label for="e-date">${esc(t('ed.date'))}</label><input class="input" id="e-date" type="date" value="${esc(item?.date || date || today)}"></div>
+    <div class="field"><label for="e-note">${esc(t('ed.note'))}</label><input class="input" id="e-note" value="${esc(item?.note || '')}" maxlength="500" placeholder="${esc(t('ed.note.ph'))}"></div></div>
     <button class="btn btn-primary btn-block" type="submit">${esc(t('ed.save'))}</button>
-    ${item ? `<button class="btn btn-secondary btn-block" type="button" id="e-dup">${esc(t('ed.dup'))}</button><button class="btn btn-secondary btn-block" type="button" id="e-sc">${esc(t('sc.fromentry'))}</button><button class="btn btn-danger btn-block" type="button" id="e-del">${esc(t('ed.delete'))}</button>` : `<button class="btn btn-secondary btn-block" type="button" id="e-more">${esc(t('ed.saveadd'))}</button>`}</form>`;
+    ${item ? `<div class="grid-2"><button class="btn btn-secondary" type="button" id="e-dup">${esc(t('ed.dup'))}</button><button class="btn btn-secondary" type="button" id="e-sc">${esc(t('sc.fromentry'))}</button></div><button class="btn btn-danger btn-block" type="button" id="e-del">${esc(t('ed.delete'))}</button>` : `<button class="btn btn-secondary btn-block" type="button" id="e-more">${esc(t('ed.saveadd'))}</button>`}</form>`;
+  const subBox = /** @type {HTMLElement} */ (d.querySelector('#e-subbox'));
+  const redrawSub = () => { subBox.innerHTML = subHtml(); if (adding) /** @type {HTMLElement|null} */ (subBox.querySelector('#e-subname'))?.focus(); };
+  const amountEl = /** @type {HTMLInputElement} */ (d.querySelector('#e-amount'));
+  const saveNewSub = () => {
+    const inp = /** @type {HTMLInputElement|null} */ (subBox.querySelector('#e-subname')); const name = inp?.value.trim() || '';
+    if (!name) { adding = false; redrawSub(); return; }
+    try { const r = addSub(localStorage, cur, cat, name); sub = { id: r.sub.id, name: r.sub.name }; adding = false; redrawSub(); } catch (e) { fail(e); }
+  };
+  subBox.addEventListener('click', (e) => {
+    const el = /** @type {HTMLElement} */ (e.target);
+    const rm = el.closest('[data-rm]'), pick = el.closest('[data-s]');
+    if (rm) {
+      const id = /** @type {HTMLElement} */ (rm).dataset.rm || '', gone = subList().find((x) => x.id === id);
+      try { const { prev } = removeSub(localStorage, cur, cat, id); if (sub?.id === id) sub = null; redrawSub(); toast(t('ed.sub.removed').replace('{n}', gone?.name || ''), { action: t('ap.undo'), ms: 5000, onAction: () => { try { restoreSubs(localStorage, prev); redrawSub(); toast(t('ed.restored')); } catch (x) { fail(x); } } }); } catch (x) { fail(x); }
+    } else if (pick) {
+      const id = /** @type {HTMLElement} */ (pick).dataset.s || '', f = subList().find((x) => x.id === id);
+      sub = sub?.id === id ? null : (f ? { id: f.id, name: f.name } : null);
+      const dflt = f && /** @type {any} */ (f).amount;
+      if (sub && dflt && !amountEl.value) amountEl.value = String(dflt);
+      redrawSub();
+    } else if (el.closest('#e-subnew')) { adding = true; redrawSub(); }
+    else if (el.closest('#e-subok')) saveNewSub();
+    else if (el.closest('#e-submanage')) { manage = !manage; adding = false; redrawSub(); }
+  });
+  subBox.addEventListener('keydown', (e) => { if (e.key === 'Enter' && /** @type {HTMLElement} */ (e.target).id === 'e-subname') { e.preventDefault(); saveNewSub(); } });
   const chipsEl = /** @type {HTMLElement} */ (d.querySelector('#e-cats'));
-  chipsEl.addEventListener('click', (e) => { const b = /** @type {HTMLElement} */ (e.target).closest('.chip'); if (b) { cat = /** @type {HTMLElement} */ (b).dataset.v || ''; chipsEl.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c === b))); } });
-  segmented(/** @type {HTMLElement} */ (d.querySelector('#e-type')), (v) => { cur = v; cat = pickDefault(cur); chipsEl.innerHTML = chipsHtml(); });
-  const fields = () => ({ type: cur, amount: val(d, 'e-amount').replace(',', '.'), date: val(d, 'e-date'), category: cat, note: val(d, 'e-note') });
+  chipsEl.addEventListener('click', (e) => { const b = /** @type {HTMLElement} */ (e.target).closest('.chip'); if (b) { cat = /** @type {HTMLElement} */ (b).dataset.v || ''; chipsEl.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(c === b))); adding = false; manage = false; pickLast(); redrawSub(); } });
+  segmented(/** @type {HTMLElement} */ (d.querySelector('#e-type')), (v) => { cur = v; cat = pickDefault(cur); chipsEl.innerHTML = chipsHtml(); adding = false; manage = false; pickLast(); redrawSub(); });
+  const fields = () => ({ type: cur, amount: val(d, 'e-amount').replace(',', '.'), date: val(d, 'e-date'), category: cat, note: val(d, 'e-note'), subcategoryId: sub?.id || '', subcategoryName: sub?.name || '' });
   const undoAdd = (added) => ({ action: t('ap.undo'), ms: 5000, onAction: () => { try { deleteQuietly(localStorage, added.id); onDone(); toast(t('ed.restored')); } catch (e) { fail(e); } } });
   /** @param {boolean} keepOpen */
   const submit = (keepOpen) => {
@@ -100,7 +142,7 @@ export function openMoneyEditor({ item, type, date, items, demo, onDone }) {
       } else {
         const added = addItem(localStorage, fields());
         flashNext(`[data-id="${added.id}"]`); onDone(); toast(t('ed.saved'), undoAdd(added));
-        if (keepOpen) { /** @type {HTMLInputElement} */ (d.querySelector('#e-amount')).value = ''; /** @type {HTMLInputElement} */ (d.querySelector('#e-note')).value = ''; /** @type {HTMLElement} */ (d.querySelector('#e-amount')).focus(); } else closeSheet(d);
+        if (keepOpen) { /** @type {HTMLInputElement} */ (d.querySelector('#e-amount')).value = ''; /** @type {HTMLInputElement} */ (d.querySelector('#e-note')).value = ''; amountEl.focus(); } else closeSheet(d);
       }
     } catch (e) { fail(e); }
   };

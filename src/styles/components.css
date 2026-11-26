@@ -278,3 +278,17 @@ html[data-motion="off"] .rest-art .lamp{animation:none}
 html[data-motion="off"] .rest-art .shade,html[data-motion="off"] .rest-art .cone,html[data-motion="off"] .rest-art .speck{animation:none}
 html[data-motion="off"] .rest-art .speck{opacity:0}
 ol.steps{list-style:decimal;margin:0;padding-inline-start:1.4em;display:grid;gap:var(--s-1)}
+
+/* Money editor: amount on top, category + sub-category grouped, date and note side by side */
+.ed-money .ed-amount .input{font-size:var(--fs-title2,1.6rem);font-weight:600;min-height:3.5rem}
+.ed-money .ed-group{display:flex;flex-direction:column;gap:var(--s-4);padding:var(--s-4);border-radius:var(--r-lg);background:var(--surface-2)}
+.ed-money .ed-group .chip{background:var(--surface)}
+.ed-money .ed-group .chip[aria-pressed="true"]{background:var(--accent-soft)}
+.ed-money .ed-row{display:grid;grid-template-columns:1fr 1fr;gap:var(--s-3)}
+.ed-money .ed-row .input{min-width:0;text-align:left}
+.ed-money .chip-add{border-style:dashed;color:var(--accent)}
+.ed-money .chip-edit{padding-right:var(--s-1);gap:var(--s-1)}
+.ed-money .chip-x{display:grid;place-items:center;min-width:2rem;min-height:2rem;color:var(--text-2);border-radius:var(--r-pill)}
+.ed-money .sub-add{display:flex;gap:var(--s-2);width:100%}
+.ed-money .sub-add .input{flex:1;min-width:0}
+.ed-money .link-btn{color:var(--accent);font-size:var(--fs-sub);font-weight:600;min-height:2.25rem;padding:0 var(--s-2)}

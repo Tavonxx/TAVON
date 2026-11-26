@@ -81,7 +81,7 @@ export function wireWork({ data, demo, rerender }) {
 const M = { view: 'list', month: '', day: '', q: '', type: '', category: '' };
 const cap = (n) => (n > 9 ? '9+' : String(n));
 /** @param {any} r @param {(tp:string,c:string)=>string} label @param {string} lang */
-const itemRow = (r, label, lang) => `<button class="row" data-id="${esc(r.id)}"><span class="row-icon">${icon(r.type === 'income' ? 'download' : 'upload')}</span><span class="row-main"><span class="row-title">${esc(label(r.type, r.category))}</span><br><span class="row-sub">${esc(dayLabel(r.date, lang))}${r.note ? ' · ' + esc(r.note) : ''}</span></span><span class="row-trail ${r.type === 'income' ? 'pos' : 'neg'}">${esc(money(r.type === 'income' ? r.amount : -r.amount, { sign: true }))}</span></button>`;
+const itemRow = (r, label, lang) => `<button class="row" data-id="${esc(r.id)}"><span class="row-icon">${icon(r.type === 'income' ? 'download' : 'upload')}</span><span class="row-main"><span class="row-title">${esc(label(r.type, r.category))}${r.subcategoryName ? ' · ' + esc(r.subcategoryName) : ''}</span><br><span class="row-sub">${esc(dayLabel(r.date, lang))}${r.note ? ' · ' + esc(r.note) : ''}</span></span><span class="row-trail ${r.type === 'income' ? 'pos' : 'neg'}">${esc(money(r.type === 'income' ? r.amount : -r.amount, { sign: true }))}</span></button>`;
 /** @param {{data:any, lang:string}} c */
 export function renderMoney({ data, lang }) {
   const today = todayKey(); if (!M.month) M.month = today.slice(0, 7);

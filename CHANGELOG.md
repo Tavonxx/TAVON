@@ -69,3 +69,5 @@
 - Launch screen: in-app logo splash (fades after first screen, min 1.3 s, safety 8 s), early theme set before first paint (no light flash in dark mode), iOS apple-touch-startup-image for 11 iPhone sizes x light/dark (assets/brand/splash). theme-color now matches --bg.
 - Launch colours: the day-off tone and the theme colour are painted from the first frame (device-only flag tavon-rest-last, excluded from backups); html background follows --bg. Fixes a dark brown band at the top of the launch screen.
 - Import: new "Paste backup text" option (old app export text or TAVON backup JSON); same check, same confirm screen, same auto-snapshot and undo.
+
+- Money editor: sub-categories per category (e.g. Transport > TTC), remembered in the old app's own key (`pee-finance-subcategories-v1`, same shape); last one used is pre-picked; add / manage / undo; entries show "Category · Sub"; editor layout redone (amount on top, category + sub grouped, date and note side by side).

@@ -28,6 +28,7 @@ const FILES = [
   "src/app/shortcuts.js",
   "src/data/backup.js",
   "src/data/categories.js",
+  "src/data/subcategories.js",
   "src/data/homelayout.js",
   "src/data/pay.js",
   "src/data/plans.js",
