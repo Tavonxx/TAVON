@@ -6,6 +6,8 @@ import { t, getLang } from './i18n.js';
 import { esc } from './format.js';
 import { dayLabel } from './format.js';
 import { openShortcutEditor } from './shortcuts.js';
+import { knownPlaces } from './pay-ui.js';
+import { normPlace } from '../data/pay.js';
 import { subsFor, addSub, removeSub, restoreSubs, lastSubId } from '../data/subcategories.js';
 import { dayInfo, recentTips, categoryRanking, todayKey } from '../data/stats.js';
 import { saveWorkDay, restoreWorkDay, saveWorkDays, restoreWorkDays, addItem, updateItem, removeItem, reinsertItem, deleteQuietly, readCategories, categoryLabel, DataError } from '../data/store.js';
@@ -42,19 +44,23 @@ export function openWorkEditor({ day, data, demo, focus, onDone }) {
   if (demo) { toast(t('ed.demo')); return; }
   const L = getLang(), d = sheet(), i = dayInfo(data.work, data.rules, day);
   const st = (focus === 'tips' && i.status === 'off') ? 'worked' : (['worked', 'planned', 'off', 'leave'].includes(i.status) ? i.status : 'worked'); // adding a tip implies the person worked
-  const tips = recentTips(data.work, 4);
+  const tips = recentTips(data.work, 4), places = knownPlaces(data);
   d.innerHTML = `<form class="stack" novalidate>${head(dayLabel(day, L))}
     ${segHtml('e-status', t('ed.status'), ['worked', 'planned', 'off', 'leave'].map((s) => [s, t('st.' + s)]), st)}
     <div class="grid-2"><div class="field"><label for="e-hours">${esc(t('ed.hours'))}</label><input class="input" id="e-hours" inputmode="decimal" value="${i.hours || ''}"></div>
     <div class="field"><label for="e-tips">${esc(t('ed.tips'))}</label><div class="input-money"><span>$</span><input class="input" id="e-tips" inputmode="decimal" value="${i.tips || ''}"></div></div></div>
     ${tips.length ? `<div class="field"><span class="t-footnote muted">${esc(t('ed.recent'))}</span><div class="chips" id="e-tipchips">${tips.map((v) => `<button type="button" class="chip" data-v="${v}">$${v}</button>`).join('')}</div></div>` : ''}
+    <div class="field"><label for="e-place">${esc(t('ed.place'))}</label><input class="input" id="e-place" value="${esc(i.place)}" maxlength="80" autocomplete="off">${places.length ? `<div class="chips" id="e-placechips" role="group" aria-label="${esc(t('ed.place'))}" style="margin-top:var(--s-2)">${places.map((p) => `<button type="button" class="chip" data-p="${esc(p)}" aria-pressed="${normPlace(p) === normPlace(i.place)}">${esc(p)}</button>`).join('')}</div>` : ''}</div>
     <details class="more"><summary>${icon('chevron', 'i-sm')}${esc(t('ed.more'))}</summary><div class="stack" style="padding-top:var(--s-2)">
-      <div class="field"><label for="e-place">${esc(t('ed.place'))}</label><input class="input" id="e-place" value="${esc(i.place)}" maxlength="80"></div>
       <div class="field"><label for="e-note">${esc(t('ed.note'))}</label><input class="input" id="e-note" value="${esc(i.note)}" maxlength="500"></div></div></details>
     <button class="btn btn-primary btn-block" type="submit">${esc(t('ed.save'))}</button></form>`;
   const segEl = /** @type {HTMLElement} */ (d.querySelector('#e-status'));
   segmented(segEl, (v) => { const h = /** @type {HTMLInputElement} */ (d.querySelector('#e-hours')); if ((v === 'off' || v === 'leave') && h.value === String(i.hours)) h.value = ''; else if (v === 'worked' && !h.value && i.hours) h.value = String(i.hours); });
   d.querySelectorAll('#e-tipchips .chip').forEach((c) => c.addEventListener('click', () => { /** @type {HTMLInputElement} */ (d.querySelector('#e-tips')).value = /** @type {HTMLElement} */ (c).dataset.v || ''; }));
+  const placeIn = /** @type {HTMLInputElement} */ (d.querySelector('#e-place')), placeChips = d.querySelector('#e-placechips');
+  const markPlace = () => placeChips?.querySelectorAll('.chip').forEach((c) => c.setAttribute('aria-pressed', String(normPlace(/** @type {HTMLElement} */ (c).dataset.p) === normPlace(placeIn.value))));
+  placeChips?.addEventListener('click', (e) => { const b = /** @type {HTMLElement} */ (e.target).closest('.chip'); if (b) { placeIn.value = /** @type {HTMLElement} */ (b).dataset.p || ''; markPlace(); } });
+  placeIn.addEventListener('input', markPlace);
   /** @type {HTMLFormElement} */ (d.querySelector('form')).addEventListener('submit', (ev) => {
     ev.preventDefault();
     const status = /** @type {HTMLElement} */ (d.querySelector('#e-status [aria-pressed="true"]'))?.dataset.value || st;
