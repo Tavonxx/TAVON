@@ -41,10 +41,10 @@ export function renderWork({ data, lang }) {
   if (W.view === 'period') {
     const s = periodSummary(data.work, data.rules, W.period), pend = pendingPastDays(data.work, data.rules, today, 400).filter((x) => x.day >= s.start && x.day <= s.end);
     const cur = payPeriod(today).start === s.start, pay = periodPay(s.days, data.payRates);
-    const payHtml = !pay.hasRates ? `<a class="btn btn-tonal btn-block" href="#/settings/pay">${icon('money', 'i-sm')}${esc(t('pay.setup'))}</a>` : `<div class="stack" style="gap:var(--s-2)">
+    const payHtml = !pay.hasRates ? `<a class="btn btn-tonal btn-block" href="#/settings/places">${icon('money', 'i-sm')}${esc(t('pay.setup'))}</a>` : `<div class="stack" style="gap:var(--s-2)">
       <div class="between"><span class="t-sub">${esc(t('pay.earned'))}</span><span class="t-title3 num">${esc(money(pay.earned))}</span></div>
       <div class="between"><span class="t-sub muted">${esc(t('pay.projected'))}</span><span class="t-sub muted num">${esc(money(pay.projected))}</span></div>
-      <p class="t-footnote muted">${esc(t('pay.est'))}</p>${pay.unrated.worked + pay.unrated.planned > 0 ? `<a class="t-footnote" href="#/settings/pay">${esc(t('pay.unrated').replace('{n}', hours(pay.unrated.worked + pay.unrated.planned)))}</a>` : ''}</div>`;
+      <p class="t-footnote muted">${esc(t('pay.est'))}</p>${pay.unrated.worked + pay.unrated.planned > 0 ? `<a class="t-footnote" href="#/settings/places">${esc(t('pay.unrated').replace('{n}', hours(pay.unrated.worked + pay.unrated.planned)))}</a>` : ''}</div>`;
     return `<div class="stack-lg">${tabs}${navBar(periodLabel(s.start, s.end, lang), 'wk')}
       <div class="card stack"><div class="grid-2"><div class="stat"><span class="t-label">${esc(t('home.worked'))}</span><span class="t-title2 num">${hours(s.workedHours)} <span class="t-sub muted">${esc(t('home.hours'))}</span></span><span class="t-footnote muted num">${esc(t('wk.unconf'))} ${hours(s.plannedHours)}</span></div>
       <div class="stat"><span class="t-label">${esc(t('wk.days'))}</span><span class="t-title2 num">${s.workedDays}</span><span class="t-footnote muted num">${esc(t('wk.unconf'))} ${s.plannedDays}</span></div></div>

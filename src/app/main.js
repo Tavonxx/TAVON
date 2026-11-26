@@ -101,7 +101,6 @@ const VIEWS = {
     ${row('search', t('settings.language'), getLang() === 'th' ? 'ไทย' : 'English', '#/settings/language')}
     ${row('work', t('settings.work'), t('settings.work.sub'), '#/settings/schedule')}
     ${row('shield', t('cache.title'), t('cache.sub'), '#/settings/cache')}
-    ${row('money', t('pay.title'), t('pay.sub'), '#/settings/pay')}
     ${row('tag', t('pl.title'), t('pl.sub'), '#/settings/places')}
     ${row('tag', t('cat.title'), t('cat.sub'), '#/settings/categories')}
     ${row('money', t('settings.money'), t('settings.money.sub'), '#/settings/recurring')}
