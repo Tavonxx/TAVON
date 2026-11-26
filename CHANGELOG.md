@@ -75,3 +75,4 @@
 - Settings > Workplaces: rename a workplace everywhere (days, schedule, pay rates) or merge two names; safety copy + undo.
 - Workplaces: each has its own page (name, first/last day, pay rates with start dates); workplaces you left are not offered in pick lists. New key tavon-place-info.
 - Settings: removed the separate Pay rates row (rates now live inside each workplace page; old link still opens). Pay links on Work page go to Workplaces.
+- Removed the orange focus ring that appeared around the page title after navigation (focus still moves there for screen readers).
