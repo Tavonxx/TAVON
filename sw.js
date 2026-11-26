@@ -29,6 +29,8 @@ const FILES = [
   "src/data/backup.js",
   "src/data/categories.js",
   "src/data/subcategories.js",
+  "src/data/places.js",
+  "src/app/places-ui.js",
   "src/data/homelayout.js",
   "src/data/pay.js",
   "src/data/plans.js",

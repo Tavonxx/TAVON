@@ -12,6 +12,7 @@ import { renderWork, wireWork, renderMoney, wireMoney, openWorkEditor, openMoney
 import { confirmDays } from './editors.js';
 import { wireShortcuts, renderShortcutManage, wireShortcutManage } from './shortcuts.js';
 import { renderPay, wirePay } from './pay-ui.js';
+import { renderPlaces, wirePlaces } from './places-ui.js';
 import { renderHomeLayout, wireHomeLayout } from './home-ui.js';
 import { dismissInstallHint } from './install.js';
 import { TAVON_KEYS } from '../data/schema.js';
@@ -101,6 +102,7 @@ const VIEWS = {
     ${row('work', t('settings.work'), t('settings.work.sub'), '#/settings/schedule')}
     ${row('shield', t('cache.title'), t('cache.sub'), '#/settings/cache')}
     ${row('money', t('pay.title'), t('pay.sub'), '#/settings/pay')}
+    ${row('tag', t('pl.title'), t('pl.sub'), '#/settings/places')}
     ${row('tag', t('cat.title'), t('cat.sub'), '#/settings/categories')}
     ${row('money', t('settings.money'), t('settings.money.sub'), '#/settings/recurring')}
     ${row('shield', t('settings.data'), t('settings.data.sub'), '#/settings/data')}</div>`,
@@ -120,6 +122,7 @@ const VIEWS = {
   'settings/categories': () => header(t('cat.title'), t('cat.sub'), 'settings') + renderCategories({ lang: getLang() }),
   'settings/data': () => header(t('bk.page'), '', 'settings') + renderBackupPage({ lang: getLang() }),
   'settings/cache': () => header(t('cache.title'), t('cache.sub'), 'settings') + renderCache({ lang: getLang() }),
+  'settings/places': () => header(t('pl.title'), t('pl.sub'), 'settings') + renderPlaces(),
   'settings/pay': () => header(t('pay.title'), t('pay.sub'), 'settings') + renderPay({ data: getData(), lang: getLang() }),
   'settings/language': () => header(t('settings.language'), '', 'settings') + `<div class="card stack">${seg('s-lang', 'settings.language', [['th', 'ไทย'], ['en', 'English']])}</div>`,
   notfound: () => header(t('nf.title'), '', null) + `<div class="card state"><div class="state-icon">${icon("alert", "i-lg")}</div><a class="btn btn-primary" href="#/">${esc(t('nf.btn'))}</a></div>`,
@@ -182,6 +185,7 @@ function wire(name) {
   if (name === 'settings/categories') wireCategories({ demo, rerender });
   if (name === 'settings/cache') wireCache({ lang: getLang() });
   if (name === 'settings/pay') wirePay({ data: getData(), demo, rerender });
+  if (name === 'settings/places') wirePlaces({ demo, rerender });
   if (name === 'settings/data') wireBackupPage({ demo, rerender });
   if (name === 'settings/home') wireHomeLayout({ demo, rerender });
   if (name === 'settings/shortcuts') wireShortcutManage({ data: getData(), demo, rerender });

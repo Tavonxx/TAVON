@@ -72,3 +72,4 @@
 
 - Money editor: sub-categories per category (e.g. Transport > TTC), remembered in the old app's own key (`pee-finance-subcategories-v1`, same shape); last one used is pre-picked; add / manage / undo; entries show "Category · Sub"; editor layout redone (amount on top, category + sub grouped, date and note side by side).
 - Work-day editor: workplace shows as tap-to-pick chips (from schedule, past days and rates); still free to type a new one.
+- Settings > Workplaces: rename a workplace everywhere (days, schedule, pay rates) or merge two names; safety copy + undo.
