@@ -68,3 +68,4 @@
 - Offline: service worker keeps a copy of the app files (network first, so no stale versions); Settings > App files to clear it. Data is never in it.
 - Launch screen: in-app logo splash (fades after first screen, min 1.3 s, safety 8 s), early theme set before first paint (no light flash in dark mode), iOS apple-touch-startup-image for 11 iPhone sizes x light/dark (assets/brand/splash). theme-color now matches --bg.
 - Launch colours: the day-off tone and the theme colour are painted from the first frame (device-only flag tavon-rest-last, excluded from backups); html background follows --bg. Fixes a dark brown band at the top of the launch screen.
+- Import: new "Paste backup text" option (old app export text or TAVON backup JSON); same check, same confirm screen, same auto-snapshot and undo.

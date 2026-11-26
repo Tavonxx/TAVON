@@ -25,6 +25,7 @@ export function renderBackupPage({ lang }) {
     <div class="card stack"><p class="t-sub">${esc(t('bk.where', lang))}</p><p class="t-headline" id="bk-when">${esc(when)}</p></div>
     <div class="stack"><button class="btn btn-primary btn-block" id="bk-now">${icon('shield', 'i-sm')}${esc(t('bk.now', lang))}</button><p class="t-footnote muted">${esc(t('bk.now.sub', lang))}</p><p class="t-footnote muted">${esc(t('bk.tip', lang))}</p></div>
     <div class="stack"><button class="btn btn-secondary btn-block" id="bk-import">${icon('download', 'i-sm')}${esc(t('bk.import', lang))}</button><p class="t-footnote muted">${esc(t('bk.import.sub', lang))}</p>
+    <button class="btn btn-ghost btn-block" id="bk-paste">${esc(t('bk.paste', lang))}</button>
     <input type="file" id="bk-file" accept=".json,application/json,text/plain" hidden></div></div>`;
 }
 
@@ -42,10 +43,8 @@ export function wireBackupPage({ demo, rerender }) {
 
   const input = /** @type {HTMLInputElement|null} */ (document.getElementById('bk-file'));
   document.getElementById('bk-import')?.addEventListener('click', () => { if (demo) { toast(t('ed.demo')); return; } input?.click(); });
-  input?.addEventListener('change', async () => {
-    const f = input.files?.[0]; input.value = ''; if (!f) return;
-    const parsed = parseBackup(await f.text());
-    if (!parsed.ok) { toast(t('bk.import.bad')); return; }
+  /** Show the "import this data?" sheet for an already-checked backup. @param {any} parsed */
+  const confirmImport = (parsed) => {
     const now = currentSummary(localStorage), inFile = parsed.summary;
     let d = /** @type {HTMLDialogElement|null} */ (document.getElementById('bk-sheet'));
     if (!d) { d = document.createElement('dialog'); d.id = 'bk-sheet'; d.className = 'sheet center'; d.setAttribute('aria-labelledby', 'bk-t'); document.body.append(d); }
@@ -62,5 +61,29 @@ export function wireBackupPage({ demo, rerender }) {
       } catch { toast(t('bk.import.fail')); }
     });
     openSheet(d);
+  };
+
+  input?.addEventListener('change', async () => {
+    const f = input.files?.[0]; input.value = ''; if (!f) return;
+    const parsed = parseBackup(await f.text());
+    if (!parsed.ok) { toast(t('bk.import.bad')); return; }
+    confirmImport(parsed);
+  });
+
+  // Paste the exported text instead of picking a file (the old app's "export backup" gives text).
+  document.getElementById('bk-paste')?.addEventListener('click', () => {
+    if (demo) { toast(t('ed.demo')); return; }
+    let p = /** @type {HTMLDialogElement|null} */ (document.getElementById('bk-paste-sheet'));
+    if (!p) { p = document.createElement('dialog'); p.id = 'bk-paste-sheet'; p.className = 'sheet center'; p.setAttribute('aria-labelledby', 'bkp-t'); document.body.append(p); }
+    p.innerHTML = `<div class="stack"><div class="between"><h2 class="t-title3" id="bkp-t">${esc(t('bk.paste'))}</h2><button class="btn btn-ghost btn-icon" data-close aria-label="${esc(t('close'))}">${icon('close')}</button></div>
+      <p class="t-sub">${esc(t('bk.paste.sub'))}</p>
+      <textarea id="bk-text" class="input" rows="6" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="${esc(t('bk.paste'))}"></textarea>
+      <button class="btn btn-primary btn-block" id="bk-check">${esc(t('bk.paste.check'))}</button></div>`;
+    p.querySelector('#bk-check')?.addEventListener('click', () => {
+      const parsed = parseBackup(/** @type {HTMLTextAreaElement} */ (p?.querySelector('#bk-text')).value.trim());
+      if (!parsed.ok) { toast(t('bk.import.bad')); return; }
+      closeSheet(/** @type {HTMLDialogElement} */ (p)); confirmImport(parsed);
+    });
+    openSheet(p);
   });
 }
