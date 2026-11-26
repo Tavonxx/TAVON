@@ -214,3 +214,9 @@ document.addEventListener('visibilitychange', () => { if (!document.hidden) sync
 addEventListener('hashchange', () => render());
 render(false);
 registerOffline();
+// Launch screen: fade the logo away once the first screen is on the page.
+{
+  const sp = document.getElementById('splash');
+  // Stays at least ~0.45 s from page start so the logo is seen as a moment, not a flicker.
+  if (sp) setTimeout(() => { sp.classList.add('done'); setTimeout(() => sp.remove(), 400); }, Math.max(0, 450 - performance.now()));
+}

@@ -39,7 +39,7 @@ export function apply(s, el = document.documentElement) {
   el.dataset.density = v.density;
   if (v.motion === 'off') el.dataset.motion = 'off'; else delete el.dataset.motion;
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', theme === 'dark' ? '#141414' : '#F4F1EA');
+  if (meta) meta.setAttribute('content', theme === 'dark' ? '#1C1511' : '#F6EFE6');
   return theme;
 }
 /** Keep "auto" in sync with the device. @param {() => any} getSettings */
@@ -56,5 +56,5 @@ export const REST_COLOR = '#151827';
 export function applyRest(on, el = document.documentElement) {
   if (on) el.dataset.rest = 'on'; else delete el.dataset.rest;
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', on ? REST_COLOR : el.dataset.theme === 'dark' ? '#141414' : '#F4F1EA');
+  if (meta) meta.setAttribute('content', on ? REST_COLOR : el.dataset.theme === 'dark' ? '#1C1511' : '#F6EFE6');
 }
