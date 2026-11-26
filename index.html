@@ -38,14 +38,16 @@
 <script>
 /* Set the theme before the first paint so a dark-mode user never sees a light flash (the full logic lives in src/ui/appearance.js). */
 try{var a=JSON.parse(localStorage.getItem('tavon-appearance')||'{}'),t=a.theme||'auto';if(t==='auto')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch(e){}
+/* Same for a day off: if the last launch today found a day off, paint the calm colours from the very first frame (and the status bar with them). */
+try{var r=JSON.parse(localStorage.getItem('tavon-rest-last')||'null'),d=new Intl.DateTimeFormat('en-CA',{timeZone:'America/Toronto'}).format(new Date());if(r&&r.on&&r.day===d){document.documentElement.dataset.rest='on';document.querySelector('meta[name="theme-color"]').setAttribute('content','#151827');}}catch(e){}
 </script>
 <style>
 #splash{position:fixed;inset:0;z-index:100;display:grid;place-items:center;background:var(--bg,#F6EFE6);transition:opacity .45s ease}
 #splash.done{opacity:0;pointer-events:none}
 #splash img{width:min(46vw,220px);height:auto;animation:splashin .8s ease both}
 #splash .logo-paper{display:none}
-html[data-theme="dark"] #splash .logo-ink{display:none}
-html[data-theme="dark"] #splash .logo-paper{display:block}
+html[data-theme="dark"] #splash .logo-ink,html[data-rest="on"] #splash .logo-ink{display:none}
+html[data-theme="dark"] #splash .logo-paper,html[data-rest="on"] #splash .logo-paper{display:block}
 @keyframes splashin{from{opacity:0;transform:scale(.94)}to{opacity:1;transform:none}}
 @media (prefers-reduced-motion:reduce){#splash,#splash img{transition:none;animation:none}}
 html[data-motion="off"] #splash,html[data-motion="off"] #splash img{transition:none;animation:none}

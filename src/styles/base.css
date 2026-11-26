@@ -1,6 +1,6 @@
 /* TAVON base: reset, typography, layout helpers. Uses only tokens.css values. */
 *,*::before,*::after{box-sizing:border-box}
-html{-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
+html{background:var(--bg);-webkit-text-size-adjust:100%;text-size-adjust:100%;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--bg);color:var(--text);font:400 var(--fs-body)/var(--lh-body) var(--font);
   -webkit-font-smoothing:antialiased;min-height:100dvh;overflow-wrap:anywhere;
   transition:background-color var(--dur-2) var(--ease-io),color var(--dur-2) var(--ease-io)}

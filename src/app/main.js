@@ -14,6 +14,7 @@ import { wireShortcuts, renderShortcutManage, wireShortcutManage } from './short
 import { renderPay, wirePay } from './pay-ui.js';
 import { renderHomeLayout, wireHomeLayout } from './home-ui.js';
 import { dismissInstallHint } from './install.js';
+import { TAVON_KEYS } from '../data/schema.js';
 import { renderCache, wireCache, registerOffline } from './cache-ui.js';
 import { renderBackupPage, wireBackupPage } from './backup-ui.js';
 import { renderSchedule, wireSchedule, renderRecurring, wireRecurring, openSwap, renderCategories, wireCategories } from './plans.js';
@@ -129,6 +130,7 @@ function syncRest() {
   const d = /** @type {any} */ (readDashboardData(localStorage)); let on = false;
   if (settings.rest === 'on' && !demo && ((Array.isArray(d.rules) && d.rules.length > 0) || hasData(d))) on = ['off', 'leave', 'swapped'].includes(dayInfo(d.work, d.rules, todayKey()).status);
   applyRest(on);
+  try { localStorage.setItem(TAVON_KEYS.restLast, JSON.stringify({ day: todayKey(), on })); } catch { /* private mode */ }
 }
 
 /** Wire up controls after a view renders. */
