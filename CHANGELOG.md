@@ -66,4 +66,4 @@
 - Lamp animation: glow breathes and flickers, shade brightens and dims, light cone pulses, tiny light specks float up. Off with reduced motion.
 - PWA: manifest + iOS full-screen meta; "Add to Home Screen" tip on Home (iPhone Safari only).
 - Offline: service worker keeps a copy of the app files (network first, so no stale versions); Settings > App files to clear it. Data is never in it.
-- Launch screen: in-app logo splash (fades after first screen, min 0.45 s, safety 8 s), early theme set before first paint (no light flash in dark mode), iOS apple-touch-startup-image for 11 iPhone sizes x light/dark (assets/brand/splash). theme-color now matches --bg.
+- Launch screen: in-app logo splash (fades after first screen, min 1.3 s, safety 8 s), early theme set before first paint (no light flash in dark mode), iOS apple-touch-startup-image for 11 iPhone sizes x light/dark (assets/brand/splash). theme-color now matches --bg.
