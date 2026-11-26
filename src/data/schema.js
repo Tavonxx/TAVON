@@ -27,6 +27,7 @@ export const TAVON_KEYS = Object.freeze({
   restLast: 'tavon-rest-last',        // device-only: was today a day off? lets the next launch paint the right colour at once
   snapshots: 'tavon-snapshots',       // automatic safety copies taken before imports/migrations
   payRates: 'tavon-pay-rates',        // hourly pay per workplace: [{id,place('' = every workplace),rate,from('' = since the start)}]
+  placeInfo: 'tavon-place-info',      // per workplace: { 'normalised name': { start:'YYYY-MM-DD'|'', end:'YYYY-MM-DD'|'' } } (start/last day there)
   homeLayout: 'tavon-home-layout',    // {order:[section ids], hidden:[section ids]}
   shortcuts: 'tavon-shortcuts',       // the person's one-tap entries: [{id,label,type,category,amount|null,count,sort}]
 });

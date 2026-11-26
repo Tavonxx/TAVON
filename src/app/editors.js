@@ -44,7 +44,7 @@ export function openWorkEditor({ day, data, demo, focus, onDone }) {
   if (demo) { toast(t('ed.demo')); return; }
   const L = getLang(), d = sheet(), i = dayInfo(data.work, data.rules, day);
   const st = (focus === 'tips' && i.status === 'off') ? 'worked' : (['worked', 'planned', 'off', 'leave'].includes(i.status) ? i.status : 'worked'); // adding a tip implies the person worked
-  const tips = recentTips(data.work, 4), places = knownPlaces(data);
+  const tips = recentTips(data.work, 4), places = knownPlaces(data, i.place);
   d.innerHTML = `<form class="stack" novalidate>${head(dayLabel(day, L))}
     ${segHtml('e-status', t('ed.status'), ['worked', 'planned', 'off', 'leave'].map((s) => [s, t('st.' + s)]), st)}
     <div class="grid-2"><div class="field"><label for="e-hours">${esc(t('ed.hours'))}</label><input class="input" id="e-hours" inputmode="decimal" value="${i.hours || ''}"></div>

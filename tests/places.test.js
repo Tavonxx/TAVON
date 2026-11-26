@@ -25,3 +25,15 @@ test('merge that would make two rates from the same date is refused, nothing cha
   const w = st.getItem('pee-work-tracker'); assert.throws(() => renamePlace(st, 'A', 'B'), (e) => e.code === 'duprate'); assert.equal(st.getItem('pee-work-tracker'), w);
 });
 test('empty or too long names refused', () => { assert.throws(() => renamePlace(base(), 'EAT BKK', ' ')); assert.throws(() => renamePlace(base(), 'EAT BKK', 'x'.repeat(41))); });
+import { readPlaceInfo, setPlaceInfo, infoFor, hasLeft } from '../src/data/places.js';
+test('start / last day saved per workplace, validated, undoable, follows a rename', () => {
+  const st = base();
+  const { prev } = setPlaceInfo(st, 'EAT BKK', { start: '2026-08-01', end: '2026-12-31' });
+  assert.deepEqual(infoFor(st, ' eat  bkk '), { start: '2026-08-01', end: '2026-12-31' });
+  assert.equal(hasLeft(st, 'EAT BKK', '2027-01-01'), true); assert.equal(hasLeft(st, 'EAT BKK', '2026-11-26'), false);
+  assert.throws(() => setPlaceInfo(st, 'EAT BKK', { start: '2026-09-01', end: '2026-08-01' }), (e) => e.code === 'dates');
+  assert.throws(() => setPlaceInfo(st, 'EAT BKK', { start: '2026-02-31' }));
+  renamePlace(st, 'EAT BKK', 'EAT BKK Steeles'); assert.equal(infoFor(st, 'EAT BKK Steeles').start, '2026-08-01'); assert.deepEqual(infoFor(st, 'EAT BKK'), { start: '', end: '' });
+  const st2 = base(); const r = setPlaceInfo(st2, 'X', { start: '2026-01-01' }); restorePlaces(st2, r.prev); assert.equal(st2.getItem('tavon-place-info'), null);
+  void prev; void readPlaceInfo;
+});

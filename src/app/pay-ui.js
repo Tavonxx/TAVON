@@ -5,6 +5,8 @@ import { openSheet, closeSheet, toast } from '../ui/ui.js';
 import { t, getLang } from './i18n.js';
 import { money, esc, shortDate } from './format.js';
 import { DataError } from '../data/store.js';
+import { hasLeft } from '../data/places.js';
+import { todayKey } from '../data/stats.js';
 import { addRate, updateRate, removeRate, restoreRate, normPlace } from '../data/pay.js';
 
 /** @returns {HTMLDialogElement} */
@@ -17,13 +19,14 @@ const head = (title) => `<div class="between"><h2 class="t-title3" id="pay-t">${
 const fail = (e) => toast(e instanceof DataError ? t('ed.error') + t('err.' + e.code) : t('ed.invalid'));
 const val = (root, id) => /** @type {HTMLInputElement} */ (root.querySelector('#' + id)).value;
 /** Workplace names the person already uses (schedule, day records, rates), each once. @param {any} data */
-export function knownPlaces(data) {
+export function knownPlaces(data, keep = '') {
   /** @type {Map<string,string>} */ const m = new Map();
   const add = (p) => { const s = String(p ?? '').trim().replace(/\s+/g, ' '); if (s && !m.has(normPlace(s))) m.set(normPlace(s), s); };
   (Array.isArray(data.rules) ? data.rules : []).forEach((r) => add(r?.place));
   Object.values(data.work && typeof data.work === 'object' ? data.work : {}).forEach((r) => add(/** @type {any} */ (r)?.place));
   (Array.isArray(data.payRates) ? data.payRates : []).forEach((r) => add(r?.place));
-  return [...m.values()];
+  const today = todayKey();
+  return [...m.values()].filter((p) => normPlace(p) === normPlace(keep) || !hasLeft(localStorage, p, today)); // a workplace you have left is no longer offered
 }
 
 /** @param {{data:any, lang:string}} c */
@@ -39,14 +42,14 @@ export function wirePay({ data, demo, rerender }) {
   document.getElementById('pay-new')?.addEventListener('click', () => openRateEditor(null, data, demo, rerender));
   document.querySelectorAll('[data-rate]').forEach((b) => b.addEventListener('click', () => openRateEditor((data.payRates || []).find((x) => x.id === /** @type {HTMLElement} */ (b).dataset.rate) || null, data, demo, rerender)));
 }
-/** @param {any} r @param {any} data @param {boolean} demo @param {()=>void} onDone */
-function openRateEditor(r, data, demo, onDone) {
+/** @param {any} r @param {any} data @param {boolean} demo @param {()=>void} onDone @param {string} [preset] workplace to pre-fill for a new rate */
+export function openRateEditor(r, data, demo, onDone, preset) {
   if (demo) { toast(t('ed.demo')); return; }
   const L = getLang(), d = sheet(), places = knownPlaces(data);
-  const isAll = r ? !r.place : !places.length; // first rate: default to "every workplace" (simplest)
+  const isAll = r ? !r.place : (preset ? false : !places.length); // first rate: default to "every workplace" (simplest)
   const chips = `<button type="button" class="chip" data-p="" aria-pressed="${isAll}">${esc(t('pay.all', L))}</button>${places.map((p) => `<button type="button" class="chip" data-p="${esc(p)}" aria-pressed="${!!r && normPlace(r.place) === normPlace(p)}">${esc(p)}</button>`).join('')}`;
   d.innerHTML = `<form class="stack" novalidate>${head(r ? t('pay.edit') : t('pay.add'))}
-    <div class="field"><label for="y-place">${esc(t('pay.place'))}</label><input class="input" id="y-place" maxlength="40" value="${esc(r ? r.place : '')}" placeholder="${esc(t('pay.all', L))}" autocomplete="off"><div class="chips" id="y-chips" role="group" aria-label="${esc(t('pay.place'))}" style="margin-top:var(--s-2)">${chips}</div><span class="t-footnote muted">${esc(t('pay.all.hint', L))}</span></div>
+    <div class="field"><label for="y-place">${esc(t('pay.place'))}</label><input class="input" id="y-place" maxlength="40" value="${esc(r ? r.place : (preset || ''))}" placeholder="${esc(t('pay.all', L))}" autocomplete="off"><div class="chips" id="y-chips" role="group" aria-label="${esc(t('pay.place'))}" style="margin-top:var(--s-2)">${chips}</div><span class="t-footnote muted">${esc(t('pay.all.hint', L))}</span></div>
     <div class="field"><label for="y-rate">${esc(t('pay.rate'))}</label><div class="input-money"><span>$</span><input class="input" id="y-rate" inputmode="decimal" value="${r?.rate ?? ''}" autocomplete="off"></div></div>
     <div class="field"><label for="y-from">${esc(t('pay.from'))}</label><input class="input" id="y-from" type="date" value="${esc(r?.from || '')}"></div>
     <button class="btn btn-primary btn-block" type="submit">${esc(t('ed.save'))}</button>
