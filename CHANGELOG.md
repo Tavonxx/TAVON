@@ -65,3 +65,4 @@
 - Night light is now a minimal cozy table lamp (cream shade, slim stand).
 - Lamp animation: glow breathes and flickers, shade brightens and dims, light cone pulses, tiny light specks float up. Off with reduced motion.
 - PWA: manifest + iOS full-screen meta; "Add to Home Screen" tip on Home (iPhone Safari only).
+- Offline: service worker keeps a copy of the app files (network first, so no stale versions); Settings > App files to clear it. Data is never in it.

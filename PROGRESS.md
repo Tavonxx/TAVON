@@ -79,3 +79,6 @@ Tap the Home dial -> "this week" sheet (7 days, status, place/time, hours, week 
 
 ## Phase 11 parts 1 and 3: DONE (awaiting approval)
 manifest.webmanifest + iOS meta (standalone, title, status bar "default"); "Add to Home Screen" tip card on Home (iPhone/iPad Safari only, hidden when opened from the icon, closable; flag tavon-install-hint is device-only and excluded from backups). Part 2 (service worker/offline) NOT built yet: separate step, riskiest (stale versions).
+
+## Phase 11 part 2: offline (service worker): DONE (awaiting approval)
+sw.js (network first with no-cache revalidation; saved copy used when offline or if the network takes >3.5 s; same-origin GET only; never touches data), FILES list guarded by tests/offline.test.js, Settings > App files with "Clear copy and reload", registered only in secure contexts. Verified over localhost with Chrome: 57 files cached, offline reload works with data intact, online always shows the newest file. Not verified on a real iPhone.

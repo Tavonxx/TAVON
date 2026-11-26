@@ -76,3 +76,6 @@
 
 ## D-Layout
 - Today card pinned on top (core of the app); only 4 lower sections customisable. Up/down buttons instead of drag (works with VoiceOver and on small screens).
+
+## D-Offline
+- Network-first, not cache-first: avoids showing an old version after a deploy (we had stale-page confusion before). Cost: slightly slower start on a bad connection (3.5 s cap). New files must be added to FILES in sw.js (test enforces).
